@@ -229,6 +229,54 @@ code {
 .tema__nombre { font-family: var(--xv-display); font-size: var(--xv-texto-lg); }
 .tema__descripcion { font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
 
+/* --- Tema: los temas y, al lado, el telefono con la vista previa --- */
+
+.tema-panel {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 2rem;
+}
+
+@media (max-width: 56rem) {
+    .tema-panel { grid-template-columns: 1fr; justify-items: center; }
+    .tema-panel__elegir { justify-self: stretch; }
+}
+
+/*
+ * La invitacion a tamano de telefono (390 x 844) y achicada: el iframe mide
+ * lo mismo que un telefono de verdad, asi se ve exactamente igual.
+ */
+.telefono {
+    --escala: 0.62;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.telefono__pantalla {
+    width: calc(390px * var(--escala));
+    height: calc(844px * var(--escala));
+    overflow: hidden;
+    border: 8px solid #1c2735;
+    border-radius: 28px;
+    background: #081427;
+    box-shadow: 0 18px 40px -18px rgba(28, 39, 53, 0.55);
+    box-sizing: content-box;
+}
+
+.telefono iframe {
+    width: 390px;
+    height: 844px;
+    border: 0;
+    transform: scale(var(--escala));
+    transform-origin: 0 0;
+}
+
+.telefono figcaption { margin: 0; font-size: var(--xv-texto-xs); }
+
 /* --- La barra de guardar, flotando abajo --- */
 
 .barra {

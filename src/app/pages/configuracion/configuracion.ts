@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@openng/optimus-ui/tabs';
 import { InputText } from '@openng/optimus-ui/inputtext';
@@ -16,6 +17,14 @@ import { TEMAS_DISPONIBLES } from '../../models/temas';
 import { CATEGORIAS, CIERRE_CONFIRMACIONES } from '../../models/tarjeta';
 import { ICONOS, MARCADORES, marcadores_de, SECCIONES, Seccion, es_opcional } from './etiquetas';
 import { ZONAS } from './fechas';
+import { URL_INVITACION } from '../../models/mensaje';
+
+/**
+ * La invitacion que se muestra en la vista previa. Trabajando en la compu
+ * es la del `bun run dev` del frontend; publicado, la de verdad. Tiene que
+ * ser una version con el modo ?vista-previa (frontend/src/App.svelte).
+ */
+const INVITACION = location.hostname === 'localhost' ? 'http://localhost:5173' : URL_INVITACION
 
 @Component({
   imports: [XVLayout, FormsModule, Tabs, TabList, Tab, TabPanels, TabPanel, InputText, Textarea, Select, MultiSelect, SelectButton, ToggleSwitch, Button],
@@ -23,7 +32,7 @@ import { ZONAS } from './fechas';
   styleUrl: './configuracion.scss',
   templateUrl: './configuracion.html',
 })
-export class ConfiguracionPage implements OnInit {
+export class ConfiguracionPage implements OnInit, OnDestroy {
 
   private readonly servicio = inject(FirebaseConfiguracionService)
 
@@ -38,6 +47,36 @@ export class ConfiguracionPage implements OnInit {
   protected readonly guardado      = signal(false)
   protected readonly error_guardar = signal<string | null>(null)
   protected readonly coordenadas_aviso = signal<string | null>(null)
+
+  // ------------------------------------------------ vista previa
+
+  private readonly previa = viewChild<ElementRef<HTMLIFrameElement>>('previa')
+  protected readonly url_vista_previa = inject(DomSanitizer).bypassSecurityTrustResourceUrl(`${INVITACION}/?vista-previa`)
+  protected readonly vista_previa_lista = signal(false)
+  private ultimo_enviado = ''
+  private reloj: ReturnType<typeof setInterval> | undefined
+
+  /** La invitacion avisa que ya puede recibir la configuracion. */
+  private readonly al_recibir = (e: MessageEvent) => {
+    if(e.origin !== new URL(INVITACION).origin || e.data?.tipo !== 'xv-vista-previa-lista') return
+    this.vista_previa_lista.set(true)
+    this.enviar_vista_previa(true)
+  }
+
+  /**
+   * Le manda a la vista previa lo que se esta editando, sin guardar. Solo
+   * si cambio algo desde la ultima vez, salvo que se pida forzar.
+   */
+  protected readonly enviar_vista_previa = (forzar = false) => {
+    const ventana = this.previa()?.nativeElement.contentWindow
+    if(!ventana || !this.b) return
+    let config: string
+    try { config = JSON.stringify(a_configuracion(this.b)) }
+    catch { return }   // una fecha a medio escribir: se manda cuando este completa
+    if(!forzar && config === this.ultimo_enviado) return
+    this.ultimo_enviado = config
+    ventana.postMessage({ tipo: 'xv-configuracion', configuracion: JSON.parse(config) }, new URL(INVITACION).origin)
+  }
 
   // Lo que la plantilla necesita a mano.
   protected readonly zonas      = ZONAS
@@ -63,6 +102,9 @@ export class ConfiguracionPage implements OnInit {
     .format(new Date(CIERRE_CONFIRMACIONES.getTime() - 1))
 
   async ngOnInit() {
+    window.addEventListener('message', this.al_recibir)
+    // Los campos cambian el borrador directo: se mira cada un rato si hay algo nuevo.
+    this.reloj = setInterval(() => this.enviar_vista_previa(), 300)
     try {
       this.cargar(await this.servicio.leer())
       this.estado.set('lista')
@@ -71,6 +113,11 @@ export class ConfiguracionPage implements OnInit {
       console.error('[configuracion]', e)
       this.estado.set('error')
     }
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('message', this.al_recibir)
+    clearInterval(this.reloj)
   }
 
   private readonly cargar = (c: Configuracion) => {
