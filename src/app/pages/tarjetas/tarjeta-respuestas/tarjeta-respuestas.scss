@@ -1,0 +1,110 @@
+.respuestas {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding-top: 0.25rem;
+}
+
+.respuestas__intro { line-height: var(--xv-interlinea-texto); }
+
+.respuestas__nota,
+.respuestas__error {
+    font-size: var(--xv-texto-xs);
+    line-height: var(--xv-interlinea-compacta);
+    color: var(--xv-texto-tenue);
+}
+
+.respuestas__error { color: #8f2c2c; }
+
+.lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.persona {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.75rem 0.9rem;
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+}
+
+.persona__alto {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.persona__nombre { font-weight: var(--xv-peso-medio); }
+
+.persona__nombre--vacio {
+    font-weight: var(--xv-peso-normal);
+    font-style: italic;
+    color: var(--xv-texto-tenue);
+}
+
+.persona__declarado { width: 100%; }
+
+.opciones {
+    display: inline-flex;
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--xv-superficie);
+}
+
+.opcion {
+    padding: 0.35rem 0.75rem;
+    background: none;
+    border: none;
+    border-inline-end: 1px solid var(--xv-borde);
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+.opcion:last-child { border-inline-end: none; }
+.opcion:hover { background: var(--xv-fondo); }
+
+.opcion--si.opcion--activa {
+    background: #e6f4ee;
+    color: #14684a;
+    font-weight: var(--xv-peso-medio);
+}
+
+.opcion--no.opcion--activa {
+    background: #fbeeee;
+    color: #8f3131;
+    font-weight: var(--xv-peso-medio);
+}
+
+.opcion--sin.opcion--activa {
+    background: var(--xv-superficie-2, #eef2f7);
+    color: var(--xv-texto);
+    font-weight: var(--xv-peso-medio);
+}
+
+.acciones {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--xv-borde);
+}
+
+.acciones__conteo {
+    margin-inline-end: auto;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}

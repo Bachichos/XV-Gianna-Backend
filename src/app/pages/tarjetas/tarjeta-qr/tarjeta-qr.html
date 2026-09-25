@@ -1,0 +1,46 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Entrada"
+  styleClass="xv-dialogo xv-dialogo--angosto"
+  (onShow)="dibujar()">
+
+  @if (tarjeta(); as t) {
+    <div class="qr">
+
+      <p class="qr__nombre">{{ t.nombre_mostrar }}</p>
+      <p class="qr__detalle">
+        <span class="xv-numero">{{ confirmados() }}</span> de
+        <span class="xv-numero">{{ cupos() }}</span> confirmados
+      </p>
+
+      @if (imagen(); as src) {
+        <img class="qr__imagen" [src]="src" width="256" height="256"
+             [alt]="'Código QR de la invitación de ' + t.nombre_mostrar">
+      } @else if (error()) {
+        <p class="qr__error" role="alert">{{ error() }}</p>
+      } @else {
+        <div class="qr__hueco" aria-hidden="true"></div>
+      }
+
+      <p class="qr__link">{{ link() }}</p>
+
+      <p class="qr__nota">
+        Es el mismo link de la invitación. Los invitados lo van a ver en su propia
+        página; esto sirve para mostrárselo o mandárselo a quien no pueda abrirla.
+      </p>
+
+      <div class="acciones">
+        <p-button [label]="copiado() ? 'Copiado' : 'Copiar link'"
+                  [icon]="copiado() ? 'pi pi-check' : 'pi pi-copy'"
+                  severity="secondary" [text]="true"
+                  (onClick)="copiar()" />
+        <p-button label="Cerrar" (onClick)="cerrar()" />
+      </div>
+
+    </div>
+  }
+
+</p-dialog>

@@ -1,0 +1,315 @@
+/* Los colores de estado son los mismos de la lista de tarjetas. */
+:host {
+    --confirmado:       #2f8a62;
+    --confirmado-suave: #e6f4ee;
+    --rechazado:        #b75757;
+    --rechazado-suave:  #fbeeee;
+    --pendiente:        #c89a3d;
+    --pendiente-suave:  #fdf4e3;
+}
+
+/* --- Cabecera --- */
+
+.cabecera { margin-bottom: 1.75rem; }
+
+.cabecera__resumen {
+    margin-top: 0.5rem;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+}
+
+.cargando { color: var(--xv-texto-tenue); }
+
+.aviso--error {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e4b9b9;
+    border-radius: 3px;
+    background: #fbf1f1;
+    color: #8f2c2c;
+}
+
+/* --- Los dos grupos: invitados (personas) y tarjetas (invitaciones) --- */
+
+/* Angular quita el espacio entre el icono y el texto: va como margen. */
+.cabecera__resumen .pi {
+    margin-right: 0.4rem;
+    font-size: var(--xv-texto-sm);
+    color: var(--p-primary-color, #5279a2);
+}
+
+.cabecera__segundo { margin-left: 1.1rem; }
+
+.grupo {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--p-primary-200, #c8d8e8);
+    font-size: var(--xv-display-sm);
+}
+
+.grupo:first-of-type { margin-top: 0; }
+
+.grupo .pi {
+    font-size: 1.3rem;
+    color: var(--p-primary-color, #5279a2);
+}
+
+.grupo__que {
+    font-family: var(--xv-ui);
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    letter-spacing: var(--xv-versalita-espaciado);
+    text-transform: uppercase;
+    color: var(--xv-texto-tenue);
+}
+
+/* Las tarjetas, en gris plata: se distinguen de los invitados de un vistazo. */
+.grupo--tarjetas { border-bottom-color: var(--xv-plata); }
+.grupo--tarjetas .pi { color: var(--xv-texto-tenue); }
+
+.kpi .xv-versalita .pi {
+    font-size: 0.8rem;
+    margin-right: 0.45rem;
+}
+
+.kpi--tarjeta {
+    background: var(--xv-plata-brillo);
+    border-top-color: var(--xv-borde-fuerte);
+}
+
+.titulo__icono {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+    color: #1d6b4a;
+}
+
+.vacio {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}
+
+/* --- Los numeros grandes --- */
+
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.2rem 1.3rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-top: 3px solid var(--xv-plata);
+    border-radius: 3px;
+}
+
+.kpi--confirmado { border-top-color: var(--confirmado); }
+.kpi--rechazado  { border-top-color: var(--rechazado); }
+.kpi--pendiente  { border-top-color: var(--pendiente); }
+
+.kpi__pie {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+/* --- Paneles --- */
+
+.panel {
+    margin-bottom: 1.5rem;
+    padding: 1.4rem 1.5rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+}
+
+.panel h2 {
+    font-size: var(--xv-texto-xl);
+    margin-bottom: 1rem;
+}
+
+.panel__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.panel__cabecera h2 { margin-bottom: 0; }
+
+.panel__dato {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}
+
+.panel__dato strong { color: var(--xv-texto); }
+
+/* --- Barras: la pista es lo que falta responder --- */
+
+.barra {
+    display: flex;
+    height: 0.85rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--pendiente-suave);
+    box-shadow: inset 0 0 0 1px rgba(200, 154, 61, 0.25);
+}
+
+.barra--fina { height: 0.5rem; }
+
+.barra__tramo {
+    height: 100%;
+    transition: width 500ms ease;
+}
+
+.barra__tramo--confirmado { background: var(--confirmado); }
+.barra__tramo--rechazado  { background: var(--rechazado); }
+
+.leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    margin-top: 0.8rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+.leyenda__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.punto {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+}
+
+.punto--confirmado { background: var(--confirmado); }
+.punto--rechazado  { background: var(--rechazado); }
+.punto--pendiente  { background: var(--pendiente-suave); box-shadow: inset 0 0 0 1px var(--pendiente); }
+
+.cierre {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--xv-borde);
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}
+
+.cierre strong { color: var(--xv-texto); }
+
+/* --- Por categoria --- */
+
+.categorias {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.categoria__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.2rem 1rem;
+    margin-bottom: 0.45rem;
+}
+
+.categoria__nombre { font-weight: var(--xv-peso-medio); }
+
+.categoria__numeros {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+/* --- Quienes faltan --- */
+
+.faltan { font-size: var(--xv-texto-md); }
+
+.faltan__detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin: 0.6rem 0 0;
+    padding-left: 1.2rem;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}
+
+.faltan__detalle strong { color: var(--xv-texto); }
+
+
+/* --- Para recordarles --- */
+
+.pendientes {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pendiente {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--xv-borde);
+}
+
+.pendiente:last-child { border-bottom: 0; }
+
+.pendiente__datos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.pendiente__nombre { font-weight: var(--xv-peso-medio); }
+
+.pendiente__detalle {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+/* El verde de WhatsApp, en version suave, como el estado confirmado. */
+.recordar {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid #a9d8c2;
+    border-radius: 3px;
+    background: var(--confirmado-suave);
+    color: #1d6b4a;
+    font-size: var(--xv-texto-sm);
+    font-weight: var(--xv-peso-medio);
+    text-decoration: none;
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.recordar:hover {
+    background: #d5ecdf;
+    border-color: #7fc2a3;
+}
+

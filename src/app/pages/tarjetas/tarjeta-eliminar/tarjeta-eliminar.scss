@@ -1,0 +1,54 @@
+.eliminar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding-top: 0.25rem;
+}
+
+.eliminar__pregunta {
+    line-height: var(--xv-interlinea-texto);
+}
+
+.eliminar__nota {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}
+
+.eliminar__error {
+    font-size: var(--xv-texto-sm);
+    color: #8f2c2c;
+}
+
+.alerta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.9rem 1rem;
+    border-radius: 3px;
+    border: 1px solid #edd6a8;
+    background: #fdf4e3;
+    color: #6f4d10;
+    font-size: var(--xv-texto-sm);
+    line-height: var(--xv-interlinea-compacta);
+}
+
+.alerta--grave {
+    border-color: #e4bdbd;
+    background: #fbeeee;
+    color: #7d2b2b;
+}
+
+.alerta__titulo {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: var(--xv-peso-fuerte);
+}
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--xv-borde);
+}

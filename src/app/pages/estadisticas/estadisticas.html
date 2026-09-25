@@ -1,0 +1,200 @@
+<xv-layout>
+    <header class="cabecera">
+        <h1>Estadísticas</h1>
+        <p class="cabecera__resumen">
+            <i class="pi pi-user" aria-hidden="true"></i> <strong>Invitados</strong> son personas.
+            <i class="pi pi-envelope cabecera__segundo" aria-hidden="true"></i> <strong>Tarjetas</strong> son las invitaciones que se mandan: una por familia o grupo.
+        </p>
+    </header>
+
+    @if (error(); as mensaje) {
+    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+    }
+
+    @if (cargando()) {
+    <p class="cargando">Cargando&hellip;</p>
+    } @else {
+
+    <!-- ============================== INVITADOS: personas -->
+    <h2 class="grupo">
+        <i class="pi pi-users" aria-hidden="true"></i> Invitados
+        <span class="grupo__que">personas</span>
+    </h2>
+
+    <section class="kpis" aria-label="Resumen de invitados">
+        <div class="kpi">
+            <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> Invitados</span>
+            <span class="xv-cifra">{{ personas().total }}</span>
+        </div>
+        <div class="kpi kpi--confirmado">
+            <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> Confirmados</span>
+            <span class="xv-cifra">{{ personas().confirmados }}</span>
+        </div>
+        <div class="kpi kpi--rechazado">
+            <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> No vienen</span>
+            <span class="xv-cifra">{{ personas().rechazados }}</span>
+        </div>
+        <div class="kpi kpi--pendiente">
+            <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> Sin responder</span>
+            <span class="xv-cifra">{{ personas().pendientes }}</span>
+        </div>
+        <div class="kpi">
+            <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> Ya ingresaron</span>
+            <span class="xv-cifra">{{ ingresaron() }}</span>
+            <span class="kpi__pie">de {{ personas().confirmados }} confirmados</span>
+        </div>
+    </section>
+
+    <!-- El avance de las respuestas, hacia el cierre. -->
+    <section class="panel">
+        <div class="panel__cabecera">
+            <h2>Respuestas</h2>
+            <p class="panel__dato">
+                <span class="xv-numero">{{ avance().respondieron }}</span> de
+                <span class="xv-numero">{{ personas().total }}</span> personas
+                &middot; <strong class="xv-numero">{{ avance().porcentaje }}%</strong>
+            </p>
+        </div>
+
+        <div class="barra" role="img"
+             [attr.aria-label]="avance().porcentaje + '% de las personas ya respondió'">
+            <span class="barra__tramo barra__tramo--confirmado" [style.width.%]="avance().confirmados"></span>
+            <span class="barra__tramo barra__tramo--rechazado"  [style.width.%]="avance().rechazados"></span>
+        </div>
+
+        <p class="leyenda">
+            <span class="leyenda__item"><i class="punto punto--confirmado"></i> Confirmados</span>
+            <span class="leyenda__item"><i class="punto punto--rechazado"></i> No vienen</span>
+            <span class="leyenda__item"><i class="punto punto--pendiente"></i> Sin responder</span>
+        </p>
+
+        <p class="cierre">
+            @if (dias_al_cierre > 1) {
+                <i class="pi pi-calendar" aria-hidden="true"></i>
+                <span>Faltan <strong class="xv-numero">{{ dias_al_cierre }}</strong> días para el cierre
+                ({{ cierre | date:"d 'de' MMMM":'UTC' }}).</span>
+            } @else if (dias_al_cierre === 1) {
+                <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                <span>Las confirmaciones cierran mañana.</span>
+            } @else {
+                <i class="pi pi-lock" aria-hidden="true"></i>
+                <span>Las confirmaciones ya cerraron.</span>
+            }
+        </p>
+    </section>
+
+    <!-- Por categoria. -->
+    <section class="panel">
+        <h2>Por categoría</h2>
+
+        <ul class="categorias">
+            @for (c of por_categoria(); track c.nombre) {
+            <li class="categoria">
+                <div class="categoria__cabecera">
+                    <span class="categoria__nombre">{{ c.nombre }}</span>
+                    <span class="categoria__numeros">
+                        <span class="xv-numero">{{ c.confirmados }}</span> confirmados &middot;
+                        <span class="xv-numero">{{ c.pendientes }}</span> sin responder &middot;
+                        <span class="xv-numero">{{ c.total }}</span> en total
+                    </span>
+                </div>
+                <div class="barra barra--fina">
+                    <span class="barra__tramo barra__tramo--confirmado" [style.width.%]="c.barra.confirmados"></span>
+                    <span class="barra__tramo barra__tramo--rechazado"  [style.width.%]="c.barra.rechazados"></span>
+                </div>
+            </li>
+            }
+        </ul>
+    </section>
+
+    <!-- Quienes faltan: en personas, como todo lo demas. -->
+    <section class="panel">
+        <h2>¿Quiénes faltan responder?</h2>
+
+        <p class="faltan">
+            <strong class="xv-numero">{{ faltan().respondieron }}</strong>
+            {{ faltan().respondieron === 1 ? 'persona ya respondió' : 'personas ya respondieron' }}
+            &middot;
+            <strong class="xv-numero">{{ faltan().sin_responder }}</strong> todavía no.
+        </p>
+
+        @if (faltan().sin_responder > 0) {
+        <ul class="faltan__detalle">
+            <li>
+                <strong class="xv-numero">{{ faltan().con_invitacion }}</strong>
+                {{ faltan().con_invitacion === 1 ? 'ya tiene la invitación' : 'ya tienen la invitación' }}{{ faltan().con_invitacion > 0 ? ': se les puede mandar un recordatorio.' : '.' }}
+            </li>
+            <li>
+                <strong class="xv-numero">{{ faltan().sin_invitacion }}</strong>
+                {{ faltan().sin_invitacion === 1 ? 'todavía no la recibió' : 'todavía no la recibieron' }}{{ faltan().sin_invitacion > 0 ? ': se envían desde Tarjetas.' : '.' }}
+            </li>
+        </ul>
+        }
+
+    </section>
+
+
+    <!-- ============================== TARJETAS: las invitaciones que se mandan -->
+    <h2 class="grupo grupo--tarjetas">
+        <i class="pi pi-envelope" aria-hidden="true"></i> Tarjetas
+        <span class="grupo__que">invitaciones</span>
+    </h2>
+
+    <section class="kpis" aria-label="Resumen de tarjetas">
+        <div class="kpi kpi--tarjeta">
+            <span class="xv-versalita"><i class="pi pi-envelope" aria-hidden="true"></i> Tarjetas</span>
+            <span class="xv-cifra">{{ tarjetas().total }}</span>
+        </div>
+        <div class="kpi kpi--tarjeta">
+            <span class="xv-versalita"><i class="pi pi-envelope" aria-hidden="true"></i> Enviadas</span>
+            <span class="xv-cifra">{{ tarjetas().enviadas }}</span>
+        </div>
+        <div class="kpi kpi--tarjeta">
+            <span class="xv-versalita"><i class="pi pi-envelope" aria-hidden="true"></i> Sin enviar</span>
+            <span class="xv-cifra">{{ tarjetas().sin_enviar }}</span>
+        </div>
+        <div class="kpi kpi--tarjeta">
+            <span class="xv-versalita"><i class="pi pi-envelope" aria-hidden="true"></i> Con respuesta</span>
+            <span class="xv-cifra">{{ tarjetas().respondidas }}</span>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel__cabecera">
+            <h2><i class="pi pi-whatsapp titulo__icono" aria-hidden="true"></i> Para recordarles</h2>
+            <p class="panel__dato">
+                <span class="xv-numero">{{ sin_responder().length }}</span>
+                {{ sin_responder().length === 1 ? 'tarjeta enviada' : 'tarjetas enviadas' }} con alguien sin responder
+            </p>
+        </div>
+
+        @if (sin_responder().length === 0) {
+        <p class="vacio">No hay a quién recordarle: acá aparecen las tarjetas enviadas a las que todavía les falta responder.</p>
+        } @else {
+        <ul class="pendientes">
+            @for (f of sin_responder(); track f.tarjeta.id) {
+            <li class="pendiente">
+                <div class="pendiente__datos">
+                    <span class="pendiente__nombre">{{ f.tarjeta.nombre_mostrar }}</span>
+                    <span class="pendiente__detalle">
+                        {{ f.tarjeta.categoria }} &middot; enviada el {{ f.tarjeta.fecha_envio | date:'d MMM' }}
+                        &middot;
+                        @if (f.parcial) {
+                            faltan {{ f.pendientes }} de {{ f.total }}
+                        } @else {
+                            {{ f.total === 1 ? '1 persona' : f.total + ' personas' }}
+                        }
+                    </span>
+                </div>
+                <a class="recordar" [href]="f.link" target="_blank" rel="noopener noreferrer"
+                   [attr.aria-label]="'Recordarle por WhatsApp a ' + f.tarjeta.nombre_mostrar">
+                    <i class="pi pi-whatsapp" aria-hidden="true"></i> Recordar
+                </a>
+            </li>
+            }
+        </ul>
+        }
+    </section>
+
+    }
+</xv-layout>

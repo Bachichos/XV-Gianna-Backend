@@ -1,0 +1,28 @@
+<main class="login">
+  <section class="login__tarjeta">
+
+    <span class="login__monograma" aria-hidden="true">XV</span>
+
+    <p class="xv-versalita login__antetitulo">Backoffice</p>
+    <h1 class="login__titulo">Los quince de Gianna</h1>
+    <p class="login__ayuda">Entre con su cuenta de Google para gestionar la lista de invitados.</p>
+
+    <p-button
+      label="Entrar con Google"
+      icon="pi pi-google"
+      styleClass="login__boton"
+      size="large"
+      [fluid]="true"
+      [loading]="cargando()"
+      (onClick)="entrar()" />
+
+    @if (error()) {
+      <div class="login__error" role="alert">
+        <p-message severity="error">{{ error() }}</p-message>
+      </div>
+    }
+
+    <p class="xv-versalita login__pie">3 de abril de 2027</p>
+
+  </section>
+</main>

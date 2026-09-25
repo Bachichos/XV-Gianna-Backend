@@ -1,0 +1,505 @@
+/* --- Cabecera --- */
+
+.cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.cabecera__resumen {
+    margin-top: 0.5rem;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+}
+
+/* El dato que de verdad se le da al salon: personas, no tarjetas. */
+.cabecera__personas {
+    margin-top: 0.2rem;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto);
+}
+
+.cabecera__personas .xv-numero {
+    font-weight: var(--xv-peso-fuerte);
+}
+
+/* --- Filtros --- */
+
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.filtros__buscador {
+    flex: 1 1 18rem;
+    max-width: 26rem;
+}
+
+.filtros__buscador input {
+    width: 100%;
+}
+
+.filtros__categoria {
+    flex: 0 1 15rem;
+}
+
+/* Cuadrados al final de la fila. Sin alto propio: se estiran al de los selects. */
+.filtros__accion {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.filtros__accion:hover {
+    border-color: var(--xv-borde-fuerte);
+    color: var(--p-primary-color, #5279a2);
+}
+
+/* El de ordenar siempre esta en algun sentido; este se enciende y se apaga. */
+.filtros__accion--activo,
+.filtros__accion--activo:hover {
+    background: var(--p-primary-50, #f3f6fa);
+    border-color: var(--p-primary-color, #5279a2);
+    color: var(--p-primary-700, #374e6b);
+}
+
+.conteo {
+    margin-bottom: 0.75rem;
+}
+
+/* --- Avisos y vacios --- */
+
+.aviso {
+    padding: 1rem 0;
+    color: var(--xv-texto-tenue);
+}
+
+.aviso--error {
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #e4b9b9;
+    border-radius: 3px;
+    background: #fbf1f1;
+    color: #8f2c2c;
+}
+
+.vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+}
+
+.vacio__icono {
+    font-size: 2rem;
+    color: var(--xv-borde-fuerte);
+}
+
+.vacio__limpiar {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 3px;
+    color: var(--xv-texto);
+    cursor: pointer;
+}
+
+.vacio__limpiar:hover { background: var(--xv-fondo); }
+
+/* --- Distintivos comunes a tabla y fichas --- */
+
+.chip {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde);
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-xs);
+    white-space: nowrap;
+}
+
+.estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.18rem 0.6rem;
+    border-radius: 999px;
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    white-space: nowrap;
+}
+
+.estado .pi { font-size: 0.85rem; }
+
+.estado--pendiente {
+    background: #fdf4e3;
+    border: 1px solid #edd6a8;
+    color: #8a6115;
+}
+
+.estado--confirmada {
+    background: #e6f4ee;
+    border: 1px solid #a9d8c2;
+    color: #1d6b4a;
+}
+
+.estado--rechazada {
+    background: #fbeeee;
+    border: 1px solid #e4bdbd;
+    color: #8f3131;
+}
+
+/* inline-grid, no grid: grid es de nivel bloque y los apila en columna. */
+.accion {
+    display: inline-grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    cursor: pointer;
+}
+
+.accion:hover {
+    border-color: var(--xv-borde);
+    background: var(--xv-superficie);
+    color: var(--p-primary-color, #5279a2);
+}
+
+.acciones-fila {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.accion:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.accion:disabled:hover {
+    border-color: transparent;
+    background: none;
+    color: var(--xv-texto-tenue);
+}
+
+.accion--peligro:not(:disabled):hover {
+    border-color: #e4bdbd;
+    background: #fbeeee;
+    color: #8f3131;
+}
+
+.visualmente-oculto {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* --- Tabla (escritorio) --- */
+
+.tabla-marco {
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    overflow-x: auto;
+}
+
+.tabla {
+    width: 100%;
+    min-width: 46rem;
+    border-collapse: collapse;
+}
+
+.tabla th {
+    padding: 0.9rem 1rem;
+    text-align: start;
+    border-bottom: 1px solid var(--xv-borde);
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    letter-spacing: var(--xv-versalita-espaciado);
+    text-transform: uppercase;
+    color: var(--xv-texto-tenue);
+    white-space: nowrap;
+}
+
+.tabla td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--xv-borde);
+    font-size: var(--xv-texto-sm);
+    line-height: var(--xv-interlinea-compacta);
+    vertical-align: top;
+}
+
+.tabla tbody tr:last-child td { border-bottom: none; }
+.tabla tbody tr:hover { background: var(--xv-fondo); }
+
+.nombre-con-qr {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Mas discreto que las acciones: pertenece a la invitacion, no a la fila. */
+.accion--qr {
+    width: 1.9rem;
+    height: 1.9rem;
+    color: var(--xv-borde-fuerte);
+}
+
+.accion--qr:hover {
+    color: var(--p-primary-color, #5279a2);
+}
+
+.tabla__nombre {
+    font-weight: var(--xv-peso-medio);
+    color: var(--xv-texto);
+    white-space: nowrap;
+    padding-top: 0.9rem;
+}
+
+.tabla__integrantes {
+    min-width: 14rem;
+}
+
+.tabla__acciones {
+    width: 1%;
+    white-space: nowrap;
+    text-align: end;
+}
+
+/* Categoria y telefono bajo el nombre: solo cuando pierden su columna. */
+.tabla__meta { display: none; }
+
+/* --- Tabla apretada --- */
+/* Las siete columnas piden ~1240px, o sea una ventana de ~1620 con el menu
+   abierto. Entre el umbral de las fichas y ese ancho, la tabla se muestra
+   plegando las dos columnas mas angostas dentro de la primera. */
+
+@media (min-width: 82.5625rem) and (max-width: 102.5rem) {
+
+    .tabla {
+        /* El piso de 46rem ya no hace falta: hay dos columnas menos. */
+        min-width: 0;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding-inline: 0.55rem;
+    }
+
+    .tabla__categoria,
+    .tabla__telefono {
+        display: none;
+    }
+
+    .tabla__nombre {
+        /* Un nombre largo prefiere cortarse antes que empujar la tabla. */
+        white-space: normal;
+    }
+
+    .tabla__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 0.3rem;
+        margin-inline-start: 2.4rem;   /* alineado con el nombre, no con el QR */
+        font-size: var(--xv-texto-xs);
+        font-weight: var(--xv-peso-normal);
+        color: var(--xv-texto-tenue);
+    }
+
+    .tabla__integrantes {
+        min-width: 11rem;
+    }
+
+    /* Que "sin responder" pueda usar dos renglones antes que ensanchar. */
+    .estado__pie {
+        white-space: normal;
+    }
+}
+
+/* --- Fichas --- */
+/* No son solo de movil: entre 960 y ~1300px el menu lateral se lleva 280px y
+   la tabla, por apretada que este, no entra sin scroll. Ahi tambien mandan. */
+
+.fichas { display: none; }
+
+@media (max-width: 82.5rem) {
+
+    .tabla-marco { display: none; }
+
+    .fichas {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .ficha {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 1rem 1.1rem;
+        background: var(--xv-superficie);
+        border: 1px solid var(--xv-borde);
+        border-radius: 3px;
+    }
+
+    .ficha__alto {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .ficha__nombre {
+        font-weight: var(--xv-peso-medio);
+        color: var(--xv-texto);
+    }
+
+    /* Nombre y categoria juntos: en un telefono angosto la categoria baja
+       de renglon antes que empujar al estado. */
+    .ficha__alto .nombre-con-qr {
+        flex-wrap: wrap;
+        min-width: 0;
+    }
+
+    .ficha__integrantes {
+        font-size: var(--xv-texto-sm);
+        line-height: var(--xv-interlinea-compacta);
+        color: var(--xv-texto-tenue);
+    }
+
+    .ficha__bajo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .ficha__telefono {
+        font-size: var(--xv-texto-sm);
+        color: var(--xv-texto-tenue);
+    }
+}
+
+/* --- Envio --- */
+
+.cabecera__canceladas {
+    color: var(--xv-texto-tenue);
+    opacity: 0.8;
+}
+
+.filtros__estado {
+    flex: 0 1 15rem;
+}
+
+.tabla__envio { white-space: nowrap; }
+
+/* El boton que abre WhatsApp con el mensaje ya escrito. */
+.boton-wsp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 3px;
+    border: 1px solid #a9d8c2;
+    background: #e6f4ee;
+    color: #14684a;
+    font-size: var(--xv-texto-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.boton-wsp:hover {
+    background: #d5ebe0;
+    border-color: #7fc4a5;
+}
+
+/* Se ve, ocupa lo mismo, pero no es un enlace: no hay nada que clickear. */
+.boton-wsp--inactivo {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.boton-wsp--inactivo:hover {
+    background: #e6f4ee;
+    border-color: #a9d8c2;
+}
+
+.envio {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+    white-space: nowrap;
+}
+
+.envio--hecho .pi { color: #1d6b4a; font-size: 0.8rem; }
+
+.estado--cancelada {
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde-fuerte);
+    color: var(--xv-texto-tenue);
+}
+
+.estado--cancelada .pi { font-size: 0.8rem; }
+
+/* Una tarjeta dada de baja sigue visible, pero pierde peso. */
+.fila--cancelada { opacity: 0.55; }
+.fila--cancelada .integrante,
+.fila--cancelada .tabla__nombre,
+.fila--cancelada .ficha__nombre { text-decoration: none; }
+
+/* Ya no es el envio: el envio subio junto al nombre y aca quedo el estado. */
+.ficha__pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--xv-borde);
+}
+
+.ficha__acciones {
+    display: inline-flex;
+    gap: 0.2rem;
+}
+
+.estado__pie {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+    white-space: nowrap;
+}

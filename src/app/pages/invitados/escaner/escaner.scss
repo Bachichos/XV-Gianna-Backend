@@ -1,0 +1,181 @@
+.escaner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-top: 0.25rem;
+}
+
+.oculto { display: none; }
+
+/* --- Visor --- */
+
+.visor {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #0e131a;
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+}
+
+.visor__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* La guia visual: donde poner el codigo. */
+.visor__marco {
+    position: absolute;
+    inset: 18%;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 6px;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.28);
+}
+
+.visor__aviso {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    background: rgba(14, 19, 26, 0.82);
+    color: #fff;
+    font-size: var(--xv-texto-sm);
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.visor__aviso .pi { font-size: 1.75rem !important; }
+
+.visor--vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2rem 1.5rem;
+    background: var(--xv-fondo);
+    color: var(--xv-texto-tenue);
+    text-align: center;
+    aspect-ratio: auto;
+    min-height: 12rem;
+}
+
+.visor--vacio .pi { font-size: 2rem !important; color: var(--xv-borde-fuerte); }
+
+.escaner__ayuda {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+    text-align: center;
+}
+
+.escaner__error {
+    font-size: var(--xv-texto-sm);
+    color: #8f2c2c;
+}
+
+/* --- Tarjeta encontrada --- */
+
+.hallazgo__nombre {
+    font-family: var(--xv-display);
+    font-size: var(--xv-texto-xl);
+    text-align: center;
+    color: var(--xv-texto);
+}
+
+.hallazgo__detalle {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+    text-align: center;
+}
+
+.gente {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.persona {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+}
+
+.persona--dentro { background: #f4faf7; border-color: #cbe6da; }
+
+.persona__datos { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+
+.persona__nombre {
+    font-weight: var(--xv-peso-medio);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.persona__estado { font-size: var(--xv-texto-xs) !important; }
+
+.persona__boton {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-width: 5.5rem;
+    min-height: 2.75rem;
+    padding: 0 0.9rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 3px;
+    color: var(--xv-texto);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+}
+
+.persona__boton--dentro {
+    background: #e6f4ee;
+    border-color: #a9d8c2;
+    color: #14684a;
+    font-weight: var(--xv-peso-medio);
+}
+
+.persona__boton:disabled { opacity: 0.5; cursor: wait; }
+
+.persona__bloqueado {
+    flex: none;
+    min-width: 5.5rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+    text-align: center;
+}
+
+.escaner__nota {
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--xv-borde);
+    border-left: 3px solid var(--xv-borde-fuerte);
+    border-radius: 3px;
+    background: var(--xv-fondo);
+    font-size: var(--xv-texto-xs);
+    line-height: var(--xv-interlinea-compacta);
+    color: var(--xv-texto-tenue);
+}
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--xv-borde);
+}

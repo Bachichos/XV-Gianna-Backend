@@ -1,0 +1,53 @@
+<xv-layout>
+    <header class="cabecera">
+        <h1>Solicitudes</h1>
+        <p class="cabecera__resumen">Lo que los invitados pidieron al confirmar.</p>
+    </header>
+
+    @if (cargando()) {
+    <p class="cargando">Cargando&hellip;</p>
+    } @else {
+
+    <section class="panel">
+        <div class="panel__cabecera">
+            <div>
+                <h2>Alergias, intolerancias y dietas</h2>
+                <p class="panel__dato">
+                    <span class="xv-numero">{{ lista().length }}</span>
+                    {{ lista().length === 1 ? 'persona' : 'personas' }}
+                    &middot; solo de quienes confirmaron
+                </p>
+            </div>
+
+            @if (lista().length > 0) {
+            <button type="button" class="copiar" (click)="copiar()">
+                <i class="pi" [class.pi-copy]="!copiado()" [class.pi-check]="copiado()" aria-hidden="true"></i>
+                {{ copiado() ? 'Copiada' : 'Copiar lista para el salón' }}
+            </button>
+            }
+        </div>
+
+        @if (lista().length === 0) {
+        <p class="vacio">Por ahora nadie declaró alergias, intolerancias ni dietas especiales.</p>
+        } @else {
+        <ul class="dietas">
+            @for (d of lista(); track d.clave) {
+            <li class="dieta">
+                <div class="dieta__persona">
+                    <span class="dieta__nombre">{{ d.nombre }}</span>
+                    <span class="dieta__tarjeta">{{ d.tarjeta }} &middot; {{ d.categoria }}</span>
+                </div>
+                <span class="dieta__texto">{{ d.alimentacion }}</span>
+            </li>
+            }
+        </ul>
+        }
+    </section>
+
+    <p class="nota">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        Los pedidos de cambio de quienes ya confirmaron también van a aparecer acá, cuando estén hechos.
+    </p>
+
+    }
+</xv-layout>

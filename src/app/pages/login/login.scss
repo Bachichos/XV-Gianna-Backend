@@ -1,0 +1,91 @@
+.login {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background:
+        radial-gradient(125% 85% at 50% -15%, var(--xv-brillo) 0%, transparent 62%),
+        var(--xv-fondo);
+}
+
+.login__tarjeta {
+    width: 100%;
+    max-width: 28rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3.5rem 2.75rem 2.75rem;
+    text-align: center;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 14px 40px -16px rgba(0, 0, 0, 0.16);
+}
+
+/* Un filete de plata cruzando el borde superior, como el marco de la referencia. */
+.login__tarjeta::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--xv-plata) 30%,
+        var(--xv-plata-brillo) 50%,
+        var(--xv-plata) 70%,
+        transparent 100%
+    );
+}
+
+.login__monograma {
+    display: grid;
+    place-items: center;
+    width: 3.75rem;
+    height: 3.75rem;
+    margin-bottom: 2rem;
+    font-family: var(--xv-display);
+    font-size: var(--xv-texto-lg);
+    letter-spacing: 0.14em;
+    text-indent: 0.14em;
+    color: var(--p-primary-color, #5279a2);
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 50%;
+}
+
+.login__antetitulo {
+    margin-bottom: 0.85rem;
+}
+
+.login__titulo {
+    margin-bottom: 1.1rem;
+}
+
+.login__ayuda {
+    margin-bottom: 2.25rem;
+    max-width: 22rem;
+    color: var(--xv-texto-tenue);
+}
+
+.login__error {
+    width: 100%;
+    margin-top: 1.15rem;
+}
+
+.login__pie {
+    width: 100%;
+    margin-top: 2.5rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--xv-borde);
+}
+
+:host ::ng-deep .login__boton {
+    letter-spacing: 0.04em;
+    font-weight: var(--xv-peso-normal);
+    font-size: var(--xv-texto-md);
+}

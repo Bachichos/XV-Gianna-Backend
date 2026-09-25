@@ -1,0 +1,257 @@
+:host { display: block; }
+
+.menu {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--xv-superficie);
+    border-inline-end: 1px solid var(--xv-borde);
+    /* Mientras el ancho se anima, el texto se recorta en vez de amontonarse. */
+    overflow: hidden;
+}
+
+/* --- Marca --- */
+
+.menu__marca {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1.6rem 1.4rem;
+    border-bottom: 1px solid var(--xv-borde);
+}
+
+.menu__monograma {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    font-family: var(--xv-display);
+    font-size: var(--xv-texto-sm);
+    letter-spacing: 0.12em;
+    text-indent: 0.12em;
+    color: var(--p-primary-color, #5279a2);
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 50%;
+}
+
+/* El mismo monograma, pero es lo que pliega y despliega el menu. */
+.menu__monograma--boton {
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.menu__monograma--boton:hover {
+    background: var(--p-primary-50, #f3f6fa);
+    border-color: var(--p-primary-color, #5279a2);
+}
+
+.menu__marca-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.menu__marca-titulo {
+    font-family: var(--xv-display);
+    font-size: var(--xv-texto-lg);
+    line-height: 1.1;
+    white-space: nowrap;
+    color: var(--xv-texto);
+}
+
+/* --- Navegacion --- */
+
+.menu__nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1rem 0.8rem;
+    overflow-y: auto;
+}
+
+.menu__item {
+    position: relative;         /* ancla del punto contador en el riel */
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 3px;
+    border-inline-start: 2px solid transparent;
+    color: var(--xv-texto-tenue);
+    text-decoration: none;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.menu__item:hover {
+    background: var(--xv-fondo);
+    color: var(--xv-texto);
+}
+
+.menu__item--activo {
+    background: var(--p-primary-50, #f3f6fa);
+    border-inline-start-color: var(--p-primary-color, #5279a2);
+    color: var(--p-primary-700, #374e6b);
+}
+
+.menu__icono {
+    flex: none;
+}
+
+.menu__etiqueta {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.menu__contador {
+    flex: none;
+    min-width: 1.7rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--p-primary-100, #e4ecf4);
+    color: var(--p-primary-700, #374e6b);
+    font-size: var(--xv-texto-xs);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+/* --- Pie: usuario y salida --- */
+
+.menu__pie {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 1rem 0.8rem 1.25rem;
+    border-top: 1px solid var(--xv-borde);
+}
+
+.menu__usuario {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding-inline: 0.5rem;
+    min-width: 0;
+}
+
+.menu__avatar {
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--xv-borde);
+}
+
+.menu__avatar--inicial {
+    display: grid;
+    place-items: center;
+    background: var(--p-primary-100, #e4ecf4);
+    color: var(--p-primary-700, #374e6b);
+    font-size: var(--xv-texto-sm);
+}
+
+.menu__usuario-datos {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.menu__usuario-nombre,
+.menu__usuario-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.menu__usuario-nombre {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto);
+}
+
+.menu__usuario-email {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+.menu__salir {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.65rem 0.85rem;
+    background: none;
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.menu__salir:hover {
+    background: var(--xv-fondo);
+    border-color: var(--xv-borde-fuerte);
+    color: var(--xv-texto);
+}
+
+/* --- Riel compacto --- */
+/* Solo escritorio: en movil el layout no enciende `compacto`, y ahi el cajon
+   se abre y cierra con la hamburguesa de la barra superior. */
+
+.menu--compacto .menu__marca {
+    justify-content: center;
+    padding-inline: 0.6rem;
+}
+
+.menu--compacto .menu__nav {
+    padding-inline: 0.7rem;
+}
+
+.menu--compacto .menu__item {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0;
+}
+
+.menu--compacto .menu__etiqueta {
+    display: none;
+}
+
+/* El numero no entra: queda de aviso un punto, y el globo dice cuantos. */
+.menu--compacto .menu__contador {
+    position: absolute;
+    inset-block-start: 0.45rem;
+    inset-inline-end: 0.8rem;
+    box-sizing: content-box;
+    min-width: 0;
+    width: 0.45rem;
+    height: 0.45rem;
+    padding: 0;
+    font-size: 0;
+    background: var(--p-primary-color, #5279a2);
+    border: 2px solid var(--xv-superficie);
+}
+
+.menu--compacto .menu__pie {
+    padding-inline: 0.7rem;
+}
+
+.menu--compacto .menu__usuario {
+    justify-content: center;
+    padding-inline: 0;
+}
+
+.menu--compacto .menu__usuario-datos,
+.menu--compacto .menu__salir-texto {
+    display: none;
+}
+
+.menu--compacto .menu__salir {
+    gap: 0;
+    padding-inline: 0;
+}

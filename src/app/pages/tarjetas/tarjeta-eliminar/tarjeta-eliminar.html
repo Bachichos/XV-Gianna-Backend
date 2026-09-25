@@ -1,0 +1,58 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Eliminar tarjeta"
+  styleClass="xv-dialogo xv-dialogo--angosto">
+
+  @if (tarjeta(); as t) {
+    <div class="eliminar">
+
+      @if (se_puede_eliminar(t)) {
+
+        <p class="eliminar__pregunta">
+          Va a eliminar la tarjeta de <strong>{{ t.nombre_mostrar }}</strong>,
+          con <span class="xv-numero">{{ personas() }}</span>
+          {{ personas() === 1 ? 'persona' : 'personas' }}.
+        </p>
+
+        <p class="eliminar__nota">
+          Todavía no se envió ni respondió, así que no se pierde nada más.
+          Aun así, no hay vuelta atrás.
+        </p>
+
+        @if (error(); as mensaje) {
+          <p class="eliminar__error" role="alert">{{ mensaje }}</p>
+        }
+
+        <div class="acciones">
+          <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+          <p-button label="Eliminar" severity="danger" icon="pi pi-trash"
+                    [loading]="borrando()" (onClick)="eliminar()" />
+        </div>
+
+      } @else {
+
+        <div class="alerta">
+          <p class="alerta__titulo">
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            Esta tarjeta ya no se puede eliminar
+          </p>
+          <p>
+            La invitacion de <strong>{{ t.nombre_mostrar }}</strong> ya salió, así que
+            su link está en el teléfono de alguien. Borrarla lo dejaría roto, y ese
+            token es único: no se recupera.
+          </p>
+        </div>
+
+        <div class="acciones">
+          <p-button label="Entendido" (onClick)="cerrar()" />
+        </div>
+
+      }
+
+    </div>
+  }
+
+</p-dialog>

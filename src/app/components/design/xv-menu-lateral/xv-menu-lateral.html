@@ -1,0 +1,82 @@
+<aside class="menu" [class.menu--compacto]="compacto()">
+
+  <div class="menu__marca">
+
+    @if (alternable()) {
+      <button type="button"
+              class="menu__monograma menu__monograma--boton"
+              (click)="alternar_compacto.emit()"
+              [pTooltip]="'Expandir el menú'"
+              [tooltipDisabled]="!compacto()"
+              tooltipPosition="right"
+              appendTo="body"
+              [attr.aria-expanded]="!compacto()"
+              aria-controls="menu-nav"
+              [attr.aria-label]="compacto() ? 'Expandir el menú' : 'Compactar el menú'">XV</button>
+    } @else {
+      <span class="menu__monograma" aria-hidden="true">XV</span>
+    }
+
+    @if (!compacto()) {
+      <span class="menu__marca-texto">
+        <span class="menu__marca-titulo">Mis 15 &middot; Gianna</span>
+        <span class="xv-versalita">Backoffice</span>
+      </span>
+    }
+
+  </div>
+
+  <nav class="menu__nav" id="menu-nav" aria-label="Secciones del backoffice">
+    @for (item of items(); track item.ruta) {
+      <a class="menu__item"
+         [routerLink]="item.ruta"
+         routerLinkActive="menu__item--activo"
+         (click)="navegar.emit()"
+         [pTooltip]="item.titulo"
+         [tooltipDisabled]="!compacto()"
+         tooltipPosition="right"
+         appendTo="body">
+        <i class="pi {{ item.icono }} menu__icono" aria-hidden="true"></i>
+        <span class="menu__etiqueta">{{ item.etiqueta }}</span>
+        @if (item.contador !== null) {
+          <span class="menu__contador">{{ item.contador }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  <div class="menu__pie">
+
+    @if (usuario(); as u) {
+      <div class="menu__usuario"
+           [pTooltip]="resumen_usuario()"
+           [tooltipDisabled]="!compacto()"
+           tooltipPosition="right"
+           appendTo="body">
+        @if (u.photoURL) {
+          <img class="menu__avatar" [src]="u.photoURL" alt="" width="36" height="36" referrerpolicy="no-referrer">
+        } @else {
+          <span class="menu__avatar menu__avatar--inicial" aria-hidden="true">{{ inicial() }}</span>
+        }
+        <span class="menu__usuario-datos">
+          <span class="menu__usuario-nombre">{{ u.displayName || u.email }}</span>
+          <span class="menu__usuario-email">{{ u.email }}</span>
+        </span>
+      </div>
+    }
+
+    <button type="button"
+            class="menu__salir"
+            (click)="salir()"
+            [pTooltip]="'Cerrar sesión'"
+            [tooltipDisabled]="!compacto()"
+            tooltipPosition="right"
+            appendTo="body"
+            [attr.aria-label]="compacto() ? 'Cerrar sesión' : null">
+      <i class="pi pi-sign-out" aria-hidden="true"></i>
+      <span class="menu__salir-texto">Cerrar sesión</span>
+    </button>
+
+  </div>
+
+</aside>

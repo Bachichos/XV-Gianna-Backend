@@ -1,0 +1,115 @@
+<xv-layout>
+
+  <header class="cabecera">
+    <div>
+      <h1>Lista de invitados</h1>
+      @if (cargando()) {
+        <p class="cabecera__resumen">Cargando&hellip;</p>
+      } @else {
+        <p class="cabecera__resumen">
+          <span class="xv-numero">{{ todos().length }}</span>
+          {{ todos().length === 1 ? 'persona confirmada' : 'personas confirmadas' }}
+        </p>
+      }
+    </div>
+
+    @if (!cargando() && todos().length > 0) {
+      <div class="tanteador">
+        <div class="marcador">
+          <div class="marcador__dato">
+            <span class="marcador__cifra xv-numero">{{ ingresaron() }}</span>
+            <span class="xv-versalita">ingresaron</span>
+          </div>
+          <div class="marcador__dato">
+            <span class="marcador__cifra marcador__cifra--tenue xv-numero">{{ faltan() }}</span>
+            <span class="xv-versalita">faltan</span>
+          </div>
+        </div>
+      </div>
+    }
+  </header>
+
+  @if (error(); as mensaje) {
+    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+  }
+
+  <div class="filtros">
+    <p-iconfield class="filtros__buscador">
+      <p-inputicon styleClass="pi pi-search" />
+      <input pInputText
+             type="search"
+             placeholder="Buscar por nombre"
+             aria-label="Buscar invitado"
+             [ngModel]="busqueda()"
+             (ngModelChange)="busqueda.set($event)">
+    </p-iconfield>
+
+    <p-select class="filtros__vista"
+              [options]="vistas"
+              optionLabel="etiqueta"
+              optionValue="valor"
+              ariaLabel="Filtrar la lista"
+              [ngModel]="vista()"
+              (ngModelChange)="vista.set($event)" />
+
+    <p-button class="filtros__escanear" label="Escanear" icon="pi pi-camera"
+              (onClick)="escaner_abierto.set(true)" />
+  </div>
+
+  @if (cargando()) {
+    <p class="aviso">Cargando la lista&hellip;</p>
+  }
+  @else if (todos().length === 0) {
+    <div class="vacio">
+      <i class="pi pi-users vacio__icono" aria-hidden="true"></i>
+      <h3>Todavía no hay nadie confirmado</h3>
+      <p>Cuando alguien confirme su asistencia, va a aparecer en esta lista.</p>
+    </div>
+  }
+  @else if (filtrados().length === 0) {
+    <div class="vacio">
+      <h3>Ningún resultado</h3>
+      <p>Nadie coincide con lo que buscó.</p>
+      <button type="button" class="vacio__limpiar" (click)="limpiar()">Limpiar la búsqueda</button>
+    </div>
+  }
+  @else {
+
+    @if (hay_filtro()) {
+      <p class="conteo xv-versalita">{{ filtrados().length }} de {{ todos().length }}</p>
+    }
+
+    <ol class="lista">
+      @for (i of filtrados(); track clave(i)) {
+        <li class="fila" [class.fila--dentro]="i.ingreso">
+
+          <span class="fila__numero xv-numero">{{ $index + 1 }}</span>
+
+          <span class="fila__datos">
+            <span class="fila__nombre">{{ i.nombre }}</span>
+            <span class="fila__tarjeta">{{ i.tarjeta_nombre }} &middot; {{ i.categoria }}</span>
+          </span>
+
+          <button type="button"
+                  class="fila__boton"
+                  [class.fila__boton--dentro]="i.ingreso"
+                  [disabled]="marcando() === clave(i)"
+                  (click)="alternar_ingreso(i)"
+                  [attr.aria-pressed]="!!i.ingreso"
+                  [attr.aria-label]="(i.ingreso ? 'Deshacer el ingreso de ' : 'Registrar el ingreso de ') + i.nombre">
+            @if (i.ingreso) {
+              <i class="pi pi-check" aria-hidden="true"></i> Entró
+            } @else {
+              Marcar
+            }
+          </button>
+
+        </li>
+      }
+    </ol>
+
+  }
+
+  <xv-escaner [(abierto)]="escaner_abierto" />
+
+</xv-layout>

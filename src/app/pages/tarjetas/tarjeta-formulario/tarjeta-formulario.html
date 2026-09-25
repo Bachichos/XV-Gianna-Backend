@@ -1,0 +1,168 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="es_edicion() ? 'Editar tarjeta' : 'Nueva tarjeta'"
+  (onShow)="reiniciar()"
+  styleClass="xv-dialogo">
+
+  <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+
+    <!-- Nombre de la invitación -->
+    <div class="campo">
+      <label for="f-nombre">Nombre de la invitación</label>
+      <input pInputText id="f-nombre" type="text" formControlName="nombre_mostrar"
+             placeholder="Ej. Familia Pérez" autocomplete="off">
+      <p class="campo__ayuda">Así la saluda la invitación cuando abre el link.</p>
+      @if (formulario.controls.nombre_mostrar.touched && formulario.controls.nombre_mostrar.invalid) {
+        <p class="campo__error">Hace falta un nombre.</p>
+      }
+    </div>
+
+    <!-- Personas -->
+    <fieldset class="campo campo--grupo">
+      <legend>Personas</legend>
+      <p class="campo__ayuda">
+        Una fila por cupo. Si todavía no sabe con quién viene, deje el nombre en blanco:
+        el invitado lo completa al confirmar.
+      </p>
+
+      @for (control of personas.controls; track control; let i = $index) {
+        <div class="integrante">
+          <input pInputText type="text" [formControl]="control"
+                 placeholder="Ej. Laura Pérez. Dejar vacío si acompañante es desconocido."
+                 autocomplete="off"
+                 [attr.aria-label]="'Persona ' + (i + 1)">
+
+          <button type="button" class="integrante__quitar"
+                  (click)="quitar_persona(i)"
+                  [disabled]="tiene_respuesta(i)"
+                  [attr.aria-label]="'Quitar persona ' + (i + 1)"
+                  [title]="tiene_respuesta(i) ? 'Esta persona ya respondió: quitarla borraría su respuesta' : 'Quitar'">
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+
+      <button type="button" class="agregar" (click)="agregar_persona()">
+        <i class="pi pi-plus" aria-hidden="true"></i> Agregar persona
+      </button>
+    </fieldset>
+
+    <!-- Categoría -->
+    <div class="campo">
+      <label for="f-categoria">Categoría</label>
+      <p-select inputId="f-categoria"
+                [options]="opciones_categoria"
+                optionLabel="etiqueta"
+                optionValue="valor"
+                placeholder="Elija una categoría"
+                formControlName="categoria" />
+      @if (formulario.controls.categoria.touched && formulario.controls.categoria.invalid) {
+        <p class="campo__error">Elija una categoría.</p>
+      }
+    </div>
+
+    <!-- Teléfono -->
+    <div class="campo">
+      <label for="f-telefono">Teléfono de WhatsApp</label>
+
+      <div class="telefono">
+        <p-select class="telefono__prefijo"
+                  [options]="opciones_prefijo"
+                  optionLabel="etiqueta"
+                  optionValue="valor"
+                  ariaLabel="País del teléfono"
+                  formControlName="prefijo">
+
+          <ng-template #selectedItem let-opcion>
+            <span class="prefijo">
+              <span class="bandera bandera--{{ opcion.bandera }}" [title]="opcion.pais"></span>
+              <span>{{ opcion.etiqueta }}</span>
+            </span>
+          </ng-template>
+
+          <ng-template #item let-opcion>
+            <span class="prefijo">
+              <span class="bandera bandera--{{ opcion.bandera }}" [title]="opcion.pais"></span>
+              <span>{{ opcion.etiqueta }}</span>
+            </span>
+          </ng-template>
+
+        </p-select>
+
+        <input pInputText id="f-telefono" type="tel" inputmode="numeric"
+               class="telefono__numero"
+               formControlName="numero_telefono"
+               (input)="normalizar_telefono($event)"
+               [placeholder]="formulario.controls.prefijo.value ? 'Ej. 3804112233' : 'Ej. 5491144332211'"
+               autocomplete="off">
+      </div>
+
+      <p class="campo__ayuda">
+        @if (formulario.controls.prefijo.value) {
+          Sin el 0 de la característica ni el 15. Los espacios y guiones se quitan solos.
+        } @else {
+          El número completo, con código de país y sin el +. Los espacios y guiones se quitan solos.
+        }
+      </p>
+      @if (formulario.controls.numero_telefono.touched && formulario.controls.numero_telefono.invalid) {
+        <p class="campo__error">
+          @if (formulario.controls.numero_telefono.hasError('required')) {
+            Hace falta un teléfono.
+          } @else {
+            Tiene que tener entre 10 y 15 dígitos, con código de país.
+          }
+        </p>
+      }
+    </div>
+
+    <!-- Lo que respondió el invitado: informativo -->
+    @if (respuesta(); as r) {
+      <div class="respuesta">
+        <p class="xv-versalita">Respuesta del invitado</p>
+        @switch (r.tipo) {
+          @case ('pendiente')  { <p class="respuesta__dato">Todavía no respondió.</p> }
+          @case ('rechazada')  { <p class="respuesta__dato">Respondió que no puede asistir.</p> }
+          @case ('respondida') {
+            <p class="respuesta__dato">
+              Confirmó <span class="xv-numero">{{ r.confirmados }}</span> de
+              <span class="xv-numero">{{ r.total }}</span>.
+              @if (r.sin_responder > 0) {
+                Faltan <span class="xv-numero">{{ r.sin_responder }}</span> por responder.
+              }
+            </p>
+          }
+        }
+
+        <ul class="integrantes">
+          @for (p of integrantes(); track p.id) {
+            <li class="integrante-linea" [class]="'integrante--' + p.estado">
+              <i class="pi" [class]="p.estado === 'confirmado' ? 'pi-check'
+                                   : p.estado === 'rechazado'  ? 'pi-times'
+                                   : 'pi-minus'" aria-hidden="true"></i>
+              <span [class.integrante--anonimo]="p.sin_nombre">{{ p.nombre }}</span>
+              @if (p.declarado) {
+                <span class="integrante__declarado" title="Nombre agregado al momento de responder">&lowast;</span>
+              }
+            </li>
+          }
+        </ul>
+
+        <p class="respuesta__nota">Esto lo escribe el invitado desde su link y no se edita aquí.</p>
+      </div>
+    }
+
+    @if (error(); as mensaje) {
+      <p class="campo__error" role="alert">{{ mensaje }}</p>
+    }
+
+    <div class="acciones">
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+      <p-button label="Guardar" type="submit" [loading]="guardando()" (onClick)="guardar()" />
+    </div>
+
+  </form>
+
+</p-dialog>

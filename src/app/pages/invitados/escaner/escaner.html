@@ -1,0 +1,121 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Escanear entrada"
+  styleClass="xv-dialogo xv-dialogo--angosto"
+  (onShow)="iniciar()"
+  (onHide)="detener()">
+
+  <div class="escaner">
+
+    @switch (estado()) {
+
+      @case ('error') {
+        <div class="visor visor--vacio">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          <p role="alert">{{ mensaje() }}</p>
+        </div>
+        <div class="acciones">
+          <p-button label="Cerrar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+          <p-button label="Reintentar" icon="pi pi-replay" (onClick)="iniciar()" />
+        </div>
+      }
+
+      @case ('desconocida') {
+        <div class="visor visor--vacio">
+          <i class="pi pi-question-circle" aria-hidden="true"></i>
+          <p>Ese código no corresponde a ninguna invitación de esta fiesta.</p>
+        </div>
+        <div class="acciones">
+          <p-button label="Cerrar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+          <p-button label="Escanear otro" icon="pi pi-camera" (onClick)="iniciar()" />
+        </div>
+      }
+
+      @case ('encontrada') {
+        @if (tarjeta(); as t) {
+          <p class="hallazgo__nombre">{{ t.nombre_mostrar }}</p>
+          <p class="hallazgo__detalle">
+            {{ t.categoria }} &middot;
+            <span class="xv-numero">{{ confirmados() }}</span> confirmados
+          </p>
+
+          <ul class="gente">
+            @for (p of integrantes(); track p.id) {
+              <li class="persona" [class.persona--dentro]="ingreso_de(p.id)">
+                <span class="persona__datos">
+                  <span class="persona__nombre">{{ p.nombre }}</span>
+                  <span class="persona__estado integrante-linea" [class]="'integrante--' + p.estado">
+                    <i class="pi" [class]="p.estado === 'confirmado' ? 'pi-check'
+                                         : p.estado === 'rechazado'  ? 'pi-times'
+                                         : 'pi-minus'" aria-hidden="true"></i>
+                    {{ p.estado === 'confirmado' ? 'confirmó'
+                     : p.estado === 'rechazado'  ? 'no venía'
+                     : 'sin responder' }}
+                  </span>
+                </span>
+
+                @if (puede_ingresar(p.id)) {
+                  <button type="button"
+                          class="persona__boton"
+                          [class.persona__boton--dentro]="ingreso_de(p.id)"
+                          [disabled]="marcando() === p.id"
+                          (click)="alternar_ingreso(p.id)"
+                          [attr.aria-pressed]="!!ingreso_de(p.id)"
+                          [attr.aria-label]="(ingreso_de(p.id) ? 'Deshacer el ingreso de ' : 'Registrar el ingreso de ') + p.nombre">
+                    @if (ingreso_de(p.id)) { <i class="pi pi-check" aria-hidden="true"></i> Entró }
+                    @else { Marcar }
+                  </button>
+                } @else {
+                  <span class="persona__bloqueado">No puede entrar</span>
+                }
+              </li>
+            }
+          </ul>
+
+          @if (hay_sin_confirmar()) {
+            <p class="escaner__nota">
+              Solo puede entrar quien confirmó. Si alguien de esta tarjeta va a pasar igual,
+              primero hay que cargar su respuesta desde <strong>Tarjetas</strong>, para que
+              el total de la fiesta lo tenga en cuenta.
+            </p>
+          }
+
+          @if (mensaje()) { <p class="escaner__error" role="alert">{{ mensaje() }}</p> }
+
+          <div class="acciones">
+            <p-button label="Cerrar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+            <p-button label="Escanear otro" icon="pi pi-camera" (onClick)="iniciar()" />
+          </div>
+        }
+      }
+
+      @default {
+        <!-- El <video> tiene que existir en el DOM ya durante 'pidiendo':
+             si no, cuando el permiso se concede no hay donde mostrar el flujo. -->
+        <div class="visor">
+          <video #video class="visor__video" playsinline muted autoplay></video>
+          <div class="visor__marco" aria-hidden="true"></div>
+          @if (estado() === 'pidiendo') {
+            <div class="visor__aviso">
+              <i class="pi pi-camera" aria-hidden="true"></i>
+              <span>Pidiendo permiso para usar la cámara&hellip;</span>
+            </div>
+          }
+        </div>
+        <p class="escaner__ayuda">
+          {{ estado() === 'pidiendo' ? 'Aceptá el permiso para continuar.' : 'Apuntá al código QR de la invitación.' }}
+        </p>
+        <div class="acciones">
+          <p-button label="Cerrar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+        </div>
+      }
+    }
+
+    <canvas #lienzo class="oculto" aria-hidden="true"></canvas>
+
+  </div>
+
+</p-dialog>

@@ -1,0 +1,110 @@
+.cabecera { margin-bottom: 1.75rem; }
+
+.cabecera__resumen {
+    margin-top: 0.5rem;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+}
+
+.cargando { color: var(--xv-texto-tenue); }
+
+/* --- El panel, como los de Estadisticas --- */
+
+.panel {
+    margin-bottom: 1.5rem;
+    padding: 1.4rem 1.5rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+}
+
+.panel h2 { font-size: var(--xv-texto-xl); }
+
+.panel__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.panel__dato {
+    margin-top: 0.3rem;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}
+
+.copiar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.95rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 3px;
+    color: var(--p-primary-700, #374e6b);
+    font-size: var(--xv-texto-sm);
+    font-weight: var(--xv-peso-medio);
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.copiar:hover {
+    background: var(--p-primary-50, #f3f6fa);
+    border-color: var(--p-primary-color, #5279a2);
+}
+
+/* --- La lista --- */
+
+.dietas {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dieta {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) 2fr;
+    align-items: baseline;
+    gap: 0.3rem 1.5rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--xv-borde);
+}
+
+.dieta:last-child { border-bottom: 0; }
+
+/* En el telefono, una debajo de la otra. */
+@media (max-width: 40rem) {
+    .dieta { grid-template-columns: 1fr; }
+}
+
+.dieta__persona {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.dieta__nombre { font-weight: var(--xv-peso-medio); }
+
+.dieta__tarjeta {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+.dieta__texto { color: var(--xv-texto); }
+
+.vacio {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}
+
+.nota {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+}

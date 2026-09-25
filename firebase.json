@@ -1,0 +1,32 @@
+{
+  "hosting": {
+    "public": "wwwroot",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "//": "El index.html nunca se cachea: es quien decide que version de los archivos se carga. Sin esto, cada despliegue tarda hasta una hora en llegar.",
+        "source": "**",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+        ]
+      },
+      {
+        "//": "Los archivos con hash en el nombre si se cachean para siempre: si cambia el contenido, cambia el nombre.",
+        "source": "**/*.@(js|css|woff2|woff|png|jpg|jpeg|svg|ico)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,347 @@
+<xv-layout>
+    <header class="cabecera">
+        <div>
+            <h1>Tarjetas de invitados</h1>
+            @if (cargando()) {
+            <p class="cabecera__resumen">Cargando&hellip;</p>
+            } @else {
+            <p class="cabecera__resumen">
+                <span class="xv-numero">{{ total() }}</span> {{ total() === 1 ? 'tarjeta' : 'tarjetas' }} &middot;
+                <span class="xv-numero">{{ enviadas() }}</span> {{ enviadas() === 1 ? 'enviada' : 'enviadas' }} &middot;
+                <span class="xv-numero">{{ respondidas() }}</span> {{ respondidas() === 1 ? 'respondida' : 'respondidas' }}
+                @if (canceladas() > 0) {
+                  <span class="cabecera__canceladas">&middot; {{ canceladas() }} canceladas</span>
+                }
+            </p>
+            <p class="cabecera__personas">
+                <span class="xv-numero">{{ personas() }}</span>
+                {{ personas() === 1 ? 'persona invitada en total' : 'personas invitadas en total' }}
+            </p>
+            }
+        </div>
+
+        <p-button label="Nueva tarjeta" icon="pi pi-plus" (onClick)="nueva()" />
+    </header>
+
+    @if (error(); as mensaje) {
+    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+    }
+
+    <div class="filtros">
+        <p-iconfield class="filtros__buscador">
+            <p-inputicon styleClass="pi pi-search" />
+            <input pInputText type="search" placeholder="Ej. Pérez o 5491144" aria-label="Buscar tarjetas"
+                [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)">
+        </p-iconfield>
+
+        <p-select class="filtros__estado"
+                  [options]="opciones_estado"
+                  optionLabel="etiqueta"
+                  optionValue="valor"
+                  ariaLabel="Filtrar por estado"
+                  [ngModel]="estado_filtro()"
+                  (ngModelChange)="estado_filtro.set($event)" />
+
+        <p-select class="filtros__categoria" [options]="opciones_categoria" optionLabel="etiqueta" optionValue="valor"
+            ariaLabel="Filtrar por categoría" [ngModel]="categoria()" (ngModelChange)="categoria.set($event)" />
+
+        <button type="button" class="filtros__accion" (click)="alternar_orden()"
+                [attr.aria-label]="orden() === 'az' ? 'Ordenar de la Z a la A' : 'Ordenar de la A a la Z'"
+                [title]="orden() === 'az' ? 'De la A a la Z' : 'De la Z a la A'">
+            <i class="pi" [class.pi-sort-alpha-down]="orden() === 'az'"
+                          [class.pi-sort-alpha-up-alt]="orden() === 'za'" aria-hidden="true"></i>
+        </button>
+
+        <button type="button" class="filtros__accion"
+                [class.filtros__accion--activo]="tamano() !== 'todas'"
+                (click)="alternar_tamano()"
+                [attr.aria-label]="TAMANOS[tamano()].texto + '. Tocar para cambiar.'"
+                [title]="TAMANOS[tamano()].texto">
+            <i class="pi {{ TAMANOS[tamano()].icono }}" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    @if (cargando()) {
+    <p class="aviso">Cargando las tarjetas&hellip;</p>
+    }
+    @else if (lista().length === 0) {
+    <div class="vacio">
+        <i class="pi pi-id-card vacio__icono" aria-hidden="true"></i>
+        <h3>Todavía no hay tarjetas</h3>
+        <p>Cuando cargue la primera, aparecerá aquí.</p>
+        <p-button label="Crear la primera" icon="pi pi-plus" (onClick)="nueva()" />
+    </div>
+    }
+    @else if (filas().length === 0) {
+    <div class="vacio">
+        <h3>Ningún resultado</h3>
+        <p>Ninguna tarjeta coincide con lo que buscó.</p>
+        <button type="button" class="vacio__limpiar" (click)="limpiar_filtros()">Limpiar los filtros</button>
+    </div>
+    }
+    @else {
+
+    @if (hay_filtro()) {
+    <p class="conteo xv-versalita">{{ filas().length }} de {{ total() }}</p>
+    }
+
+    <!-- Pantallas anchas (desde 1320px) -->
+    <div class="tabla-marco">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th scope="col">Invitación</th>
+                    <th scope="col">Integrantes</th>
+                    <th scope="col" class="tabla__categoria">Categoría</th>
+                    <th scope="col" class="tabla__telefono">Teléfono</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Envío</th>
+                    <th scope="col"><span class="visualmente-oculto">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (f of filas(); track f.tarjeta.id) {
+                <tr [class.fila--cancelada]="f.cancelada">
+                    <td class="tabla__nombre">
+                        <span class="nombre-con-qr">
+                            <button type="button" class="accion accion--qr" (click)="ver_qr(f.tarjeta)"
+                                    [attr.aria-label]="'Ver el código QR de ' + f.tarjeta.nombre_mostrar"
+                                    title="Ver el código QR">
+                                <i class="pi pi-qrcode" aria-hidden="true"></i>
+                            </button>
+                            <span>{{ f.tarjeta.nombre_mostrar }}</span>
+                        </span>
+                        <!-- Solo se ve cuando la pantalla no da para columnas propias. -->
+                        <span class="tabla__meta">
+                            <span class="xv-numero">{{ f.tarjeta.numero_telefono }}</span>
+                            <span class="chip">{{ f.tarjeta.categoria }}</span>
+                        </span>
+                    </td>
+                    <td class="tabla__integrantes">
+                        <ul class="integrantes">
+                            @for (p of f.integrantes; track p.id) {
+                            <li class="integrante-linea" [class]="'integrante--' + p.estado">
+                                <i class="pi" [class]="p.estado === 'confirmado' ? 'pi-check'
+                                         : p.estado === 'rechazado'  ? 'pi-times'
+                                         : 'pi-minus'" aria-hidden="true"></i>
+                                <span [class.integrante--anonimo]="p.sin_nombre">{{ p.nombre }}</span>
+                                @if (p.declarado) {
+                                <span class="integrante__declarado"
+                                    title="Nombre agregado al momento de responder">&lowast;</span>
+                                }
+                            </li>
+                            }
+                        </ul>
+                    </td>
+                    <td class="tabla__categoria"><span class="chip">{{ f.tarjeta.categoria }}</span></td>
+                    <td class="tabla__telefono xv-numero">{{ f.tarjeta.numero_telefono }}</td>
+                    <td>
+                        @if (f.cancelada) {
+                          <span class="estado estado--cancelada"><i class="pi pi-ban" aria-hidden="true"></i> Cancelada</span>
+                        } @else {
+                        @switch (f.estado.tipo) {
+                        @case ('pendiente') { <span class="estado estado--pendiente">Pendiente</span> }
+                        @case ('rechazada') { <span class="estado estado--rechazada">Rechazada</span> }
+                        @case ('respondida') {
+                        <span class="estado estado--confirmada">
+                            <i class="pi pi-check-circle" aria-hidden="true"></i>
+                            <span class="xv-numero">{{ f.estado.confirmados }}/{{ f.estado.total }}</span>
+                        </span>
+                        @if (f.estado.sin_responder > 0) {
+                        <span class="estado__pie">
+                            <span class="xv-numero">{{ f.estado.sin_responder }}</span> sin responder
+                        </span>
+                        }
+                        }
+                        }
+                        }
+                    </td>
+
+                    <td class="tabla__envio">
+                          @if (f.tarjeta.fecha_envio) {
+                            <span class="envio envio--hecho" [title]="f.tarjeta.fecha_envio">
+                              <i class="pi pi-check" aria-hidden="true"></i> {{ f.tarjeta.fecha_envio | date:'d MMM' }}
+                            </span>
+                          } @else if (envios_habilitados) {
+                            <a class="boton-wsp" [href]="f.link" target="_blank" rel="noopener"
+                               (click)="marcar_enviada(f.tarjeta)"
+                               [attr.aria-label]="'Enviar la invitación a ' + f.tarjeta.nombre_mostrar">
+                              <i class="pi pi-whatsapp" aria-hidden="true"></i> Enviar
+                            </a>
+                          } @else {
+                            <span class="boton-wsp boton-wsp--inactivo" aria-disabled="true"
+                                  title="Los envíos todavía no están habilitados">
+                              <i class="pi pi-whatsapp" aria-hidden="true"></i> Enviar
+                            </span>
+                          }
+
+                    </td>
+                    <td class="tabla__acciones">
+                        <span class="acciones-fila">
+                            @if (se_puede_cancelar(f.tarjeta) || f.cancelada) {
+                            <button type="button" class="accion" (click)="cancelar(f.tarjeta)"
+                                    [attr.aria-label]="(f.cancelada ? 'Reactivar ' : 'Cancelar ') + f.tarjeta.nombre_mostrar"
+                                    [title]="f.cancelada ? 'Reactivar invitación' : 'Cancelar invitación'">
+                                <i class="pi" [class.pi-ban]="!f.cancelada" [class.pi-replay]="f.cancelada" aria-hidden="true"></i>
+                            </button>
+                        }
+                            <button type="button" class="accion accion--peligro" (click)="eliminar(f.tarjeta)"
+                            [disabled]="!se_puede_eliminar(f.tarjeta)"
+                            [attr.aria-label]="'Eliminar ' + f.tarjeta.nombre_mostrar"
+                            [title]="se_puede_eliminar(f.tarjeta) ? 'Eliminar' : 'No se puede eliminar: la invitación ya se envió'">
+                            <i class="pi pi-trash" aria-hidden="true"></i>
+                        </button>
+                            <button type="button" class="accion" (click)="responder(f.tarjeta)"
+                                    [disabled]="f.cancelada"
+                                    [attr.aria-label]="'Cargar respuesta de ' + f.tarjeta.nombre_mostrar"
+                                    [title]="f.cancelada ? 'La invitación está cancelada' : 'Cargar respuesta a mano'">
+                                <i class="pi pi-comment" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="accion" (click)="editar(f.tarjeta)"
+                            [attr.aria-label]="'Editar ' + f.tarjeta.nombre_mostrar" title="Editar">
+                            <i class="pi pi-pencil" aria-hidden="true"></i>
+                        </button>
+                        </span>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="leyenda">
+        <span class="integrante-linea integrante--confirmado">
+            <i class="pi pi-check" aria-hidden="true"></i> confirmó
+            <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().confirmados }}</span>
+            {{ conteo_personas().confirmados === 1 ? 'persona' : 'personas' }})</span>
+        </span>
+        <span class="integrante-linea integrante--rechazado">
+            <i class="pi pi-times" aria-hidden="true"></i> no viene
+            <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().rechazados }}</span>
+            {{ conteo_personas().rechazados === 1 ? 'persona' : 'personas' }})</span>
+        </span>
+        <span class="integrante-linea integrante--pendiente">
+            <i class="pi pi-minus" aria-hidden="true"></i> sin responder
+            <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().pendientes }}</span>
+            {{ conteo_personas().pendientes === 1 ? 'persona' : 'personas' }})</span>
+        </span>
+    </p>
+
+    <!-- Telefono y portatiles (hasta 1320px) -->
+    <ul class="fichas">
+        @for (f of filas(); track f.tarjeta.id) {
+        <li class="ficha" [class.fila--cancelada]="f.cancelada">
+            <div class="ficha__alto">
+                <span class="nombre-con-qr">
+                    <button type="button" class="accion accion--qr" (click)="ver_qr(f.tarjeta)"
+                            [attr.aria-label]="'Ver el código QR de ' + f.tarjeta.nombre_mostrar"
+                            title="Ver el código QR">
+                        <i class="pi pi-qrcode" aria-hidden="true"></i>
+                    </button>
+                    <span class="ficha__nombre">{{ f.tarjeta.nombre_mostrar }}</span>
+                    <span class="chip">{{ f.tarjeta.categoria }}</span>
+                </span>
+                @if (f.tarjeta.fecha_envio) {
+                <span class="envio envio--hecho" [title]="f.tarjeta.fecha_envio">
+                    <i class="pi pi-check" aria-hidden="true"></i>
+                    Enviada el {{ f.tarjeta.fecha_envio | date:'d MMM' }}
+                </span>
+                } @else if (envios_habilitados) {
+                <a class="boton-wsp" [href]="f.link" target="_blank" rel="noopener"
+                   (click)="marcar_enviada(f.tarjeta)"
+                   [attr.aria-label]="'Enviar la invitación a ' + f.tarjeta.nombre_mostrar">
+                    <i class="pi pi-whatsapp" aria-hidden="true"></i> Enviar
+                </a>
+                } @else {
+                <span class="boton-wsp boton-wsp--inactivo" aria-disabled="true"
+                      title="Los envíos todavía no están habilitados">
+                    <i class="pi pi-whatsapp" aria-hidden="true"></i> Enviar
+                </span>
+                }
+            </div>
+
+            <ul class="integrantes">
+                @for (p of f.integrantes; track p.id) {
+                <li class="integrante-linea" [class]="'integrante--' + p.estado">
+                    <i class="pi" [class]="p.estado === 'confirmado' ? 'pi-check'
+                                   : p.estado === 'rechazado'  ? 'pi-times'
+                                   : 'pi-minus'" aria-hidden="true"></i>
+                    <span [class.integrante--anonimo]="p.sin_nombre">{{ p.nombre }}</span>
+                    @if (p.declarado) {
+                    <span class="integrante__declarado"
+                        title="Nombre agregado al momento de responder">&lowast;</span>
+                    }
+                    @if (p.manual) {
+                    <i class="pi pi-comment integrante__manual"
+                        title="Respuesta cargada a mano desde el backoffice" aria-hidden="true"></i>
+                    }
+                </li>
+                }
+            </ul>
+
+            <div class="ficha__bajo">
+                <span class="ficha__telefono xv-numero">{{ f.tarjeta.numero_telefono }}</span>
+            </div>
+
+            <div class="ficha__pie">
+                @if (f.cancelada) {
+                <span class="estado estado--cancelada"><i class="pi pi-ban" aria-hidden="true"></i> Cancelada</span>
+                } @else {
+                @switch (f.estado.tipo) {
+                @case ('pendiente') { <span class="estado estado--pendiente">Pendiente</span> }
+                @case ('rechazada') { <span class="estado estado--rechazada">Rechazada</span> }
+                @case ('respondida') {
+                <span class="estado estado--confirmada">
+                    <i class="pi pi-check-circle" aria-hidden="true"></i>
+                    <span class="xv-numero">{{ f.estado.confirmados }}/{{ f.estado.total }}</span>
+                    @if (f.estado.sin_responder > 0) {
+                    <span class="estado__pie">&middot; {{ f.estado.sin_responder }} sin responder</span>
+                    }
+                </span>
+                }
+                }
+                }
+
+                <span class="ficha__acciones">
+                    @if (se_puede_cancelar(f.tarjeta) || f.cancelada) {
+                    <button type="button" class="accion" (click)="cancelar(f.tarjeta)"
+                        [attr.aria-label]="(f.cancelada ? 'Reactivar ' : 'Cancelar ') + f.tarjeta.nombre_mostrar"
+                        [title]="f.cancelada ? 'Reactivar invitación' : 'Cancelar invitación'">
+                        <i class="pi" [class.pi-ban]="!f.cancelada" [class.pi-replay]="f.cancelada" aria-hidden="true"></i>
+                    </button>
+                    }
+                    <button type="button" class="accion accion--peligro" (click)="eliminar(f.tarjeta)"
+                        [disabled]="!se_puede_eliminar(f.tarjeta)"
+                        [attr.aria-label]="'Eliminar ' + f.tarjeta.nombre_mostrar"
+                        [title]="se_puede_eliminar(f.tarjeta) ? 'Eliminar' : 'No se puede eliminar: la invitación ya se envió'">
+                        <i class="pi pi-trash" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="accion" (click)="responder(f.tarjeta)"
+                            [disabled]="f.cancelada"
+                            [attr.aria-label]="'Cargar respuesta de ' + f.tarjeta.nombre_mostrar"
+                            [title]="f.cancelada ? 'La invitación está cancelada' : 'Cargar respuesta a mano'">
+                        <i class="pi pi-comment" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="accion" (click)="editar(f.tarjeta)"
+                        [attr.aria-label]="'Editar ' + f.tarjeta.nombre_mostrar" title="Editar">
+                        <i class="pi pi-pencil" aria-hidden="true"></i>
+                    </button>
+                </span>
+            </div>
+        </li>
+        }
+    </ul>
+
+    }
+
+    <xv-tarjeta-formulario [(abierto)]="formulario_abierto" [tarjeta]="editando()" />
+
+    <xv-tarjeta-eliminar [(abierto)]="eliminar_abierto" [tarjeta]="eliminando()" />
+
+    <xv-tarjeta-cancelar [(abierto)]="cancelar_abierto" [tarjeta]="cancelando()" />
+
+    <xv-tarjeta-respuestas [(abierto)]="respuestas_abierto" [tarjeta]="respondiendo()" />
+
+    <xv-tarjeta-qr [(abierto)]="qr_abierto" [tarjeta]="mostrando()" />
+
+</xv-layout>

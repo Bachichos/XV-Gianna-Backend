@@ -1,0 +1,65 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="cancelada() ? 'Reactivar invitación' : 'Cancelar invitación'"
+  styleClass="xv-dialogo xv-dialogo--angosto">
+
+  @if (tarjeta(); as t) {
+    <div class="cancelar">
+
+      @if (cancelada()) {
+
+        <p>
+          Va a reactivar la invitación de <strong>{{ tarjeta()?.nombre_mostrar }}</strong>.
+        </p>
+
+        <ul class="cancelar__consecuencias">
+          <li>Vuelve a contar en los totales.</li>
+          <li>Queda pendiente de envío: hay que mandarla de nuevo.</li>
+          <li>Si ya había confirmado, esa respuesta se borra.</li>
+        </ul>
+
+      } @else {
+
+        <p>
+          Va a dar de baja la invitación de <strong>{{ t.nombre_mostrar }}</strong>,
+          que ya fue enviada.
+        </p>
+
+        <ul class="cancelar__consecuencias">
+          <li>
+            Sus <span class="xv-numero">{{ personas() }}</span>
+            {{ personas() === 1 ? 'persona deja' : 'personas dejan' }} de contar
+            en el total de invitados.
+          </li>
+          <li>La tarjeta no vuelve a aparecer en los envíos ni en los recordatorios.</li>
+          <li>Sigue visible en la lista, marcada como cancelada, para no perderla de vista.</li>
+        </ul>
+
+        <p class="cancelar__nota">
+          Se puede revertir cuando quiera. No borra nada.
+        </p>
+
+      }
+
+      @if (error(); as mensaje) {
+        <p class="cancelar__error" role="alert">{{ mensaje }}</p>
+      }
+
+      <div class="acciones">
+        <p-button label="Volver" severity="secondary" [text]="true" (onClick)="cerrar()" />
+        @if (cancelada()) {
+          <p-button label="Reactivar" icon="pi pi-replay"
+                    [loading]="guardando()" (onClick)="reactivar()" />
+        } @else {
+          <p-button label="Cancelar invitación" severity="danger" icon="pi pi-ban"
+                    [loading]="guardando()" (onClick)="cancelar()" />
+        }
+      </div>
+
+    </div>
+  }
+
+</p-dialog>

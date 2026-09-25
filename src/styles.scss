@@ -1,0 +1,246 @@
+/* ============================================================
+   ESTILOS GLOBALES DEL BACKOFFICE
+
+   TIPOGRAFIA: dos familias y nada mas.
+     --xv-display  Marcellus  ->  titulos, marca, monograma
+     --xv-ui       Inter      ->  absolutamente todo lo demas
+
+   Regla: ningun componente declara su propia font-family ni
+   inventa tamanos. Si hace falta un tamano nuevo, se agrega
+   a la escala de aca abajo y se usa por token.
+   ============================================================ */
+
+:root {
+
+    /* --- Familias --- */
+    --xv-display: 'Marcellus', Georgia, 'Times New Roman', serif;
+    --xv-ui:      'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    /* --- Escala de tamanos --- */
+    --xv-texto-xs: 0.82rem;   /* versalitas, pies, contadores */
+    --xv-texto-sm: 0.94rem;   /* texto secundario, celdas densas */
+    --xv-texto-md: 1.05rem;   /* cuerpo y controles: la base */
+    --xv-texto-lg: 1.2rem;    /* destacados, marca del lateral */
+    --xv-texto-xl: 1.5rem;    /* subtitulos de seccion */
+
+    --xv-display-sm: 1.9rem;  /* h2 */
+    --xv-display-md: 2.45rem; /* h1, titulo de pantalla */
+    --xv-display-lg: 3.1rem;  /* cifras grandes de los KPIs */
+
+    --xv-icono: 1.1rem;       /* los pi-* siempre a esta medida */
+
+    /* --- Pesos --- */
+    --xv-peso-normal: 400;
+    --xv-peso-medio:  500;
+    --xv-peso-fuerte: 600;
+
+    /* --- Interlineas --- */
+    --xv-interlinea-titulo:   1.12;
+    --xv-interlinea-texto:    1.6;
+    --xv-interlinea-compacta: 1.35;  /* filas de tabla, listas densas */
+
+    /* --- Espaciado entre letras --- */
+    --xv-versalita-espaciado: 0.22em;
+
+    /* --- Color --- */
+    --xv-fondo:        #f4f6f9;
+    --xv-superficie:   #ffffff;
+    --xv-borde:        #e0e6ee;
+    --xv-borde-fuerte: #c6d0dd;
+    --xv-texto:        #1c2735;
+    --xv-texto-tenue:  #566577;
+    --xv-brillo:       rgba(82, 121, 162, 0.08);
+
+    --xv-plata:        #c3ccd8;
+    --xv-plata-brillo: #eef2f7;
+
+    color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+/*
+ * Toda la escala tipografica esta en rem, asi que moviendo esta unica raiz
+ * se achica o agranda la interfaz entera manteniendo las proporciones.
+ * 16px en escritorio, 14px en telefonos, y un degrade suave entre medio.
+ * Va en rem + vw (y no solo vw) para respetar el tamano de letra que el
+ * usuario tenga configurado en su navegador.
+ */
+html {
+    font-size: clamp(0.875rem, 0.82rem + 0.28vw, 1rem);
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: var(--xv-ui);
+    font-size: var(--xv-texto-md);
+    font-weight: var(--xv-peso-normal);
+    line-height: var(--xv-interlinea-texto);
+    background: var(--xv-fondo);
+    color: var(--xv-texto);
+}
+
+/* Un placeholder tiene que verse como una pista, no como contenido cargado. */
+::placeholder {
+    color: var(--xv-texto-tenue);
+    opacity: 0.55;
+}
+
+/* Los controles de formulario NO heredan la fuente del documento.
+   Sin esto, cada boton e input sale con la del sistema. */
+button,
+input,
+select,
+textarea,
+optgroup {
+    font: inherit;
+    color: inherit;
+}
+
+/* Y que la libreria tampoco traiga la suya. */
+.p-component {
+    font-family: var(--xv-ui);
+}
+
+/* --- Titulos: siempre el display, el tamano lo da el nivel --- */
+
+h1, h2, h3, h4 {
+    margin: 0;
+    font-family: var(--xv-display);
+    font-weight: var(--xv-peso-normal);
+    line-height: var(--xv-interlinea-titulo);
+    text-wrap: balance;
+    color: var(--xv-texto);
+}
+
+h1 { font-size: var(--xv-display-md); }
+h2 { font-size: var(--xv-display-sm); }
+h3 { font-size: var(--xv-texto-xl); }
+h4 { font-size: var(--xv-texto-lg); }
+
+p { margin: 0; }
+
+strong, b { font-weight: var(--xv-peso-fuerte); }
+
+/* --- Utilidades tipograficas reutilizables --- */
+
+/* Etiqueta en versalitas espaciadas: antetitulos, pies, encabezados de tabla. */
+.xv-versalita {
+    font-family: var(--xv-ui);
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    letter-spacing: var(--xv-versalita-espaciado);
+    text-transform: uppercase;
+    color: var(--xv-texto-tenue);
+}
+
+/* Cifras que se comparan en columna: KPIs, contadores, tablas. */
+.xv-numero {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Cifra grande de panel. */
+.xv-cifra {
+    font-family: var(--xv-display);
+    font-size: var(--xv-display-lg);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--xv-texto);
+}
+
+/* Los iconos de PrimeIcons, todos del mismo cuerpo. */
+.pi {
+    font-size: var(--xv-icono);
+}
+
+/* El modal se renderiza con la encapsulacion de la libreria: su ancho va aca. */
+.xv-dialogo {
+    width: 38rem;
+    max-width: calc(100vw - 2rem);
+}
+
+.xv-dialogo--angosto { width: 30rem; }
+
+/* --- Integrantes de una tarjeta, persona por persona --- */
+
+.integrantes {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.integrante-linea {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-size: var(--xv-texto-sm);
+    line-height: var(--xv-interlinea-compacta);
+    white-space: nowrap;
+}
+
+.integrante-linea .pi {
+    font-size: 0.7rem;
+    flex: none;
+}
+
+.integrante-linea.integrante--confirmado { color: #1d6b4a; }
+.integrante-linea.integrante--rechazado  { color: #97564f; }
+.integrante-linea.integrante--pendiente  { color: var(--xv-texto-tenue); }
+
+.integrante-linea.integrante--rechazado span { text-decoration: line-through; text-decoration-thickness: 1px; }
+
+/* Cupo que todavia nadie nombro. */
+.integrante--anonimo {
+    font-style: italic;
+    opacity: 0.75;
+}
+
+/* Respuesta que cargo el backoffice, no el invitado. */
+.integrante__manual {
+    font-size: 0.62rem !important;
+    opacity: 0.55;
+    cursor: help;
+}
+
+/* Nombre que escribio el invitado al confirmar. */
+.integrante__declarado {
+    color: var(--p-primary-color, #5279a2);
+    cursor: help;
+}
+
+.leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.1rem;
+    margin-top: 0.85rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+.leyenda .integrante-linea { font-size: var(--xv-texto-xs); }
+
+/* --- Varios --- */
+
+/* La pone el layout cuando se abre el cajon del menu en movil. */
+.xv-sin-scroll { overflow: hidden; }
+
+:focus-visible {
+    outline: 2px solid var(--p-primary-color, #5279a2);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,83 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Cargar respuesta"
+  styleClass="xv-dialogo"
+  (onShow)="reiniciar()">
+
+  @if (tarjeta(); as t) {
+    <div class="respuestas">
+
+      <p class="respuestas__intro">
+        Anote lo que le dijeron por teléfono o en persona, para
+        <strong>{{ t.nombre_mostrar }}</strong>.
+      </p>
+
+      <ul class="lista">
+        @for (p of personas(); track p.id) {
+          <li class="persona">
+
+            <div class="persona__alto">
+              <span class="persona__nombre" [class.persona__nombre--vacio]="!p.nombre">
+                {{ p.nombre || 'Acompañante sin nombre' }}
+              </span>
+
+              <div class="opciones" role="group" [attr.aria-label]="'Respuesta de ' + (p.nombre || 'acompañante')">
+                <button type="button" class="opcion opcion--si"
+                        [class.opcion--activa]="valor_de(p.id) === true"
+                        [attr.aria-pressed]="valor_de(p.id) === true"
+                        (click)="marcar(p.id, true)">Sí</button>
+
+                <button type="button" class="opcion opcion--no"
+                        [class.opcion--activa]="valor_de(p.id) === false"
+                        [attr.aria-pressed]="valor_de(p.id) === false"
+                        (click)="marcar(p.id, false)">No</button>
+
+                <button type="button" class="opcion opcion--sin"
+                        [class.opcion--activa]="valor_de(p.id) === null"
+                        [attr.aria-pressed]="valor_de(p.id) === null"
+                        (click)="marcar(p.id, null)">Sin responder</button>
+              </div>
+            </div>
+
+            @if (!p.nombre && valor_de(p.id) !== null) {
+              <input pInputText type="text" class="persona__declarado"
+                     placeholder="Ej. Abuela Rosa — quién viene en este cupo"
+                     [value]="nombre_de(p.id)"
+                     (input)="escribir_nombre(p.id, $event)"
+                     [attr.aria-label]="'Nombre de quien ocupa el cupo'">
+            }
+
+            @if (valor_de(p.id) === true) {
+              <input pInputText type="text" class="persona__declarado" maxlength="120"
+                     placeholder="Alergia, intolerancia o dieta (opcional)"
+                     [value]="alimentacion_de(p.id)"
+                     (input)="escribir_alimentacion(p.id, $event)"
+                     [attr.aria-label]="'Alergia, intolerancia o dieta de ' + (p.nombre || 'acompañante')">
+            }
+
+          </li>
+        }
+      </ul>
+
+  
+
+      @if (error(); as mensaje) {
+        <p class="respuestas__error" role="alert">{{ mensaje }}</p>
+      }
+
+      <div class="acciones">
+        <span class="acciones__conteo">
+          <span class="xv-numero">{{ confirmados() }}</span> de
+          <span class="xv-numero">{{ personas().length }}</span> confirmados
+        </span>
+        <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+        <p-button label="Guardar" [loading]="guardando()" (onClick)="guardar()" />
+      </div>
+
+    </div>
+  }
+
+</p-dialog>
