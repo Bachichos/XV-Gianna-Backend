@@ -1,4 +1,300 @@
 <xv-layout>
-    <h1>Configuración</h1>
-    <p class="pendiente">Los datos editables de cada sección de la invitación</p>
+    <header class="cabecera">
+        <h1>Configuración</h1>
+        <p class="cabecera__resumen">Los datos de la fiesta, los textos de cada sección y el tema de la invitación.</p>
+    </header>
+
+    @if (estado() === 'cargando') {
+    <p class="tenue">Cargando&hellip;</p>
+    } @else if (estado() === 'error') {
+    <p class="aviso aviso--error" role="alert">No pudimos leer la configuración. Revise la conexión y vuelva a intentar.</p>
+    } @else {
+
+    <p-tabs value="fiesta">
+        <p-tablist>
+            <p-tab value="fiesta">Fiesta</p-tab>
+            <p-tab value="programa">Programa e información</p-tab>
+            <p-tab value="regalo">Regalo</p-tab>
+            <p-tab value="secciones">Secciones y textos</p-tab>
+            <p-tab value="tema">Tema</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+
+            <!-- ============================== FIESTA -->
+            <p-tabpanel value="fiesta">
+                <section class="panel">
+                    <h2>La fiesta</h2>
+                    <div class="grilla">
+                        <div class="campo">
+                            <label for="c-festejada">A quién se festeja</label>
+                            <input pInputText id="c-festejada" [(ngModel)]="b.festejada" placeholder="Ej. Gianna">
+                            <small>El nombre grande de la presentación.</small>
+                        </div>
+                        <div class="campo">
+                            <label for="c-titulo">Título del evento</label>
+                            <input pInputText id="c-titulo" [(ngModel)]="b.titulo" placeholder="Ej. Los 15 de Gianna">
+                            <small>Así aparece en el calendario de cada invitado.</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>Cuándo</h2>
+                    <div class="grilla">
+                        <div class="campo">
+                            <label for="c-zona">Dónde es la fiesta (zona horaria)</label>
+                            <p-select inputId="c-zona" [options]="zonas" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="b.zona" />
+                            <small>Fecha y hora se muestran como en ese lugar, aunque el invitado esté de viaje.</small>
+                        </div>
+                        <div class="campo">
+                            <label for="c-fecha-dia">Empieza</label>
+                            <div class="fila">
+                                <input pInputText id="c-fecha-dia" type="date" [(ngModel)]="b.fecha_dia">
+                                <input pInputText type="time" [(ngModel)]="b.fecha_hora" aria-label="Hora de inicio">
+                            </div>
+                        </div>
+                        <div class="campo">
+                            <label for="c-termina-dia">Termina</label>
+                            <div class="fila">
+                                <input pInputText id="c-termina-dia" type="date" [(ngModel)]="b.termina_dia">
+                                <input pInputText type="time" [(ngModel)]="b.termina_hora" aria-label="Hora de fin">
+                            </div>
+                            <small>Hace falta para agendar el evento.</small>
+                        </div>
+                        <div class="campo">
+                            <label for="c-cierre">Último día para confirmar</label>
+                            <input pInputText id="c-cierre" type="date" [(ngModel)]="b.ultimo_dia">
+                            <small class="advertencia">
+                                <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                                Tiene que coincidir con la regla de seguridad de Firebase, que hoy corta el
+                                <strong>{{ ultimo_dia_de_la_regla }}</strong>. Si lo cambia, hay que cambiar también la regla.
+                            </small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>Dónde</h2>
+                    <div class="grilla">
+                        <div class="campo">
+                            <label for="c-salon">Nombre del lugar</label>
+                            <input pInputText id="c-salon" [(ngModel)]="b.salon.nombre">
+                        </div>
+                        <div class="campo">
+                            <label for="c-direccion">Dirección</label>
+                            <input pInputText id="c-direccion" [(ngModel)]="b.salon.direccion">
+                        </div>
+                        <div class="campo campo--ancho">
+                            <label for="c-maps">Link de Google Maps</label>
+                            <input pInputText id="c-maps" [(ngModel)]="b.salon.maps" placeholder="https://maps.app.goo.gl/…">
+                            <small>El que se comparte desde la app: abre la ficha del lugar, con fotos y reseñas.</small>
+                        </div>
+                        <div class="campo campo--ancho">
+                            <label for="c-coordenadas">Coordenadas, para Waze</label>
+                            <div class="fila">
+                                <input pInputText id="c-coordenadas" type="number" step="any" [(ngModel)]="b.salon.latitud" aria-label="Latitud">
+                                <input pInputText type="number" step="any" [(ngModel)]="b.salon.longitud" aria-label="Longitud">
+                            </div>
+                            <input pInputText class="pegar" [(ngModel)]="b.link_largo" (ngModelChange)="sacar_coordenadas($event)"
+                                   placeholder="O pegue acá el link largo de Google Maps y se completan solas">
+                            @if (coordenadas_aviso()) { <small class="advertencia">{{ coordenadas_aviso() }}</small> }
+                            <small>Waze no entiende los links de Google: necesita las coordenadas del mismo lugar.</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>Confirmación</h2>
+                    <div class="campo">
+                        <label for="c-alergias">Dónde se pregunta por alergias, intolerancias y dietas</label>
+                        <p-select inputId="c-alergias" [options]="opciones_alergias" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="b.alergias" />
+                        <small>En las dos formas es obligatoria para poder confirmar.</small>
+                    </div>
+                </section>
+            </p-tabpanel>
+
+            <!-- ============================== PROGRAMA E INFORMACION -->
+            <p-tabpanel value="programa">
+                <section class="panel">
+                    <div class="panel__cabecera">
+                        <h2>Programa</h2>
+                        <label class="interruptor">
+                            <p-toggleswitch [(ngModel)]="b.secciones.programa.visible" />
+                            {{ b.secciones.programa.visible ? 'Se muestra' : 'No se muestra' }}
+                        </label>
+                    </div>
+
+                    <ol class="lista">
+                        @for (item of b.programa; track $index; let i = $index, primero = $first, ultimo = $last) {
+                        <li class="lista__fila lista__fila--programa">
+                            <input pInputText type="time" [(ngModel)]="item.hora" [attr.aria-label]="'Hora del momento ' + (i + 1)">
+                            <input pInputText [(ngModel)]="item.titulo" placeholder="Ej. Recepción" [attr.aria-label]="'Qué pasa en el momento ' + (i + 1)">
+                            <p-select [options]="iconos" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="item.icono" [ariaLabel]="'Ícono del momento ' + (i + 1)" />
+                            <span class="lista__acciones">
+                                <button type="button" class="icono" (click)="mover(b.programa, i, -1)" [disabled]="primero" aria-label="Subir"><i class="pi pi-arrow-up"></i></button>
+                                <button type="button" class="icono" (click)="mover(b.programa, i, 1)" [disabled]="ultimo" aria-label="Bajar"><i class="pi pi-arrow-down"></i></button>
+                                <button type="button" class="icono icono--quitar" (click)="quitar(b.programa, i)" aria-label="Quitar"><i class="pi pi-trash"></i></button>
+                            </span>
+                        </li>
+                        }
+                    </ol>
+                    <button type="button" class="agregar" (click)="b.programa.push({ hora: '', titulo: '', icono: '' })">
+                        <i class="pi pi-plus" aria-hidden="true"></i> Agregar momento
+                    </button>
+                </section>
+
+                <section class="panel">
+                    <div class="panel__cabecera">
+                        <h2>Información importante</h2>
+                        <label class="interruptor">
+                            <p-toggleswitch [(ngModel)]="b.secciones.informacion.visible" />
+                            {{ b.secciones.informacion.visible ? 'Se muestra' : 'No se muestra' }}
+                        </label>
+                    </div>
+                    <p class="tenue">Un título corto y una o dos líneas: más largo, en un teléfono, deja de leerse.
+                        <code>{{ '{' }}cierre{{ '}' }}</code> se reemplaza por el último día para confirmar.</p>
+
+                    <ol class="lista">
+                        @for (d of b.informacion; track $index; let i = $index, primero = $first, ultimo = $last) {
+                        <li class="lista__fila lista__fila--info">
+                            <input pInputText [(ngModel)]="d.titulo" placeholder="Ej. Código de vestimenta" [attr.aria-label]="'Título del bloque ' + (i + 1)">
+                            <textarea pTextarea rows="2" [(ngModel)]="d.texto" [attr.aria-label]="'Texto del bloque ' + (i + 1)"></textarea>
+                            <span class="lista__acciones">
+                                <button type="button" class="icono" (click)="mover(b.informacion, i, -1)" [disabled]="primero" aria-label="Subir"><i class="pi pi-arrow-up"></i></button>
+                                <button type="button" class="icono" (click)="mover(b.informacion, i, 1)" [disabled]="ultimo" aria-label="Bajar"><i class="pi pi-arrow-down"></i></button>
+                                <button type="button" class="icono icono--quitar" (click)="quitar(b.informacion, i)" aria-label="Quitar"><i class="pi pi-trash"></i></button>
+                            </span>
+                        </li>
+                        }
+                    </ol>
+                    <button type="button" class="agregar" (click)="b.informacion.push({ titulo: '', texto: '' })">
+                        <i class="pi pi-plus" aria-hidden="true"></i> Agregar bloque
+                    </button>
+                </section>
+            </p-tabpanel>
+
+            <!-- ============================== REGALO -->
+            <p-tabpanel value="regalo">
+                <section class="panel">
+                    <div class="panel__cabecera">
+                        <h2>Regalo</h2>
+                        <label class="interruptor">
+                            <p-toggleswitch [(ngModel)]="b.secciones.regalo.visible" />
+                            {{ b.secciones.regalo.visible ? 'Se muestra' : 'No se muestra' }}
+                        </label>
+                    </div>
+
+                    <div class="campo">
+                        <label>Quiénes lo ven</label>
+                        <p-selectbutton [options]="opciones_regalo" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="b.regalo.para" [allowEmpty]="false" />
+                        @if (b.regalo.para === 'algunas') {
+                        <p-multiselect [options]="categorias" [(ngModel)]="b.regalo.categorias" placeholder="Elija las categorías" display="chip" ariaLabel="Categorías que ven el regalo" />
+                        <small>Solo las tarjetas de estas categorías ven la sección.</small>
+                        }
+                    </div>
+
+                    <div class="campo">
+                        <label for="c-regalo-texto">Texto</label>
+                        <textarea pTextarea id="c-regalo-texto" rows="5" [(ngModel)]="b.regalo.texto"></textarea>
+                    </div>
+
+                    <div class="grilla">
+                        <div class="campo">
+                            <label for="c-alias">Alias</label>
+                            <input pInputText id="c-alias" [(ngModel)]="b.regalo.alias">
+                        </div>
+                        <div class="campo">
+                            <label for="c-cbu">CBU o CVU</label>
+                            <input pInputText id="c-cbu" inputmode="numeric" [(ngModel)]="b.regalo.cbu">
+                        </div>
+                        <div class="campo">
+                            <label for="c-titular">Titular</label>
+                            <input pInputText id="c-titular" [(ngModel)]="b.regalo.titular">
+                        </div>
+                    </div>
+                </section>
+            </p-tabpanel>
+
+            <!-- ============================== SECCIONES Y TEXTOS -->
+            <p-tabpanel value="secciones">
+                <p class="tenue intro">
+                    Cada campo muestra en gris el texto que viene de fábrica. Déjelo vacío para usar ese;
+                    escriba para cambiarlo. Lo que va entre llaves, como <code>{{ '{' }}hora{{ '}' }}</code>,
+                    se completa solo: puede moverlo dentro de la frase, pero no borrarlo.
+                </p>
+
+                @for (s of secciones; track s.id) {
+                <section class="panel">
+                    <div class="panel__cabecera">
+                        <h2>{{ s.nombre }}</h2>
+                        @if (es_opcional(s.id)) {
+                        <label class="interruptor">
+                            <p-toggleswitch [(ngModel)]="b.secciones[s.id].visible" />
+                            {{ b.secciones[s.id].visible ? 'Se muestra' : 'No se muestra' }}
+                        </label>
+                        }
+                    </div>
+
+                    <div class="textos">
+                        @for (t of claves(s.textos); track t) {
+                        <div class="campo">
+                            <label [for]="'t-' + s.id + '-' + t">{{ s.textos[t] }}</label>
+                            <input pInputText [id]="'t-' + s.id + '-' + t" [(ngModel)]="b.secciones[s.id].textos[t]"
+                                   [placeholder]="por_defecto(s.id, t)">
+                            @if (falta_marcador(s.id, t); as falta) {
+                            <small class="advertencia">
+                                <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                                Falta <code>{{ falta }}</code>: sin eso, no se muestra {{ marcadores[falta] }}.
+                            </small>
+                            }
+                        </div>
+                        }
+                    </div>
+                </section>
+                }
+            </p-tabpanel>
+
+            <!-- ============================== TEMA -->
+            <p-tabpanel value="tema">
+                <section class="panel">
+                    <h2>Tema</h2>
+                    <p class="tenue">Los temas son de fábrica: cada uno trae sus colores, sus tipografías y sus adornos, probados para que todo se lea bien.</p>
+
+                    <div class="temas" role="radiogroup" aria-label="Tema de la invitación">
+                        @for (t of temas; track t.id) {
+                        <label class="tema" [class.tema--elegido]="b.tema === t.id">
+                            <input type="radio" name="tema" [value]="t.id" [(ngModel)]="b.tema">
+                            <span class="tema__nombre">{{ t.nombre }}</span>
+                            <span class="tema__descripcion">{{ t.descripcion }}</span>
+                        </label>
+                        }
+                    </div>
+                    <p class="tenue">La vista previa de la presentación viene en el próximo paso.</p>
+                </section>
+            </p-tabpanel>
+
+        </p-tabpanels>
+    </p-tabs>
+
+    <!-- Cambios sin guardar: siempre a la vista, abajo. -->
+    @if (sucio() || guardado()) {
+    <div class="barra" [class.barra--guardado]="!sucio() && guardado()" role="status">
+        @if (sucio()) {
+        <span>
+            <i class="pi pi-pencil" aria-hidden="true"></i> Hay cambios sin guardar.
+            @if (error_guardar(); as e) { <strong class="barra__error">{{ e }}</strong> }
+        </span>
+        <span class="barra__acciones">
+            <p-button label="Descartar" severity="secondary" [text]="true" (onClick)="descartar()" [disabled]="guardando()" />
+            <p-button label="Guardar" icon="pi pi-check" (onClick)="guardar()" [loading]="guardando()" [disabled]="!!problema()" />
+        </span>
+        @if (problema(); as p) { <small class="barra__problema">{{ p }}</small> }
+        } @else {
+        <span><i class="pi pi-check" aria-hidden="true"></i> Guardado. La invitación ya lo muestra.</span>
+        }
+    </div>
+    }
+
+    }
 </xv-layout>

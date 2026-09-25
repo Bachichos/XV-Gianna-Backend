@@ -1,4 +1,268 @@
-.pendiente {
-    margin-top: 0.75rem;
+.cabecera { margin-bottom: 1.5rem; }
+
+.cabecera__resumen,
+.tenue {
+    margin-top: 0.5rem;
     color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+}
+
+.intro { margin: 1.25rem 0 1rem; max-width: 46rem; }
+
+.aviso--error {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e4b9b9;
+    border-radius: 3px;
+    background: #fbf1f1;
+    color: #8f2c2c;
+}
+
+code {
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    background: var(--xv-plata-brillo);
+    font-size: 0.9em;
+}
+
+/* Deja lugar abajo para la barra de guardar, que flota. */
+:host { display: block; padding-bottom: 5rem; }
+
+/* --- Paneles, como los de Estadisticas --- */
+
+.panel {
+    margin-top: 1.25rem;
+    padding: 1.4rem 1.5rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+}
+
+.panel h2 {
+    margin-bottom: 1rem;
+    font-size: var(--xv-texto-xl);
+}
+
+.panel__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.panel__cabecera h2 { margin-bottom: 0; }
+
+/* --- Campos: uno debajo del otro, a todo lo ancho --- */
+
+.grilla {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+/* Entre campos sueltos del panel, la misma separacion que dentro de la grilla. */
+.panel > .campo + .campo,
+.panel > .campo + .grilla,
+.panel > .grilla + .campo { margin-top: 1.6rem; }
+
+.campo label {
+    font-size: var(--xv-texto-sm);
+    font-weight: var(--xv-peso-medio);
+    color: var(--xv-texto);
+}
+
+.campo input,
+.campo textarea,
+.campo p-select,
+.campo p-multiselect { width: 100%; }
+
+.campo small {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+    line-height: var(--xv-interlinea-compacta);
+}
+
+.campo .advertencia,
+.advertencia {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    color: #8a6115;
+}
+
+.advertencia .pi { font-size: 0.8rem; }
+
+.fila {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.fila input { width: 100%; }
+
+.pegar { margin-top: 0.15rem; }
+
+.interruptor {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+    cursor: pointer;
+}
+
+/* --- Listas editables (programa, informacion) --- */
+
+.lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lista__fila {
+    display: grid;
+    align-items: start;
+    gap: 0.5rem;
+}
+
+.lista__fila--programa { grid-template-columns: 7.5rem 1fr 13rem auto; }
+.lista__fila--info     { grid-template-columns: 14rem 1fr auto; }
+
+@media (max-width: 50rem) {
+    .lista__fila--programa,
+    .lista__fila--info {
+        grid-template-columns: 1fr;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--xv-borde);
+    }
+}
+
+.lista__fila input,
+.lista__fila textarea,
+.lista__fila p-select { width: 100%; }
+
+.lista__acciones {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.icono {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    cursor: pointer;
+}
+
+.icono:hover:not(:disabled) { border-color: var(--xv-borde-fuerte); color: var(--p-primary-color, #5279a2); }
+.icono:disabled { opacity: 0.35; cursor: default; }
+.icono--quitar:hover:not(:disabled) { color: #8f2c2c; border-color: #e4bdbd; }
+
+.agregar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.9rem;
+    padding: 0.45rem 0.9rem;
+    background: none;
+    border: 1px dashed var(--xv-borde-fuerte);
+    border-radius: 3px;
+    color: var(--p-primary-700, #374e6b);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+}
+
+.agregar:hover { background: var(--p-primary-50, #f3f6fa); }
+
+/* --- Textos de cada seccion --- */
+
+.textos {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+}
+
+/* --- Temas --- */
+
+.temas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+.tema {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.tema input { position: absolute; opacity: 0; pointer-events: none; }
+
+.tema--elegido {
+    border-color: var(--p-primary-color, #5279a2);
+    box-shadow: 0 0 0 1px var(--p-primary-color, #5279a2);
+    background: var(--p-primary-50, #f3f6fa);
+}
+
+.tema:has(input:focus-visible) { outline: 2px solid var(--p-primary-color, #5279a2); outline-offset: 2px; }
+
+.tema__nombre { font-family: var(--xv-display); font-size: var(--xv-texto-lg); }
+.tema__descripcion { font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
+
+/* --- La barra de guardar, flotando abajo --- */
+
+.barra {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.25rem;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    max-width: min(40rem, calc(100vw - 3rem));
+    padding: 0.7rem 0.9rem 0.7rem 1.2rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 4px;
+    box-shadow: 0 10px 30px -12px rgba(28, 39, 53, 0.35);
+    font-size: var(--xv-texto-sm);
+}
+
+.barra .pi { margin-right: 0.35rem; font-size: 0.85rem; }
+
+.barra--guardado {
+    border-color: #a9d8c2;
+    background: #e6f4ee;
+    color: #1d6b4a;
+}
+
+.barra__acciones { display: flex; gap: 0.4rem; }
+
+.barra__problema,
+.barra__error {
+    flex-basis: 100%;
+    color: #8f2c2c;
+    font-size: var(--xv-texto-xs);
 }
