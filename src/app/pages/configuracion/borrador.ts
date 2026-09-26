@@ -21,6 +21,9 @@ export type Borrador = {
     informacion: { titulo: string, texto: string }[]
     regalo: { para: 'todos' | 'algunas', categorias: string[], texto: string, alias: string, cbu: string, titular: string }
     alergias: Configuracion['evento']['confirmacion']['alergias']
+    /** En objetos, y no como textos sueltos: ngModel dentro de un @for los necesita asi. */
+    categorias: { nombre: string }[]
+    mensajes: Configuracion['evento']['mensajes']
     secciones: Record<Seccion, { visible: boolean, textos: Record<string, string> }>
     tema: string
 }
@@ -54,6 +57,8 @@ export const a_borrador = (c: Configuracion): Borrador => {
             texto: e.regalo.texto, alias: e.regalo.alias, cbu: e.regalo.cbu, titular: e.regalo.titular,
         },
         alergias: e.confirmacion.alergias,
+        categorias: e.categorias.map(nombre => ({ nombre })),
+        mensajes: { ...e.mensajes },
         secciones,
         tema: c.tema.id,
     }
@@ -78,6 +83,8 @@ export const a_configuracion = (b: Borrador): Configuracion => {
             fecha:     instante(b.fecha_dia, b.fecha_hora, b.zona),
             termina:   instante(b.termina_dia, b.termina_hora, b.zona),
             cierre:    cierre_desde_ultimo_dia(b.ultimo_dia),
+            // Para la regla de seguridad, que corta las respuestas con esto.
+            cierre_ms: new Date(cierre_desde_ultimo_dia(b.ultimo_dia)).getTime(),
             zona:      b.zona,
             salon:     { ...b.salon, latitud: Number(b.salon.latitud), longitud: Number(b.salon.longitud) },
             programa:  b.programa.map(p => ({ hora: p.hora, titulo: p.titulo.trim(), icono: p.icono })),
@@ -88,6 +95,8 @@ export const a_configuracion = (b: Borrador): Configuracion => {
                 cbu: b.regalo.cbu.trim(), titular: b.regalo.titular.trim(),
             },
             confirmacion: { alergias: b.alergias },
+            categorias:   b.categorias.map(c => c.nombre.trim()),
+            mensajes:     { invitacion: b.mensajes.invitacion.trim(), recordatorio: b.mensajes.recordatorio.trim() },
         },
         secciones: secciones as ConfigSecciones,
         tema: { id: b.tema },

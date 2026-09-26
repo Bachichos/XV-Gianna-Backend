@@ -42,7 +42,7 @@
                   [ngModel]="estado_filtro()"
                   (ngModelChange)="estado_filtro.set($event)" />
 
-        <p-select class="filtros__categoria" [options]="opciones_categoria" optionLabel="etiqueta" optionValue="valor"
+        <p-select class="filtros__categoria" [options]="opciones_categoria()" optionLabel="etiqueta" optionValue="valor"
             ariaLabel="Filtrar por categoría" [ngModel]="categoria()" (ngModelChange)="categoria.set($event)" />
 
         <button type="button" class="filtros__accion" (click)="alternar_orden()"

@@ -11,6 +11,8 @@ import { definePreset } from '@openng/optimus-ui-themes';
 import Aura from '@openng/optimus-ui-themes/aura';
 import { Usuario } from './models/usuario';
 import { TarjetaConId } from './models/tarjeta';
+import { Configuracion, POR_DEFECTO } from './models/configuracion';
+import { Marca, MARCA_POR_DEFECTO } from './models/marca';
 
 /* Fechas, numeros y meses en castellano: sin esto el DatePipe escribe en ingles. */
 registerLocaleData(es_AR);
@@ -21,6 +23,16 @@ export const XVStorage = {
   /** La coleccion en vivo. null mientras no haya sesion o no haya llegado. */
   tarjetas:       signal<TarjetaConId[] | null>(null),
   error_tarjetas: signal<string | null>(null),
+
+  /**
+   * La configuracion de la fiesta. Arranca con los valores por defecto y se
+   * reemplaza cuando llega la guardada (app.ts) o cuando se guarda una nueva
+   * (pantalla Configuracion). De aca salen las categorias y los mensajes.
+   */
+  configuracion:  signal<Configuracion>(POR_DEFECTO),
+
+  /** El nombre del evento y su logo (models/marca.ts). Se lee al abrir, antes del login. */
+  marca:          signal<Marca>(MARCA_POR_DEFECTO),
 }
 
 const firebase_config = {

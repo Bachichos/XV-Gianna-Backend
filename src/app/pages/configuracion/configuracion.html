@@ -1,7 +1,13 @@
 <xv-layout>
     <header class="cabecera">
-        <h1>Configuración</h1>
-        <p class="cabecera__resumen">Los datos de la fiesta, los textos de cada sección y el tema de la invitación.</p>
+        <div>
+            <h1>Configuración</h1>
+            <p class="cabecera__resumen">Los datos de la fiesta, los textos de cada sección y el tema de la invitación.</p>
+        </div>
+        <button type="button" class="ver-previa" (click)="ver_previa.set(!ver_previa())" [attr.aria-pressed]="ver_previa()">
+            <i class="pi" [class.pi-eye]="!ver_previa()" [class.pi-eye-slash]="ver_previa()" aria-hidden="true"></i>
+            {{ ver_previa() ? 'Ocultar vista previa' : 'Ver vista previa' }}
+        </button>
     </header>
 
     @if (estado() === 'cargando') {
@@ -10,11 +16,17 @@
     <p class="aviso aviso--error" role="alert">No pudimos leer la configuración. Revise la conexión y vuelva a intentar.</p>
     } @else {
 
-    <p-tabs value="fiesta">
-        <p-tablist>
+    <div class="con-previa" [class.con-previa--sin]="!ver_previa()">
+    <!-- En el telefono las pestanas no entran: se elige desde un desplegable. -->
+    <p-select class="pestanas-movil" [options]="pestanas" optionLabel="etiqueta" optionValue="valor"
+              [ngModel]="pestana()" (ngModelChange)="pestana.set($event)" ariaLabel="Parte de la configuración" />
+
+    <p-tabs [value]="pestana()" (valueChange)="pestana.set($any($event))">
+        <p-tablist class="pestanas-escritorio">
             <p-tab value="fiesta">Fiesta</p-tab>
             <p-tab value="programa">Programa e información</p-tab>
             <p-tab value="regalo">Regalo</p-tab>
+            <p-tab value="mensajes">Tarjetas y mensajes</p-tab>
             <p-tab value="secciones">Secciones y textos</p-tab>
             <p-tab value="tema">Tema</p-tab>
         </p-tablist>
@@ -65,11 +77,9 @@
                         <div class="campo">
                             <label for="c-cierre">Último día para confirmar</label>
                             <input pInputText id="c-cierre" type="date" [(ngModel)]="b.ultimo_dia">
-                            <small class="advertencia">
-                                <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-                                Tiene que coincidir con la regla de seguridad de Firebase, que hoy corta el
-                                <strong>{{ ultimo_dia_de_la_regla }}</strong>. Si lo cambia, hay que cambiar también la regla.
-                            </small>
+                            <small>Hasta ese día, inclusive, los invitados pueden responder. Después, la
+                                invitación ya no deja confirmar: lo controla la regla de seguridad de Firebase,
+                                que toma esta misma fecha.</small>
                         </div>
                     </div>
                 </section>
@@ -128,6 +138,7 @@
                     <ol class="lista">
                         @for (item of b.programa; track $index; let i = $index, primero = $first, ultimo = $last) {
                         <li class="lista__fila lista__fila--programa">
+                            <span class="lista__numero">Momento {{ i + 1 }}</span>
                             <input pInputText type="time" [(ngModel)]="item.hora" [attr.aria-label]="'Hora del momento ' + (i + 1)">
                             <input pInputText [(ngModel)]="item.titulo" placeholder="Ej. Recepción" [attr.aria-label]="'Qué pasa en el momento ' + (i + 1)">
                             <p-select [options]="iconos" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="item.icono" [ariaLabel]="'Ícono del momento ' + (i + 1)" />
@@ -158,6 +169,7 @@
                     <ol class="lista">
                         @for (d of b.informacion; track $index; let i = $index, primero = $first, ultimo = $last) {
                         <li class="lista__fila lista__fila--info">
+                            <span class="lista__numero">Bloque {{ i + 1 }}</span>
                             <input pInputText [(ngModel)]="d.titulo" placeholder="Ej. Código de vestimenta" [attr.aria-label]="'Título del bloque ' + (i + 1)">
                             <textarea pTextarea rows="2" [(ngModel)]="d.texto" [attr.aria-label]="'Texto del bloque ' + (i + 1)"></textarea>
                             <span class="lista__acciones">
@@ -189,7 +201,7 @@
                         <label>Quiénes lo ven</label>
                         <p-selectbutton [options]="opciones_regalo" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="b.regalo.para" [allowEmpty]="false" />
                         @if (b.regalo.para === 'algunas') {
-                        <p-multiselect [options]="categorias" [(ngModel)]="b.regalo.categorias" placeholder="Elija las categorías" display="chip" ariaLabel="Categorías que ven el regalo" />
+                        <p-multiselect [options]="nombres_categorias()" [(ngModel)]="b.regalo.categorias" placeholder="Elija las categorías" display="chip" ariaLabel="Categorías que ven el regalo" />
                         <small>Solo las tarjetas de estas categorías ven la sección.</small>
                         }
                     </div>
@@ -212,6 +224,73 @@
                             <label for="c-titular">Titular</label>
                             <input pInputText id="c-titular" [(ngModel)]="b.regalo.titular">
                         </div>
+                    </div>
+                </section>
+            </p-tabpanel>
+
+            <!-- ============================== TARJETAS Y MENSAJES -->
+            <p-tabpanel value="mensajes">
+                <section class="panel">
+                    <h2>Categorías de tarjetas</h2>
+                    <p class="tenue">Sirven para filtrar las tarjetas, para las estadísticas y para elegir quién ve el regalo.
+                        Cambiar el nombre de una no cambia las tarjetas que ya la tienen: esas se editan desde Tarjetas.</p>
+
+                    <ol class="lista">
+                        @for (c of b.categorias; track $index; let i = $index, primero = $first, ultimo = $last) {
+                        <li class="lista__fila lista__fila--categoria">
+                            <span class="lista__numero">Categoría {{ i + 1 }}</span>
+                            <input pInputText [(ngModel)]="c.nombre" placeholder="Ej. Familia" [attr.aria-label]="'Categoría ' + (i + 1)">
+                            <span class="lista__acciones">
+                                <button type="button" class="icono" (click)="mover(b.categorias, i, -1)" [disabled]="primero" aria-label="Subir"><i class="pi pi-arrow-up"></i></button>
+                                <button type="button" class="icono" (click)="mover(b.categorias, i, 1)" [disabled]="ultimo" aria-label="Bajar"><i class="pi pi-arrow-down"></i></button>
+                                <button type="button" class="icono icono--quitar" (click)="quitar(b.categorias, i)" [disabled]="b.categorias.length === 1" aria-label="Quitar"><i class="pi pi-trash"></i></button>
+                            </span>
+                        </li>
+                        }
+                    </ol>
+                    <button type="button" class="agregar" (click)="b.categorias.push({ nombre: '' })">
+                        <i class="pi pi-plus" aria-hidden="true"></i> Agregar categoría
+                    </button>
+                </section>
+
+                <section class="panel">
+                    <h2>Mensajes de WhatsApp</h2>
+                    <p class="tenue">Lo que va entre llaves se completa solo, para cada tarjeta. Para cambiar lo que dice, cambie el dato de origen:</p>
+
+                    <table class="marcadores">
+                        <thead>
+                            <tr><th>En el mensaje</th><th>Qué se pone</th><th>Dónde se cambia</th></tr>
+                        </thead>
+                        <tbody>
+                            @for (m of marcadores_mensaje; track m.clave) {
+                            <tr>
+                                <td><code>{{ '{' + m.clave + '}' }}</code></td>
+                                <td>{{ m.que }}</td>
+                                <td>{{ m.donde }}</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="grilla">
+                        @for (m of mensajes; track m.id) {
+                        <div class="campo">
+                            <div class="campo__cabecera">
+                                <label [for]="'m-' + m.id">{{ m.etiqueta }}</label>
+                                @if (b.mensajes[m.id] !== por_defecto_mensaje(m.id)) {
+                                <button type="button" class="restaurar" (click)="b.mensajes[m.id] = por_defecto_mensaje(m.id)">Volver al de fábrica</button>
+                                }
+                            </div>
+                            <textarea pTextarea [id]="'m-' + m.id" rows="9" [(ngModel)]="b.mensajes[m.id]"></textarea>
+                            @if (!b.mensajes[m.id].includes('{link}')) {
+                            <small class="advertencia">
+                                <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                                Falta <code>{{ '{' }}link{{ '}' }}</code>: sin eso, el invitado no recibe su invitación.
+                            </small>
+                            }
+                            <small>{{ m.ayuda }}</small>
+                        </div>
+                        }
                     </div>
                 </section>
             </p-tabpanel>
@@ -257,8 +336,8 @@
 
             <!-- ============================== TEMA -->
             <p-tabpanel value="tema">
-                <section class="panel tema-panel">
-                    <div class="tema-panel__elegir">
+                <section class="panel">
+                    <div>
                         <h2>Tema</h2>
                         <p class="tenue">Los temas son de fábrica: cada uno trae sus colores, sus tipografías y sus adornos, probados para que todo se lea bien.</p>
 
@@ -276,25 +355,29 @@
                             <label for="c-previa-antetitulo">Antetítulo, sobre el nombre</label>
                             <input pInputText id="c-previa-antetitulo" [(ngModel)]="b.secciones.presentacion.textos['antetitulo']"
                                    [placeholder]="por_defecto('presentacion', 'antetitulo')">
-                            <small>El nombre se cambia en la pestaña Fiesta. Los dos se ven al instante en la vista previa.</small>
+                            <small>El nombre se cambia en la pestaña Fiesta. Todo se ve al instante en la vista previa.</small>
                         </div>
                     </div>
 
-                    <!-- La presentacion de verdad, con lo que se esta editando: sin guardar. -->
-                    <figure class="telefono">
-                        <div class="telefono__pantalla">
-                            <iframe #previa [src]="url_vista_previa" title="Vista previa de la presentación" (load)="enviar_vista_previa(true)"></iframe>
-                        </div>
-                        <figcaption class="tenue">
-                            @if (vista_previa_lista()) { Vista previa: todavía sin guardar. }
-                            @else { Abriendo la vista previa&hellip; }
-                        </figcaption>
-                    </figure>
                 </section>
             </p-tabpanel>
 
         </p-tabpanels>
     </p-tabs>
+
+    <!-- La invitacion entera, con lo que se esta editando: sin guardar. Fija al costado. -->
+    <aside class="previa" [hidden]="!ver_previa()">
+        <figure class="telefono">
+            <div class="telefono__pantalla">
+                <iframe #previa [src]="url_vista_previa" title="Vista previa de la invitación" (load)="enviar_vista_previa(true)"></iframe>
+            </div>
+            <figcaption class="tenue">
+                @if (vista_previa_lista()) { Vista previa, sin guardar. Tocá el sobre para abrirla. }
+                @else { Abriendo la vista previa&hellip; }
+            </figcaption>
+        </figure>
+    </aside>
+    </div>
 
     <!-- Cambios sin guardar: siempre a la vista, abajo. -->
     @if (sucio() || guardado()) {

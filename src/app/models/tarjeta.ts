@@ -46,7 +46,7 @@ export type Tarjeta = {
 /** Como vive en la tabla: el id del documento es el token del link. */
 export type TarjetaConId = Tarjeta & { id: string }
 
-export const CATEGORIAS = ['Familia', 'Amigos Gianna', 'Colegio', 'Amigos padres'] as const
+/* Las categorias de tarjeta viven en la configuracion de la fiesta (evento.categorias). */
 
 /**
  * Id de persona: p1, p2, p3... Solo tiene que ser unico dentro de la tarjeta.
@@ -152,12 +152,7 @@ export const estado_de = (t: Tarjeta): EstadoRsvp => {
 export const se_puede_eliminar = (t: Tarjeta): boolean =>
     !t.fecha_envio && !t.fecha_confirmacion
 
-/**
- * Cuando cierran las confirmaciones. Tiene que coincidir con la regla de
- * Firestore, request.time < timestamp.date(2027, 3, 14), y con el mismo
- * dato de la invitacion (frontend/src/models/evento.ts).
- */
-export const CIERRE_CONFIRMACIONES = new Date('2027-03-14T00:00:00Z')
+/* El cierre de las confirmaciones vive en la configuracion de la fiesta (evento.cierre). */
 
 export const esta_cancelada = (t: Tarjeta): boolean =>
     !!t.fecha_cancelacion

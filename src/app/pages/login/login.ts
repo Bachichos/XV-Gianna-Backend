@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { XVStorage } from '../../app.config';
 import { Router } from '@angular/router';
 import { Button } from '@openng/optimus-ui/button';
 import { Message } from '@openng/optimus-ui/message';
@@ -14,6 +15,14 @@ export class LoginPage implements OnInit {
 
   private readonly firebase_auth = inject(FirebaseAuthService)
   private readonly router        = inject(Router)
+
+  protected readonly marca = XVStorage.marca.asReadonly()
+
+  /** "3 de abril de 2027": la fecha de la fiesta, de la configuracion. */
+  protected readonly fecha = computed(() => {
+    const e = XVStorage.configuracion().evento
+    return new Intl.DateTimeFormat('es-AR', { timeZone: e.zona, day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(e.fecha))
+  })
 
   protected readonly cargando = signal(false)
   protected readonly error    = signal<string | null>(null)

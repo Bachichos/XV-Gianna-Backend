@@ -9,7 +9,7 @@
             aria-label="Abrir el menú">
       <i class="pi" [class.pi-bars]="!abierto()" [class.pi-times]="abierto()" aria-hidden="true"></i>
     </button>
-    <span class="layout__marca">Mis 15 &middot; Gianna</span>
+    <span class="layout__marca">{{ marca().nombre }}</span>
   </header>
 
   <div class="layout__velo" (click)="cerrar()" aria-hidden="true"></div>

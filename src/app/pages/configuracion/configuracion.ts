@@ -1,4 +1,5 @@
 import { Component, ElementRef, inject, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
+import { XVStorage } from '../../app.config';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@openng/optimus-ui/tabs';
@@ -11,10 +12,9 @@ import { ToggleSwitch } from '@openng/optimus-ui/toggleswitch';
 import { Button } from '@openng/optimus-ui/button';
 import { XVLayout } from "../../components/design/xv-layout/xv-layout";
 import { FirebaseConfiguracionService } from '../../services/firebase-configuracion';
-import { Configuracion } from '../../models/configuracion';
+import { Configuracion, POR_DEFECTO } from '../../models/configuracion';
 import { Borrador, a_borrador, a_configuracion, textos_de } from './borrador';
 import { TEMAS_DISPONIBLES } from '../../models/temas';
-import { CATEGORIAS, CIERRE_CONFIRMACIONES } from '../../models/tarjeta';
 import { ICONOS, MARCADORES, marcadores_de, SECCIONES, Seccion, es_opcional } from './etiquetas';
 import { ZONAS } from './fechas';
 import { URL_INVITACION } from '../../models/mensaje';
@@ -38,6 +38,17 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
 
   protected readonly estado = signal<'cargando' | 'lista' | 'error'>('cargando')
 
+  /** La pestana abierta. La comparten la barra de la compu y el desplegable del telefono. */
+  protected readonly pestana = signal('fiesta')
+  protected readonly pestanas = [
+    { etiqueta: 'Fiesta',                 valor: 'fiesta' },
+    { etiqueta: 'Programa e información', valor: 'programa' },
+    { etiqueta: 'Regalo',                 valor: 'regalo' },
+    { etiqueta: 'Tarjetas y mensajes',    valor: 'mensajes' },
+    { etiqueta: 'Secciones y textos',     valor: 'secciones' },
+    { etiqueta: 'Tema',                   valor: 'tema' },
+  ]
+
   /** Lo que se edita. Es un objeto comun: los campos lo cambian directo con ngModel. */
   protected b!: Borrador
   /** El borrador tal como se cargo o se guardo, para saber si hay cambios. */
@@ -53,6 +64,8 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
   private readonly previa = viewChild<ElementRef<HTMLIFrameElement>>('previa')
   protected readonly url_vista_previa = inject(DomSanitizer).bypassSecurityTrustResourceUrl(`${INVITACION}/?vista-previa`)
   protected readonly vista_previa_lista = signal(false)
+  /** Se puede ocultar, para trabajar con mas ancho. */
+  protected readonly ver_previa = signal(true)
   private ultimo_enviado = ''
   private reloj: ReturnType<typeof setInterval> | undefined
 
@@ -83,7 +96,28 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
   protected readonly iconos     = ICONOS
   protected readonly secciones  = SECCIONES
   protected readonly temas      = TEMAS_DISPONIBLES
-  protected readonly categorias = [...CATEGORIAS]
+  /** Las categorias del borrador, para elegir quien ve el regalo. */
+  protected readonly nombres_categorias = () => this.b.categorias.map(c => c.nombre.trim()).filter(Boolean)
+
+  protected readonly mensajes = [
+    { id: 'invitacion'   as const, etiqueta: 'Invitación',   ayuda: 'Se manda una sola vez, desde Tarjetas, con el botón Enviar.' },
+    { id: 'recordatorio' as const, etiqueta: 'Recordatorio', ayuda: 'Para quien todavía no respondió. Se manda desde Estadísticas, las veces que haga falta.' },
+  ]
+  /** Cada dato de los mensajes: que se pone y de donde sale, para saber donde cambiarlo. */
+  protected readonly marcadores_mensaje = [
+    { clave: 'nombre',    que: 'A quién va la tarjeta, por ejemplo "Familia Pérez".',
+                          donde: 'En cada tarjeta: Tarjetas de invitados → editar → "Nombre de la invitación".' },
+    { clave: 'link',      que: 'El link personal de la invitación de esa tarjeta. No puede faltar.',
+                          donde: 'No se cambia: se arma solo para cada tarjeta.' },
+    { clave: 'festejada', que: 'A quién se festeja.',
+                          donde: 'Configuración → Fiesta → "A quién se festeja".' },
+    { clave: 'fecha',     que: 'El día de la fiesta, por ejemplo "Sábado 3 de abril de 2027".',
+                          donde: 'Configuración → Fiesta → Cuándo → "Empieza".' },
+    { clave: 'cierre',    que: 'El último día para confirmar, por ejemplo "13 de marzo".',
+                          donde: 'Configuración → Fiesta → Cuándo → "Último día para confirmar".' },
+  ]
+
+  protected readonly por_defecto_mensaje = (id: 'invitacion' | 'recordatorio') => POR_DEFECTO.evento.mensajes[id]
   protected readonly marcadores = MARCADORES
   protected readonly es_opcional = es_opcional
   protected readonly claves = (o: Record<string, string>) => Object.keys(o)
@@ -96,10 +130,6 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
     { etiqueta: 'Todos',              valor: 'todos' },
     { etiqueta: 'Algunas categorías', valor: 'algunas' },
   ]
-
-  /** El ultimo dia que dejan responder las reglas de Firebase, escrito. */
-  protected readonly ultimo_dia_de_la_regla = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
-    .format(new Date(CIERRE_CONFIRMACIONES.getTime() - 1))
 
   async ngOnInit() {
     window.addEventListener('message', this.al_recibir)
@@ -145,6 +175,11 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
     if(!b.ultimo_dia)                               return 'Falta el último día para confirmar.'
     if(!Number.isFinite(Number(b.salon.latitud)) || !Number.isFinite(Number(b.salon.longitud)))
                                                     return 'Las coordenadas tienen que ser números.'
+    const categorias = b.categorias.map(c => c.nombre.trim())
+    if(categorias.some(c => !c))                    return 'Hay una categoría sin nombre.'
+    if(new Set(categorias).size !== categorias.length) return 'Hay dos categorías con el mismo nombre.'
+    if(!b.mensajes.invitacion.includes('{link}') || !b.mensajes.recordatorio.includes('{link}'))
+                                                    return 'A un mensaje de WhatsApp le falta {link}.'
     if(b.regalo.para === 'algunas' && !b.regalo.categorias.length)
                                                     return 'Elija al menos una categoría para el regalo.'
     for(const s of SECCIONES)
@@ -201,6 +236,8 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
         this.servicio.guardar('tema', c.tema),
       ])
       this.cargar(c)
+      // Tarjetas y Estadisticas usan las categorias y los mensajes nuevos al toque.
+      XVStorage.configuracion.set(c)
       this.guardado.set(true)
     }
     catch(e) {

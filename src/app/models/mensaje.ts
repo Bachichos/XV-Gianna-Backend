@@ -1,4 +1,5 @@
 import { TarjetaConId } from './tarjeta';
+import { ConfigEvento } from './configuracion';
 
 /**
  * Base publica de la invitacion. Cuando se compre el dominio propio,
@@ -6,63 +7,53 @@ import { TarjetaConId } from './tarjeta';
  */
 export const URL_INVITACION = 'https://gianna-drs-xv.web.app';
 
-/**
- * El mensaje que sale por WhatsApp. Va en tono cercano a proposito:
- * el backoffice habla de usted, pero esto lo lee la familia y las amigas
- * de Gianna. Son dos registros distintos y no tienen por que coincidir. Por ahora vive en el codigo;
- * cuando exista la coleccion de configuracion, se muda ahi y se edita
- * desde el backoffice sin tocar nada.
- */
-export const PLANTILLA_INVITACION =
-`¡Hola {nombre}! 💫
-
-Gianna cumple 15 y nos encantaría que nos acompañes.
-
-Te dejo tu invitación personal, con toda la información y el botón para confirmar tu asistencia:
-{link}
-
-📅 Sábado 3 de abril de 2027`;
-
-/**
- * El recordatorio para quien todavia no respondio. Mismo tono que la
- * invitacion, y sin reproche: puede que simplemente no lo haya visto.
- */
-export const PLANTILLA_RECORDATORIO =
-`¡Hola {nombre}! 💫
-
-Te escribo para recordarte que todavía no nos confirmaste si venís a los 15 de Gianna.
-
-Podés responder desde tu invitación, con este mismo link:
-{link}
-
-Las confirmaciones cierran el 13 de marzo. ¡Te esperamos!`;
-
 /** El link unico de la tarjeta. El id del documento es el token. */
 export const link_invitacion = (id: string): string =>
     `${URL_INVITACION}/i/${id}`;
 
-export const mensaje_de = (t: TarjetaConId): string =>
-    PLANTILLA_INVITACION
-        .replace('{nombre}', t.nombre_mostrar ?? '')
-        .replace('{link}', link_invitacion(t.id));
+/**
+ * Completa un mensaje de WhatsApp. Las plantillas viven en la configuracion
+ * de la fiesta (evento.mensajes) y se editan desde Configuracion; los
+ * marcadores estan explicados ahi.
+ *
+ * Recibe el evento como parametro, en vez de leerlo solo: asi quien lo usa
+ * dentro de un computed se entera cuando la configuracion cambia.
+ */
+export const completar = (plantilla: string, t: TarjetaConId, evento: ConfigEvento): string => {
+    const cuando = new Date(evento.fecha)
+    const en_zona = (d: Date, o: Intl.DateTimeFormatOptions) =>
+        new Intl.DateTimeFormat('es-AR', { timeZone: evento.zona, ...o }).format(d)
+    // "sábado, 3 de abril de 2027" -> "Sábado 3 de abril de 2027"
+    const fecha = en_zona(cuando, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).replace(',', '')
+    // El ultimo dia para responder: el anterior al instante del cierre.
+    const cierre = en_zona(new Date(new Date(evento.cierre).getTime() - 1), { day: 'numeric', month: 'long' })
+
+    const datos: Record<string, string> = {
+        nombre:    t.nombre_mostrar ?? '',
+        link:      link_invitacion(t.id),
+        festejada: evento.festejada,
+        fecha:     fecha.charAt(0).toUpperCase() + fecha.slice(1),
+        cierre,
+    }
+    return plantilla.replace(/\{(\w+)\}/g, (entero, clave) => datos[clave] ?? entero)
+}
+
+export const mensaje_de = (t: TarjetaConId, evento: ConfigEvento): string =>
+    completar(evento.mensajes.invitacion, t, evento);
 
 /**
  * Abre WhatsApp con el chat de esa persona y el mensaje ya escrito.
  * Solo falta tocar enviar: el ultimo paso lo da una persona, no el sistema.
  */
-export const link_whatsapp = (t: TarjetaConId): string =>
-    `https://wa.me/${t.numero_telefono}?text=${encodeURIComponent(mensaje_de(t))}`;
+export const link_whatsapp = (t: TarjetaConId, evento: ConfigEvento): string =>
+    `https://wa.me/${t.numero_telefono}?text=${encodeURIComponent(mensaje_de(t, evento))}`;
 
 /**
  * El recordatorio por WhatsApp. A diferencia de la invitacion, no deja
  * registro: se puede mandar las veces que haga falta.
  */
-export const link_recordatorio = (t: TarjetaConId): string => {
-    const texto = PLANTILLA_RECORDATORIO
-        .replace('{nombre}', t.nombre_mostrar ?? '')
-        .replace('{link}', link_invitacion(t.id))
-    return `https://wa.me/${t.numero_telefono}?text=${encodeURIComponent(texto)}`
-}
+export const link_recordatorio = (t: TarjetaConId, evento: ConfigEvento): string =>
+    `https://wa.me/${t.numero_telefono}?text=${encodeURIComponent(completar(evento.mensajes.recordatorio, t, evento))}`;
 
 /**
  * Saca el token de lo que devuelve un QR. Acepta el link completo de la

@@ -24,8 +24,21 @@ code {
     font-size: 0.9em;
 }
 
-/* Deja lugar abajo para la barra de guardar, que flota. */
-:host { display: block; padding-bottom: 5rem; }
+/*
+ * Deja lugar abajo para la barra de guardar, que flota. Va en el contenido
+ * y no en :host: el host envuelve al layout entero, y el espacio quedaria
+ * afuera, como una franja gris debajo del menu.
+ */
+.con-previa { padding-bottom: 5rem; }
+
+/* --- Las pestanas: barra en la compu, desplegable en el telefono --- */
+
+.pestanas-movil { display: none; width: 100%; margin-bottom: 0.5rem; }
+
+@media (max-width: 40rem) {
+    .pestanas-movil { display: flex; }
+    .pestanas-escritorio { display: none; }
+}
 
 /* --- Paneles, como los de Estadisticas --- */
 
@@ -52,6 +65,27 @@ code {
 }
 
 .panel__cabecera h2 { margin-bottom: 0; }
+
+/*
+ * En el telefono, "Se muestra" no entra al lado del titulo: en vez de bajar
+ * abajo, se va a la esquina de arriba a la derecha de la tarjeta, y el
+ * titulo le deja lugar.
+ */
+@media (max-width: 40rem) {
+    .panel:has(> .panel__cabecera > .interruptor) { position: relative; }
+
+    .panel__cabecera > .interruptor {
+        position: absolute;
+        top: 0.85rem;
+        right: 0.9rem;
+        gap: 0.45rem;
+        font-size: var(--xv-texto-xs);
+    }
+
+    .panel__cabecera:has(> .interruptor) h2 {
+        padding-top: 1.6rem;
+    }
+}
 
 /* --- Campos: uno debajo del otro, a todo lo ancho --- */
 
@@ -138,14 +172,49 @@ code {
 
 .lista__fila--programa { grid-template-columns: 7.5rem 1fr 13rem auto; }
 .lista__fila--info     { grid-template-columns: 14rem 1fr auto; }
+.lista__fila--categoria { grid-template-columns: 1fr auto; }
 
+/* El numero solo se ve en el telefono, en el encabezado de cada tarjetita. */
+.lista__numero { display: none; }
+
+/*
+ * En el telefono, cada fila es una tarjetita: arriba "Momento 1" y, a su
+ * derecha, las flechas y el cesto; debajo, los campos a todo lo ancho.
+ */
 @media (max-width: 50rem) {
+    .lista { gap: 0.9rem; }
+
     .lista__fila--programa,
-    .lista__fila--info {
-        grid-template-columns: 1fr;
-        padding-bottom: 0.8rem;
-        border-bottom: 1px solid var(--xv-borde);
+    .lista__fila--info,
+    .lista__fila--categoria {
+        grid-template-columns: 1fr auto;
+        gap: 0.6rem;
+        padding: 0.8rem 0.9rem 0.95rem;
+        background: var(--xv-fondo);
+        border: 1px solid var(--xv-borde);
+        border-radius: 4px;
     }
+
+    .lista__fila > * { grid-column: 1 / -1; }
+
+    .lista__numero {
+        display: block;
+        grid-column: 1;
+        grid-row: 1;
+        align-self: center;
+        font-size: var(--xv-texto-xs);
+        font-weight: var(--xv-peso-medio);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--xv-texto-tenue);
+    }
+
+    .lista__fila > .lista__acciones {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .icono { width: 2.2rem; height: 2.2rem; }
 }
 
 .lista__fila input,
@@ -189,6 +258,56 @@ code {
 
 .agregar:hover { background: var(--p-primary-50, #f3f6fa); }
 
+/* --- De donde sale cada dato de los mensajes --- */
+
+.marcadores {
+    width: 100%;
+    margin: 0.4rem 0 1.6rem;
+    border-collapse: collapse;
+    font-size: var(--xv-texto-sm);
+}
+
+.marcadores th {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--xv-borde-fuerte);
+    text-align: left;
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--xv-texto-tenue);
+}
+
+.marcadores td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--xv-borde);
+    vertical-align: top;
+}
+
+.marcadores td:first-child { white-space: nowrap; }
+.marcadores td:last-child  { color: var(--xv-texto-tenue); }
+
+/* Etiqueta y, a la derecha, "Volver al de fabrica". */
+.campo__cabecera {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.restaurar {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--p-primary-color, #5279a2);
+    font-size: var(--xv-texto-xs);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.campo textarea { font-family: var(--xv-ui); line-height: var(--xv-interlinea-texto); }
+
 /* --- Textos de cada seccion --- */
 
 .textos {
@@ -229,18 +348,49 @@ code {
 .tema__nombre { font-family: var(--xv-display); font-size: var(--xv-texto-lg); }
 .tema__descripcion { font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
 
-/* --- Tema: los temas y, al lado, el telefono con la vista previa --- */
+/* --- La vista previa: al costado de todas las pestanas, fija al bajar --- */
 
-.tema-panel {
+.cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.ver-previa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.95rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 3px;
+    color: var(--p-primary-700, #374e6b);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+}
+
+.ver-previa:hover { background: var(--p-primary-50, #f3f6fa); }
+
+.con-previa {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
     gap: 2rem;
 }
 
-@media (max-width: 56rem) {
-    .tema-panel { grid-template-columns: 1fr; justify-items: center; }
-    .tema-panel__elegir { justify-self: stretch; }
+.con-previa--sin { grid-template-columns: minmax(0, 1fr); }
+
+.previa {
+    position: sticky;
+    top: 1rem;
+}
+
+/* En pantallas angostas el telefono va arriba de las pestanas, sin fijarse. */
+@media (max-width: 64rem) {
+    .con-previa { grid-template-columns: minmax(0, 1fr); }
+    .previa { position: static; order: -1; justify-self: center; }
 }
 
 /*

@@ -6,7 +6,8 @@ import { Button } from '@openng/optimus-ui/button';
 import { Select } from '@openng/optimus-ui/select';
 import { InputText } from '@openng/optimus-ui/inputtext';
 import { FirebaseTarjetasService } from '../../../services/firebase-tarjetas';
-import { CATEGORIAS, estado_de, fusionar_personas, integrantes_de, siguiente_id_persona, Persona, Tarjeta, TarjetaConId } from '../../../models/tarjeta';
+import { XVStorage } from '../../../app.config';
+import { estado_de, fusionar_personas, integrantes_de, siguiente_id_persona, Persona, Tarjeta, TarjetaConId } from '../../../models/tarjeta';
 
 /**
  * El prefijo es solo una ayuda para escribir: lo que se guarda sigue siendo el
@@ -65,7 +66,17 @@ export class TarjetaFormulario {
 
   protected readonly es_edicion = computed(() => this.tarjeta() !== null)
 
-  protected readonly opciones_categoria = CATEGORIAS.map(c => ({ etiqueta: c, valor: c }))
+  /**
+   * Las categorias de la configuracion. Si la tarjeta que se edita tiene una
+   * que ya no esta (se cambio el nombre), se ofrece igual: si no, el
+   * formulario la perderia sin avisar.
+   */
+  protected readonly opciones_categoria = computed(() => {
+    const nombres = [...XVStorage.configuracion().evento.categorias]
+    const actual = this.tarjeta()?.categoria
+    if(actual && !nombres.includes(actual)) nombres.push(actual)
+    return nombres.map(c => ({ etiqueta: c, valor: c }))
+  })
   protected readonly opciones_prefijo   = PREFIJOS
 
   /** Lo que respondio el invitado: se muestra, no se toca. */

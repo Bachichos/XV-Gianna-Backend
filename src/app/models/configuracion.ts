@@ -46,6 +46,12 @@ export type ConfigEvento = {
      * cosa, el formulario dejaria intentar algo que la base va a negar.
      */
     cierre:  string
+    /**
+     * El mismo cierre, en milisegundos desde 1970. Lo escribe el backoffice
+     * al guardar, y lo lee la regla de seguridad de Firebase: las reglas no
+     * saben leer una fecha escrita como texto. No se edita a mano.
+     */
+    cierre_ms?: number
     /** La zona de la fiesta, para mostrar fecha y hora como alla. */
     zona:    string
 
@@ -89,6 +95,26 @@ export type ConfigEvento = {
          * En las dos es obligatoria.
          */
         alergias: 'por_persona' | 'general'
+    }
+
+    /**
+     * Las categorias de las tarjetas (Familia, Colegio...). Sirven para
+     * filtrar, para las estadisticas y para elegir quien ve el regalo.
+     * Cambiar el nombre de una no cambia las tarjetas que ya la tienen.
+     */
+    categorias: string[]
+
+    /**
+     * Los mensajes de WhatsApp que manda el backoffice. Marcadores:
+     *   {nombre}     a quien va la tarjeta
+     *   {link}       su invitacion (obligatorio)
+     *   {festejada}  a quien se festeja
+     *   {fecha}      "Sábado 3 de abril de 2027"
+     *   {cierre}     el ultimo dia para confirmar: "13 de marzo"
+     */
+    mensajes: {
+        invitacion:   string
+        recordatorio: string
     }
 }
 
@@ -165,6 +191,32 @@ export const POR_DEFECTO: Configuracion = {
         },
 
         confirmacion: { alergias: 'por_persona' },
+
+        categorias: ['Familia', 'Amigos Gianna', 'Colegio', 'Amigos padres'],
+
+        // En tono cercano a proposito: el backoffice habla de usted, pero
+        // esto lo leen la familia y las amigas. Son dos registros distintos.
+        mensajes: {
+            invitacion:
+`¡Hola {nombre}! 💫
+
+{festejada} cumple 15 y nos encantaría que nos acompañes.
+
+Te dejo tu invitación personal, con toda la información y el botón para confirmar tu asistencia:
+{link}
+
+📅 {fecha}`,
+            // Sin reproche: puede que simplemente no lo haya visto.
+            recordatorio:
+`¡Hola {nombre}! 💫
+
+Te escribo para recordarte que todavía no nos confirmaste si venís a los 15 de {festejada}.
+
+Podés responder desde tu invitación, con este mismo link:
+{link}
+
+Las confirmaciones cierran el {cierre}. ¡Te esperamos!`,
+        },
     },
 
     secciones: {},

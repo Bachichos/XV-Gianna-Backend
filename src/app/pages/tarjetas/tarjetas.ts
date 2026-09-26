@@ -11,9 +11,9 @@ import { TarjetaEliminar } from './tarjeta-eliminar/tarjeta-eliminar';
 import { TarjetaCancelar } from './tarjeta-cancelar/tarjeta-cancelar';
 import { TarjetaRespuestas } from './tarjeta-respuestas/tarjeta-respuestas';
 import { TarjetaQr } from './tarjeta-qr/tarjeta-qr';
-import { link_whatsapp, mensaje_de } from '../../models/mensaje';
+import { link_whatsapp } from '../../models/mensaje';
 import { FirebaseTarjetasService } from '../../services/firebase-tarjetas';
-import { CATEGORIAS, cupos_de, estado_de, EstadoRsvp, Integrante, integrantes_de, se_puede_eliminar, se_puede_cancelar, se_puede_enviar, esta_cancelada, TarjetaConId } from '../../models/tarjeta';
+import { cupos_de, estado_de, EstadoRsvp, Integrante, integrantes_de, se_puede_eliminar, se_puede_cancelar, se_puede_enviar, esta_cancelada, TarjetaConId } from '../../models/tarjeta';
 import { XVLayout } from "../../components/design/xv-layout/xv-layout";
 import { XVStorage } from '../../app.config';
 import { sin_acentos } from '../../models/texto';
@@ -89,7 +89,6 @@ export class TarjetasPage {
   protected readonly se_puede_eliminar = se_puede_eliminar
   protected readonly se_puede_enviar   = se_puede_enviar
   protected readonly se_puede_cancelar = se_puede_cancelar
-  protected readonly mensaje_de        = mensaje_de
 
   protected readonly enviando = signal<string | null>(null)
 
@@ -159,10 +158,11 @@ export class TarjetasPage {
     sola:  { icono: 'pi-user',  texto: 'Solo las de una sola persona' }
   } as const
 
-  protected readonly opciones_categoria = [
+  /** Las categorias salen de la configuracion de la fiesta. */
+  protected readonly opciones_categoria = computed(() => [
     { etiqueta: 'Todas las categorías', valor: TODAS },
-    ...CATEGORIAS.map(c => ({ etiqueta: c, valor: c }))
-  ]
+    ...XVStorage.configuracion().evento.categorias.map(c => ({ etiqueta: c, valor: c }))
+  ])
 
   /** Cupos totales: las personas con nombre mas los acompanantes sin nombre. */
   protected readonly personas = computed(() =>
@@ -222,7 +222,7 @@ export class TarjetasPage {
       estado:      estado_de(t),
       integrantes: integrantes_de(t),
       cancelada:   esta_cancelada(t),
-      link:        link_whatsapp(t)
+      link:        link_whatsapp(t, XVStorage.configuracion().evento)
     }))
   )
 

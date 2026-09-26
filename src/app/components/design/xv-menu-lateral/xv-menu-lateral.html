@@ -12,16 +12,26 @@
               appendTo="body"
               [attr.aria-expanded]="!compacto()"
               aria-controls="menu-nav"
-              [attr.aria-label]="compacto() ? 'Expandir el menú' : 'Compactar el menú'">XV</button>
+              [attr.aria-label]="compacto() ? 'Expandir el menú' : 'Compactar el menú'">
+        @if (marca().logo; as logo) { <img class="menu__logo" [src]="logo" alt=""> } @else { XV }
+      </button>
     } @else {
-      <span class="menu__monograma" aria-hidden="true">XV</span>
+      <span class="menu__monograma" aria-hidden="true">
+        @if (marca().logo; as logo) { <img class="menu__logo" [src]="logo" alt=""> } @else { XV }
+      </span>
     }
 
     @if (!compacto()) {
       <span class="menu__marca-texto">
-        <span class="menu__marca-titulo">Mis 15 &middot; Gianna</span>
+        <span class="menu__marca-titulo">{{ marca().nombre }}</span>
         <span class="xv-versalita">Backoffice</span>
       </span>
+
+      <button type="button" class="menu__editar" (click)="editando.set(true)"
+              pTooltip="Cambiar nombre y logo" tooltipPosition="bottom" appendTo="body"
+              aria-label="Cambiar el nombre y el logo del evento">
+        <i class="pi pi-pencil" aria-hidden="true"></i>
+      </button>
     }
 
   </div>
@@ -80,3 +90,5 @@
   </div>
 
 </aside>
+
+<xv-marca [(abierto)]="editando" />

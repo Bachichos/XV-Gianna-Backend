@@ -1,6 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { doc, Firestore, getDoc, setDoc } from '@angular/fire/firestore';
 import { combinar, Configuracion, POR_DEFECTO } from '../models/configuracion';
+import { Marca, MARCA_POR_DEFECTO } from '../models/marca';
 
 /** Los tres documentos de la coleccion `configuracion`. */
 export type Documento = keyof Configuracion
@@ -30,6 +31,16 @@ export class FirebaseConfiguracionService {
             secciones: combinar(POR_DEFECTO.secciones, secciones),
             tema:      combinar(POR_DEFECTO.tema,      tema),
         }
+    }
+
+    /** La marca del backoffice (configuracion/marca). Se puede leer sin haber entrado. */
+    public readonly leer_marca = async (): Promise<Marca> => {
+        const snap = await getDoc(doc(this.firestore, 'configuracion', 'marca'))
+        return combinar(MARCA_POR_DEFECTO, snap.exists() ? snap.data() : undefined)
+    }
+
+    public readonly guardar_marca = async (marca: Marca): Promise<void> => {
+        await setDoc(doc(this.firestore, 'configuracion', 'marca'), marca)
     }
 
     /** Reemplaza el documento entero: lo que no vaya, deja de estar. */

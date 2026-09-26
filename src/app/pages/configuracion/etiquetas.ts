@@ -50,7 +50,10 @@ export const SECCIONES: { id: Seccion, nombre: string, textos: Record<string, st
         sin_enviar:    'Tarjeta todavía no enviada',
         dieta_persona: 'Pregunta de alergias, por persona',
         dieta_general: 'Pregunta de alergias, general',
-        dieta_ejemplo: 'Ejemplos de alergias' } },
+        dieta_ejemplo: 'Ejemplos de alergias',
+        pase_titulo:   'Pase para la entrada: título',
+        pase_texto:    'Pase para la entrada: texto',
+        pase_nota:     'Pase para la entrada: nota' } },
     { id: 'estados',      nombre: 'Pantallas de carga y de error', textos: {
         cargando:             'Mientras carga',
         personal_titulo:      'Link sin código: título',

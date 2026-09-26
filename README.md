@@ -1,3 +1,11 @@
+# Mis 15 · Gianna — el backoffice
+
+> **¿Otra fiesta?** La guía para usar esta invitación y su backoffice en otra
+> fiesta está en [`docs/otra-fiesta.md`](https://github.com/Bachichos/XV-Gianna-Frontend/blob/main/docs/otra-fiesta.md) (en el repositorio de la
+> invitación).
+
+---
+
 # BackofficeGiannaDrsXv
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.5.

@@ -2,7 +2,7 @@ import { Component, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { XVLayout } from "../../components/design/xv-layout/xv-layout";
 import { XVStorage } from '../../app.config';
-import { CATEGORIAS, CIERRE_CONFIRMACIONES, esta_cancelada, integrantes_de, TarjetaConId } from '../../models/tarjeta';
+import { esta_cancelada, integrantes_de, TarjetaConId } from '../../models/tarjeta';
 import { link_recordatorio } from '../../models/mensaje';
 
 /** Cuantas personas hay en cada estado. Base de todos los numeros de la pantalla. */
@@ -86,11 +86,14 @@ export class EstadisticasPage {
     }
   })
 
-  /** El ultimo dia para responder: el cierre es la medianoche del 14 (UTC). */
-  protected readonly cierre = new Date(CIERRE_CONFIRMACIONES.getTime() - 1)
+  /** El instante del cierre, de la configuracion de la fiesta. */
+  private readonly instante_cierre = computed(() => new Date(XVStorage.configuracion().evento.cierre).getTime())
+
+  /** El ultimo dia para responder: el anterior al instante del cierre. */
+  protected readonly cierre = computed(() => new Date(this.instante_cierre() - 1))
 
   /** Dias hasta el cierre. Se calcula al abrir la pantalla: no hace falta un reloj. */
-  protected readonly dias_al_cierre = Math.ceil((CIERRE_CONFIRMACIONES.getTime() - Date.now()) / 86_400_000)
+  protected readonly dias_al_cierre = computed(() => Math.ceil((this.instante_cierre() - Date.now()) / 86_400_000))
 
   /**
    * Por categoria, con las fijas siempre en su orden. Si alguna tarjeta
@@ -100,7 +103,7 @@ export class EstadisticasPage {
     const activas = this.activas()
     const categoria = (t: TarjetaConId) => t.categoria || SIN_CATEGORIA
 
-    const nombres: string[] = [...CATEGORIAS]
+    const nombres: string[] = [...XVStorage.configuracion().evento.categorias]
     for(const t of activas)
       if(!nombres.includes(categoria(t))) nombres.push(categoria(t))
 
@@ -125,7 +128,7 @@ export class EstadisticasPage {
           pendientes: c.pendientes,
           total:      c.total,
           parcial:    c.pendientes > 0 && c.pendientes < c.total,
-          link:       link_recordatorio(t),
+          link:       link_recordatorio(t, XVStorage.configuracion().evento),
         }
       })
       .filter(f => f.pendientes > 0)

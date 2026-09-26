@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { inject } from '@angular/core';
 import { filter } from 'rxjs';
 import { XVMenuLateral } from "../xv-menu-lateral/xv-menu-lateral";
+import { XVStorage } from '../../../app.config';
 
 /** El mismo corte que usa el SCSS para separar movil de escritorio. */
 const ESCRITORIO = '(min-width: 60.0625rem)'
@@ -27,6 +28,9 @@ export class XVLayout {
 
   /** Solo aplica en movil: en escritorio el lateral esta siempre visible. */
   protected readonly abierto = signal(false)
+
+  /** El nombre del evento, en la barra del telefono. */
+  protected readonly marca = XVStorage.marca.asReadonly()
 
   /** Lo que eligio la persona. Solo tiene sentido en escritorio. */
   private readonly compacto_elegido = signal(localStorage.getItem(CLAVE_COMPACTO) === '1')

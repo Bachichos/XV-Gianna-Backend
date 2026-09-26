@@ -1,7 +1,9 @@
 import { Component, effect, inject, Injector, OnInit, runInInjectionContext, signal } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { FirebaseAuthService } from './services/firebase-auth';
 import { FirebaseTarjetasService } from './services/firebase-tarjetas';
+import { FirebaseConfiguracionService } from './services/firebase-configuracion';
 import { XVStorage } from './app.config';
 
 @Component({
@@ -14,7 +16,9 @@ export class App implements OnInit {
 
   private readonly firebase_auth     = inject(FirebaseAuthService)
   private readonly firebase_tarjetas = inject(FirebaseTarjetasService)
+  private readonly firebase_config   = inject(FirebaseConfiguracionService)
   private readonly injector          = inject(Injector)
+  private readonly titulo            = inject(Title)
 
   protected readonly title = signal('backoffice-gianna-drs-xv');
 
@@ -48,9 +52,31 @@ export class App implements OnInit {
 
       onCleanup(() => suscripcion.unsubscribe())
     })
+
+    // El titulo de la pestana sigue a la marca.
+    effect(() => this.titulo.setTitle(`Backoffice · ${XVStorage.marca().nombre}`))
+
+    // La configuracion, una vez por sesion: categorias y mensajes salen de
+    // ahi. Si no se puede leer, quedan los valores por defecto.
+    effect(() => {
+      if(!XVStorage.logged_user()) return
+      runInInjectionContext(this.injector, () => this.firebase_config.leer())
+        .then(c => XVStorage.configuracion.set(c))
+        .catch(e => console.warn('[configuracion] no se pudo leer', e))
+    })
   }
 
   async ngOnInit() {
+    // La marca y la configuracion son publicas: se leen enseguida, para que
+    // el login ya muestre el nombre, el logo y la fecha de la fiesta.
+    // Fuera del constructor no hay contexto de inyeccion: AngularFire avisa si el SDK se llama sin el.
+    runInInjectionContext(this.injector, () => this.firebase_config.leer_marca())
+      .then(m => XVStorage.marca.set(m))
+      .catch(e => console.warn('[marca] no se pudo leer', e))
+    runInInjectionContext(this.injector, () => this.firebase_config.leer())
+      .then(c => XVStorage.configuracion.set(c))
+      .catch(e => console.warn('[configuracion] no se pudo leer', e))
+
     // Solo restaura la sesion en silencio. El popup lo dispara el boton de /login.
     await this.firebase_auth.restaurar_sesion()
   }

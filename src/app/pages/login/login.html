@@ -1,10 +1,12 @@
 <main class="login">
   <section class="login__tarjeta">
 
-    <span class="login__monograma" aria-hidden="true">XV</span>
+    <span class="login__monograma" aria-hidden="true">
+      @if (marca().logo; as logo) { <img class="login__logo" [src]="logo" alt=""> } @else { XV }
+    </span>
 
     <p class="xv-versalita login__antetitulo">Backoffice</p>
-    <h1 class="login__titulo">Los quince de Gianna</h1>
+    <h1 class="login__titulo">{{ marca().nombre }}</h1>
     <p class="login__ayuda">Entre con su cuenta de Google para gestionar la lista de invitados.</p>
 
     <p-button
@@ -22,7 +24,7 @@
       </div>
     }
 
-    <p class="xv-versalita login__pie">3 de abril de 2027</p>
+    <p class="xv-versalita login__pie">{{ fecha() }}</p>
 
   </section>
 </main>

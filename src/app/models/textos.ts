@@ -82,6 +82,10 @@ export const TEXTOS = {
         dieta_persona:  '¿Tiene alguna alergia, intolerancia o dieta especial?',
         dieta_general:  '¿Alguien tiene alguna alergia, intolerancia o dieta especial?',
         dieta_ejemplo:  'Por ejemplo: celiaquía, frutos secos, vegetariana.',
+        // El pase: el QR que se muestra en la puerta, una vez que confirmaron.
+        pase_titulo:    'Tu pase para la entrada',
+        pase_texto:     'Mostrá este código en la puerta del salón: con él recibimos a todo tu grupo.',
+        pase_nota:      'Guardá una captura de pantalla, por si esa noche no tenés señal.',
     },
 
     /** Las pantallas de antes de la invitacion. */

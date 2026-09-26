@@ -1,0 +1,47 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Nombre y logo del evento"
+  appendTo="body"
+  styleClass="xv-dialogo xv-dialogo--angosto"
+  (onShow)="reiniciar()">
+
+  <div class="marca">
+
+    <div class="campo">
+      <label for="m-nombre">Nombre del evento</label>
+      <input pInputText id="m-nombre" [(ngModel)]="nombre" placeholder="Ej. Mis 15 · Gianna" maxlength="40">
+      <small>Aparece arriba del menú, en el login y en la pestaña del navegador.</small>
+    </div>
+
+    <div class="campo">
+      <span class="campo__etiqueta">Logo</span>
+      <div class="logo">
+        <span class="logo__circulo" aria-hidden="true">
+          @if (logo()) { <img [src]="logo()" alt=""> } @else { XV }
+        </span>
+
+        <div class="logo__acciones">
+          <label class="logo__subir">
+            <input type="file" accept="image/png, image/jpeg, image/webp, image/svg+xml" (change)="elegir($event)">
+            <i class="pi pi-upload" aria-hidden="true"></i>
+            {{ logo() ? 'Cambiar imagen' : 'Subir una imagen' }}
+          </label>
+          @if (logo()) {
+          <button type="button" class="logo__quitar" (click)="logo.set(null)">Quitar y volver al "XV"</button>
+          }
+        </div>
+      </div>
+      <small>PNG, JPG, WebP o SVG. Se ve dentro de un círculo: queda mejor una imagen cuadrada, con fondo transparente. Se achica sola.</small>
+      @if (error()) { <small class="error" role="alert">{{ error() }}</small> }
+    </div>
+
+    <div class="acciones">
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="abierto.set(false)" />
+      <p-button label="Guardar" [loading]="guardando()" [disabled]="!nombre.trim()" (onClick)="guardar()" />
+    </div>
+
+  </div>
+</p-dialog>
