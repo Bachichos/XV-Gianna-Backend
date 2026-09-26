@@ -7,6 +7,56 @@
 
 .respuestas__intro { line-height: var(--xv-interlinea-texto); }
 
+/* --- Entregada por otro medio --- */
+
+.envio {
+    padding: 0.8rem 1rem;
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+}
+
+.envio__interruptor {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    cursor: pointer;
+}
+
+/* Sin esto, el texto largo de al lado lo aplasta y el interruptor se deforma. */
+.envio__interruptor p-toggleswitch {
+    flex: none;
+    margin-top: 0.1rem;
+}
+
+.envio__interruptor > span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.envio__titulo {
+    font-size: var(--xv-texto-sm);
+    font-weight: var(--xv-peso-medio);
+    color: var(--xv-texto);
+}
+
+.envio__ayuda {
+    font-size: var(--xv-texto-xs);
+    line-height: var(--xv-interlinea-compacta);
+    color: var(--xv-texto-tenue);
+}
+
+.envio__hecho {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: var(--xv-texto-sm);
+    color: #1d6b4a;
+}
+
+.envio__hecho .pi { font-size: 0.8rem; }
+
 .respuestas__nota,
 .respuestas__error {
     font-size: var(--xv-texto-xs);

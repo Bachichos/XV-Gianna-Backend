@@ -53,7 +53,11 @@ export const SECCIONES: { id: Seccion, nombre: string, textos: Record<string, st
         dieta_ejemplo: 'Ejemplos de alergias',
         pase_titulo:   'Pase para la entrada: título',
         pase_texto:    'Pase para la entrada: texto',
-        pase_nota:     'Pase para la entrada: nota' } },
+        pase_nota:     'Pase para la entrada: nota',
+        pase_boton:    'Pase para la entrada: botón para guardarlo',
+        instalar_boton: 'Agregar a la pantalla de inicio: botón',
+        instalar_ios:   'Agregar a la pantalla de inicio: instrucciones en iPhone',
+        instalar_otro:  'Agregar a la pantalla de inicio: instrucciones en otros' } },
     { id: 'estados',      nombre: 'Pantallas de carga y de error', textos: {
         cargando:             'Mientras carga',
         personal_titulo:      'Link sin código: título',

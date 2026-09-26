@@ -15,6 +15,24 @@
         <strong>{{ t.nombre_mostrar }}</strong>.
       </p>
 
+      <!-- Entregada por otro medio: queda enviada, igual que por WhatsApp. -->
+      <div class="envio">
+        @if (t.fecha_envio) {
+          <span class="envio__hecho">
+            <i class="pi pi-check" aria-hidden="true"></i>
+            Invitación enviada el {{ t.fecha_envio | date:'d MMM' }}.
+          </span>
+        } @else {
+          <label class="envio__interruptor">
+            <p-toggleswitch [ngModel]="marcar_enviada()" (ngModelChange)="marcar_enviada.set($event)" />
+            <span>
+              <span class="envio__titulo">Invitación entregada</span>
+              <span class="envio__ayuda">Por ejemplo, si se la dieron en persona o por otro medio. Una vez guardada, no se desmarca.</span>
+            </span>
+          </label>
+        }
+      </div>
+
       <ul class="lista">
         @for (p of personas(); track p.id) {
           <li class="persona">

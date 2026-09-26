@@ -2,6 +2,9 @@ import { Component, computed, inject, input, model, signal } from '@angular/core
 import { Dialog } from '@openng/optimus-ui/dialog';
 import { Button } from '@openng/optimus-ui/button';
 import { InputText } from '@openng/optimus-ui/inputtext';
+import { ToggleSwitch } from '@openng/optimus-ui/toggleswitch';
+import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { FirebaseTarjetasService } from '../../../services/firebase-tarjetas';
 import { Persona, sin_indefinidos, TarjetaConId } from '../../../models/tarjeta';
 
@@ -9,7 +12,7 @@ import { Persona, sin_indefinidos, TarjetaConId } from '../../../models/tarjeta'
 type Borrador = { confirmado: boolean | null, nombre: string, alimentacion: string };
 
 @Component({
-  imports: [Dialog, Button, InputText],
+  imports: [Dialog, Button, InputText, ToggleSwitch, FormsModule, DatePipe],
   selector: 'xv-tarjeta-respuestas',
   styleUrl: './tarjeta-respuestas.scss',
   templateUrl: './tarjeta-respuestas.html',
@@ -26,6 +29,9 @@ export class TarjetaRespuestas {
 
   protected readonly borrador = signal<Record<string, Borrador>>({})
 
+  /** Marcarla como enviada al guardar, si todavia no salio. */
+  protected readonly marcar_enviada = signal(false)
+
   protected readonly personas = computed(() => this.tarjeta()?.personas ?? [])
 
   protected readonly confirmados = computed(() =>
@@ -36,6 +42,7 @@ export class TarjetaRespuestas {
   protected readonly reiniciar = () => {
     this.error.set(null)
     this.guardando.set(false)
+    this.marcar_enviada.set(false)
 
     const borrador: Record<string, Borrador> = {}
 
@@ -128,7 +135,9 @@ export class TarjetaRespuestas {
     try {
       await this.servicio.update(t.id, {
         personas,
-        fecha_confirmacion: hay_alguna ? (t.fecha_confirmacion ?? ahora) : null
+        fecha_confirmacion: hay_alguna ? (t.fecha_confirmacion ?? ahora) : null,
+        // Solo si no habia salido: una fecha de envio no se cambia ni se borra.
+        ...(this.marcar_enviada() && !t.fecha_envio ? { fecha_envio: ahora } : {}),
       })
       this.abierto.set(false)
     }

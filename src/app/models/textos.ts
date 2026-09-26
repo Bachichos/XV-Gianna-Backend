@@ -85,7 +85,12 @@ export const TEXTOS = {
         // El pase: el QR que se muestra en la puerta, una vez que confirmaron.
         pase_titulo:    'Tu pase para la entrada',
         pase_texto:     'Mostrá este código en la puerta del salón: con él recibimos a todo tu grupo.',
-        pase_nota:      'Guardá una captura de pantalla, por si esa noche no tenés señal.',
+        pase_nota:      'Guardalo en tu celular, por si esa noche no tenés señal.',
+        pase_boton:     'Guardar mi pase',
+        // Agregar la invitacion a la pantalla de inicio, como una app.
+        instalar_boton: 'Agregar a la pantalla de inicio',
+        instalar_ios:   'En Safari, tocá el botón Compartir (el cuadrado con la flecha) y elegí «Agregar a inicio».',
+        instalar_otro:  'Desde el menú del navegador, elegí «Agregar a la pantalla de inicio».',
     },
 
     /** Las pantallas de antes de la invitacion. */
