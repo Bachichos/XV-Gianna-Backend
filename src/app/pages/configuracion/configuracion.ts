@@ -117,6 +117,13 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
                           donde: 'Configuración → Fiesta → Cuándo → "Último día para confirmar".' },
   ]
 
+  /** El {cierre} tal como se va a leer, con la fecha que esta en el borrador: "13 de marzo". */
+  protected readonly ejemplo_cierre = () => {
+    if(!this.b?.ultimo_dia) return '13 de marzo'
+    return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long', timeZone: 'UTC' })
+      .format(new Date(`${this.b.ultimo_dia}T12:00:00Z`))
+  }
+
   protected readonly por_defecto_mensaje = (id: 'invitacion' | 'recordatorio') => POR_DEFECTO.evento.mensajes[id]
   protected readonly marcadores = MARCADORES
   protected readonly es_opcional = es_opcional

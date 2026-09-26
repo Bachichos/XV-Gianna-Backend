@@ -163,8 +163,12 @@
                             {{ b.secciones.informacion.visible ? 'Se muestra' : 'No se muestra' }}
                         </label>
                     </div>
-                    <p class="tenue">Un título corto y una o dos líneas: más largo, en un teléfono, deja de leerse.
-                        <code>{{ '{' }}cierre{{ '}' }}</code> se reemplaza por el último día para confirmar.</p>
+                    <p class="tenue">Un título corto y una o dos líneas: más largo, en un teléfono, deja de leerse.</p>
+                    <p class="tenue">
+                        <code>{{ '{' }}cierre{{ '}' }}</code> se reemplaza solo por el último día para confirmar,
+                        por ejemplo "{{ ejemplo_cierre() }}". Sale de <strong>Fiesta → Cuándo → Último día para confirmar</strong>:
+                        para cambiarlo, se cambia ahí.
+                    </p>
 
                     <ol class="lista">
                         @for (d of b.informacion; track $index; let i = $index, primero = $first, ultimo = $last) {

@@ -153,6 +153,11 @@ code {
     cursor: pointer;
 }
 
+/* Entre un texto de ayuda y los campos que le siguen, aire: que se lea como explicacion, no como parte del campo. */
+.panel > .tenue + .lista,
+.panel > .tenue + .grilla,
+.panel > .tenue + .marcadores { margin-top: 1.5rem; }
+
 /* --- Listas editables (programa, informacion) --- */
 
 .lista {
