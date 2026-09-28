@@ -1,4 +1,5 @@
-import { Configuracion, ConfigSecciones, SECCIONES_OPCIONALES } from '../../models/configuracion';
+import { AjustesTema, Configuracion, ConfigSecciones, SECCIONES_OPCIONALES } from '../../models/configuracion';
+import { trae_el_tema } from '../../models/temas';
 import { TEXTOS } from '../../models/textos';
 import { SECCIONES, Seccion } from './etiquetas';
 import { partes, instante, cierre_desde_ultimo_dia, ultimo_dia_desde_cierre } from './fechas';
@@ -25,7 +26,8 @@ export type Borrador = {
     categorias: { nombre: string }[]
     mensajes: Configuracion['evento']['mensajes']
     secciones: Record<Seccion, { visible: boolean, textos: Record<string, string> }>
-    tema: string
+    /** El tema y sus ajustes, todos con valor: los que no se tocaron, como los trae el tema. */
+    tema: { id: string } & Required<AjustesTema>
 }
 
 export const textos_de = (s: Seccion): Record<string, string> => TEXTOS[s] as Record<string, string>
@@ -60,7 +62,7 @@ export const a_borrador = (c: Configuracion): Borrador => {
         categorias: e.categorias.map(nombre => ({ nombre })),
         mensajes: { ...e.mensajes },
         secciones,
-        tema: c.tema.id,
+        tema: { ...trae_el_tema(c.tema.id), ...c.tema.ajustes, id: c.tema.id },
     }
 }
 
@@ -99,6 +101,14 @@ export const a_configuracion = (b: Borrador): Configuracion => {
             mensajes:     { invitacion: b.mensajes.invitacion.trim(), recordatorio: b.mensajes.recordatorio.trim() },
         },
         secciones: secciones as ConfigSecciones,
-        tema: { id: b.tema },
+        tema: tema_a_guardar(b.tema),
     }
+}
+
+/** Se guarda solo lo que difiere de como viene el tema: lo demas sigue siempre al tema. */
+const tema_a_guardar = ({ id, ...elegidos }: Borrador['tema']): Configuracion['tema'] => {
+    const trae = trae_el_tema(id)
+    const ajustes = Object.fromEntries(Object.entries(elegidos)
+        .filter(([k, v]) => v !== trae[k as keyof AjustesTema])) as AjustesTema
+    return Object.keys(ajustes).length ? { id, ajustes } : { id }
 }

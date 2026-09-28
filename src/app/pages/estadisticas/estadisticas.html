@@ -24,11 +24,13 @@
     <section class="kpis" aria-label="Resumen de invitados">
         <div class="kpi">
             <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> Invitados</span>
-            <span class="xv-cifra">{{ personas().total }}</span>
+            <span class="xv-cifra">{{ personas().total + anfitriones() }}</span>
+            @if (anfitriones()) { <span class="kpi__pie">incluye {{ anfitriones() === 1 ? '1 anfitrión' : anfitriones() + ' anfitriones' }}</span> }
         </div>
         <div class="kpi kpi--confirmado">
             <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> Confirmados</span>
-            <span class="xv-cifra">{{ personas().confirmados }}</span>
+            <span class="xv-cifra">{{ personas().confirmados + anfitriones() }}</span>
+            @if (anfitriones()) { <span class="kpi__pie">incluye {{ anfitriones() === 1 ? '1 anfitrión' : anfitriones() + ' anfitriones' }}</span> }
         </div>
         <div class="kpi kpi--rechazado">
             <span class="xv-versalita"><i class="pi pi-user" aria-hidden="true"></i> No vienen</span>
@@ -81,6 +83,24 @@
                 <span>Las confirmaciones ya cerraron.</span>
             }
         </p>
+    </section>
+
+    <!-- Lo que se arregla con el salon: cuantos menus de cada tipo. -->
+    <section class="panel">
+        <h2>Menús</h2>
+        <ul class="categorias">
+            @for (m of menus(); track m.nombre) {
+            <li class="categoria">
+                <div class="categoria__cabecera">
+                    <span class="categoria__nombre">{{ m.nombre }}</span>
+                    <span class="categoria__numeros">
+                        <span class="xv-numero">{{ m.adultos }}</span> {{ m.adultos === 1 ? 'adulto' : 'adultos' }} &middot;
+                        <span class="xv-numero">{{ m.infantiles }}</span> {{ m.infantiles === 1 ? 'infantil' : 'infantiles' }}
+                    </span>
+                </div>
+            </li>
+            }
+        </ul>
     </section>
 
     <!-- Por categoria. -->
@@ -186,7 +206,7 @@
                         }
                     </span>
                 </div>
-                <a class="recordar" [href]="f.link" target="_blank" rel="noopener noreferrer"
+                <a class="recordar" [href]="f.link" [attr.target]="destino_whatsapp" rel="noopener noreferrer"
                    [attr.aria-label]="'Recordarle por WhatsApp a ' + f.tarjeta.nombre_mostrar">
                     <i class="pi pi-whatsapp" aria-hidden="true"></i> Recordar
                 </a>

@@ -1,7 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { XVLayout } from "../../components/design/xv-layout/xv-layout";
 import { XVStorage } from '../../app.config';
-import { con_alimentacion } from '../../models/tarjeta';
+import { con_alimentacion, menus_de } from '../../models/tarjeta';
 
 @Component({
   imports: [XVLayout],
@@ -15,7 +15,13 @@ export class SolicitudesPage {
   protected readonly cargando = computed(() => XVStorage.tarjetas() === null)
 
   /** Quienes confirmaron y declararon una alergia, intolerancia o dieta. */
-  protected readonly lista = computed(() => con_alimentacion(XVStorage.tarjetas() ?? []))
+  protected readonly lista = computed(() => con_alimentacion(XVStorage.tarjetas() ?? [], XVStorage.anfitriones() ?? []))
+
+  /** Los menus de quienes confirmaron: lo otro que el salon necesita saber. */
+  protected readonly menus = computed(() => menus_de(XVStorage.tarjetas() ?? [], true, XVStorage.anfitriones() ?? []))
+
+  protected readonly hay_algo = computed(() =>
+    this.lista().length > 0 || this.menus().adultos + this.menus().infantiles > 0)
 
   protected readonly copiado = signal(false)
 
@@ -25,10 +31,12 @@ export class SolicitudesPage {
    */
   protected readonly copiar = async () => {
     const lista = this.lista()
+    const m = this.menus()
     const texto = [
-      `Alergias, intolerancias y dietas: ${lista.length} ${lista.length === 1 ? 'persona' : 'personas'}`,
+      `Menús (confirmados y anfitriones): ${m.adultos} de adulto · ${m.infantiles} ${m.infantiles === 1 ? 'infantil' : 'infantiles'}`,
       '',
-      ...lista.map(d => `• ${d.nombre}: ${d.alimentacion}`),
+      `Alergias, intolerancias y dietas: ${lista.length} ${lista.length === 1 ? 'persona' : 'personas'}`,
+      ...lista.map(d => `• ${d.nombre}${d.menu_infantil ? ' (menú infantil)' : ''}: ${d.alimentacion}`),
     ].join('\n')
 
     try {

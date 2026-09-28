@@ -22,6 +22,8 @@
     "@openng/icons": "^1.0.0",
     "@openng/optimus-ui": "2.0.1",
     "@openng/optimus-ui-themes": "2.0.1",
+    "jspdf": "4.2.1",
+    "jspdf-autotable": "5.0.8",
     "jsqr": "1.4.0",
     "qrcode": "^1.5.4",
     "rxjs": "~7.8.0",

@@ -1,3 +1,4 @@
+import type { Anfitrion } from './anfitriones';
 /**
  * Una persona de la tarjeta, con su respuesta adentro.
  *
@@ -30,6 +31,13 @@ export type Persona = {
      * Si la persona estaba en dos casos, van los dos unidos por " · ".
      */
     alimentacion?:        string
+
+    /**
+     * Come el menu infantil: el salon lo cobra aparte. Lo marca el backoffice
+     * en el formulario de la tarjeta; el invitado no lo toca (al confirmar
+     * se conserva, como cualquier otro campo). Ausente = menu de adulto.
+     */
+    menu_infantil?:       boolean
 }
 
 export type Tarjeta = {
@@ -67,17 +75,23 @@ export const sin_indefinidos = <T extends object>(objeto: T): T =>
     Object.fromEntries(Object.entries(objeto).filter(([, v]) => v !== undefined)) as T
 
 /**
- * Une los nombres que se editaron en el backoffice con el estado que cada
- * persona ya tenia. El estado es del invitado y aca no se toca nunca:
- * guardar nombres jamas puede borrar una confirmacion.
+ * Une lo que se edito en el backoffice (el nombre y el menu) con el estado
+ * que cada persona ya tenia. El estado es del invitado y aca no se toca
+ * nunca: guardar nombres jamas puede borrar una confirmacion.
  */
 export const fusionar_personas = (
     previas: Persona[] | undefined,
-    editadas: { id: string, nombre: string }[]
+    editadas: { id: string, nombre: string, menu_infantil?: boolean }[]
 ): Persona[] =>
     editadas.map(e => {
         const previa = (previas ?? []).find(p => p.id === e.id)
-        return sin_indefinidos({ ...(previa ?? {}), id: e.id, nombre: e.nombre })
+        return sin_indefinidos({
+            ...(previa ?? {}),
+            id:            e.id,
+            nombre:        e.nombre,
+            // Solo se guarda cuando es true: el adulto es lo normal.
+            menu_infantil: e.menu_infantil ? true : undefined,
+        })
     })
 
 // ---------------------------------------------------------------- estados
@@ -94,6 +108,7 @@ export type Integrante = {
     declarado:  boolean
     /** Cupo que todavia nadie nombro. */
     sin_nombre: boolean
+    menu_infantil: boolean
 }
 
 /**
@@ -113,7 +128,8 @@ export const integrantes_de = (t: Tarjeta): Integrante[] =>
                       : 'rechazado',
             manual:     !!p.manual,
             declarado:  !!p.declarado,
-            sin_nombre: !nombre
+            sin_nombre: !nombre,
+            menu_infantil: !!p.menu_infantil
         }
     })
 
@@ -175,6 +191,9 @@ export type Invitado = {
     nombre:         string
     categoria:      string
     ingreso:        string | null
+    /** Alergia o dieta, como la escribio al confirmar. '' = no declaro nada. */
+    alimentacion:   string
+    menu_infantil:  boolean
 }
 
 /**
@@ -193,7 +212,9 @@ export const invitados_confirmados = (tarjetas: TarjetaConId[]): Invitado[] =>
                 persona_id:     p.id,
                 nombre:         (p.nombre ?? '').trim() || 'Acompañante',
                 categoria:      t.categoria ?? '',
-                ingreso:        p.ingreso ?? null
+                ingreso:        p.ingreso ?? null,
+                alimentacion:   (p.alimentacion ?? '').trim(),
+                menu_infantil:  !!p.menu_infantil
             })))
         .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
 
@@ -206,14 +227,26 @@ export type ConAlimentacion = {
     tarjeta:      string
     categoria:    string
     alimentacion: string
+    menu_infantil: boolean
 }
 
 /**
  * Lo que hay que pasarle al salon. Solo cuenta quien viene: si alguien
  * declaro algo y despues se marco que no asiste, no hace falta cocinarle.
  */
-export const con_alimentacion = (tarjetas: TarjetaConId[]): ConAlimentacion[] =>
-    (tarjetas ?? [])
+export const con_alimentacion = (tarjetas: TarjetaConId[], anfitriones: Anfitrion[] = []): ConAlimentacion[] => [
+    // Los anfitriones tambien comen: van con los demas, bajo "Anfitriones".
+    ...anfitriones
+        .filter(a => !!(a.alimentacion ?? '').trim())
+        .map(a => ({
+            clave:         `casa/${a.id}`,
+            nombre:        a.nombre,
+            tarjeta:       'Anfitriones',
+            categoria:     'Anfitriones',
+            alimentacion:  a.alimentacion!.trim(),
+            menu_infantil: !!a.menu_infantil,
+        })),
+    ...(tarjetas ?? [])
         .filter(t => !esta_cancelada(t))
         .flatMap(t => (t.personas ?? [])
             .filter(p => p.confirmado === true && !!(p.alimentacion ?? '').trim())
@@ -223,5 +256,31 @@ export const con_alimentacion = (tarjetas: TarjetaConId[]): ConAlimentacion[] =>
                 tarjeta:      t.nombre_mostrar ?? '',
                 categoria:    t.categoria || 'Sin categoría',
                 alimentacion: p.alimentacion!.trim(),
-            })))
-        .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+                menu_infantil: !!p.menu_infantil,
+            }))),
+].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+
+// ------------------------------------------------- menus
+
+export type Menus = { adultos: number, infantiles: number }
+
+/**
+ * Cuantos menus de cada tipo, para arreglar con el salon. Las canceladas no
+ * cuentan. `solo_confirmados` = los que ya dijeron que vienen; sin eso,
+ * todos los invitados salvo los que dijeron que no (para ir previendo).
+ * Los anfitriones suman siempre.
+ */
+export const menus_de = (tarjetas: TarjetaConId[], solo_confirmados: boolean, anfitriones: Anfitrion[] = []): Menus =>
+    [
+        // Los anfitriones siempre vienen.
+        ...anfitriones,
+        ...(tarjetas ?? [])
+            .filter(t => !esta_cancelada(t))
+            .flatMap(t => t.personas ?? [])
+            .filter(p => solo_confirmados ? p.confirmado === true : p.confirmado !== false),
+    ]
+        .reduce((m, p) => {
+            if(p.menu_infantil) m.infantiles++
+            else                m.adultos++
+            return m
+        }, { adultos: 0, infantiles: 0 } as Menus)

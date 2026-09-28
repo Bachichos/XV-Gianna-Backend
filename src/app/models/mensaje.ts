@@ -1,5 +1,6 @@
 import { TarjetaConId } from './tarjeta';
 import { ConfigEvento } from './configuracion';
+import { mesas_de_tarjeta, PlanoMesas, unir } from './mesas';
 
 /**
  * Base publica de la invitacion. Cuando se compre el dominio propio,
@@ -19,7 +20,7 @@ export const link_invitacion = (id: string): string =>
  * Recibe el evento como parametro, en vez de leerlo solo: asi quien lo usa
  * dentro de un computed se entera cuando la configuracion cambia.
  */
-export const completar = (plantilla: string, t: TarjetaConId, evento: ConfigEvento): string => {
+export const completar = (plantilla: string, t: TarjetaConId, evento: ConfigEvento, plano: PlanoMesas | null = null): string => {
     const cuando = new Date(evento.fecha)
     const en_zona = (d: Date, o: Intl.DateTimeFormatOptions) =>
         new Intl.DateTimeFormat('es-AR', { timeZone: evento.zona, ...o }).format(d)
@@ -34,9 +35,41 @@ export const completar = (plantilla: string, t: TarjetaConId, evento: ConfigEven
         festejada: evento.festejada,
         fecha:     fecha.charAt(0).toUpperCase() + fecha.slice(1),
         cierre,
+        mesa:      frase_mesa(mesas_de_tarjeta(plano, t, evento.festejada)),
     }
-    return plantilla.replace(/\{(\w+)\}/g, (entero, clave) => datos[clave] ?? entero)
+    return plantilla
+        .replace(/\{(\w+)\}/g, (entero, clave) => datos[clave] ?? entero)
+        // Un marcador vacio (sin mesa todavia) no deja un hueco de renglones.
+        .replace(/\n{3,}/g, '\n\n')
+        .trim()
 }
+
+/** "Tu mesa: Mesa 4." / "Sus mesas: Mesa 4 y Mesa 5." / '' si todavia no tiene. */
+const frase_mesa = (mesas: string[]): string =>
+    !mesas.length      ? ''
+    : mesas.length === 1 ? `Tu mesa: ${mesas[0]}.`
+    : `Sus mesas: ${unir(mesas)}.`
+
+/**
+ * En el telefono, wa.me abre la app de WhatsApp. En la compu, wa.me pasa por
+ * una pagina intermedia que solo sirve con WhatsApp de escritorio instalado
+ * (en Linux no existe): ahi se va directo a WhatsApp Web, que anda en
+ * cualquier navegador con la sesion abierta.
+ */
+export const ES_TELEFONO =
+    /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)   // iPad que se hace pasar por Mac
+
+/**
+ * Donde se abre el chat. En la compu, siempre en la misma pestaña: WhatsApp
+ * Web no deja tener dos abiertas a la vez, y asi no se juntan pestañas.
+ */
+export const DESTINO_WHATSAPP = ES_TELEFONO ? '_blank' : 'xv-whatsapp'
+
+const chat_con = (numero: string, texto: string): string =>
+    ES_TELEFONO
+        ? `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`
+        : `https://web.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(texto)}`;
 
 export const mensaje_de = (t: TarjetaConId, evento: ConfigEvento): string =>
     completar(evento.mensajes.invitacion, t, evento);
@@ -46,14 +79,14 @@ export const mensaje_de = (t: TarjetaConId, evento: ConfigEvento): string =>
  * Solo falta tocar enviar: el ultimo paso lo da una persona, no el sistema.
  */
 export const link_whatsapp = (t: TarjetaConId, evento: ConfigEvento): string =>
-    `https://wa.me/${t.numero_telefono}?text=${encodeURIComponent(mensaje_de(t, evento))}`;
+    chat_con(t.numero_telefono, mensaje_de(t, evento));
 
 /**
  * El recordatorio por WhatsApp. A diferencia de la invitacion, no deja
  * registro: se puede mandar las veces que haga falta.
  */
-export const link_recordatorio = (t: TarjetaConId, evento: ConfigEvento): string =>
-    `https://wa.me/${t.numero_telefono}?text=${encodeURIComponent(completar(evento.mensajes.recordatorio, t, evento))}`;
+export const link_recordatorio = (t: TarjetaConId, evento: ConfigEvento, plano: PlanoMesas | null = null): string =>
+    chat_con(t.numero_telefono, completar(evento.mensajes.recordatorio, t, evento, plano));
 
 /**
  * Saca el token de lo que devuelve un QR. Acepta el link completo de la

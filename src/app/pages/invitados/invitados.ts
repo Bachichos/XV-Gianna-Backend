@@ -7,10 +7,12 @@ import { InputIcon } from '@openng/optimus-ui/inputicon';
 import { Button } from '@openng/optimus-ui/button';
 import { XVLayout } from '../../components/design/xv-layout/xv-layout';
 import { Escaner } from './escaner/escaner';
+import { DescargarLista } from './descargar-lista/descargar-lista';
 import { XVStorage } from '../../app.config';
 import { FirebaseTarjetasService } from '../../services/firebase-tarjetas';
 import { Invitado, invitados_confirmados, sin_indefinidos } from '../../models/tarjeta';
 import { sin_acentos } from '../../models/texto';
+import { clave_de, nombre_mesa_de } from '../../models/mesas';
 
 const TODOS = 'todos';
 
@@ -21,7 +23,7 @@ const VISTAS = [
 ];
 
 @Component({
-  imports: [FormsModule, Select, InputText, IconField, InputIcon, Button, XVLayout, Escaner],
+  imports: [FormsModule, Select, InputText, IconField, InputIcon, Button, XVLayout, Escaner, DescargarLista],
   selector: 'app-invitados',
   styleUrl: './invitados.scss',
   templateUrl: './invitados.html',
@@ -35,10 +37,14 @@ export class InvitadosPage {
   /** La lista viva: se reordena sola cuando alguien confirma o entra. */
   protected readonly todos = computed(() => invitados_confirmados(XVStorage.tarjetas() ?? []))
 
+  /** Los confirmados que comen el menu infantil; el resto, adultos. */
+  protected readonly infantiles = computed(() => this.todos().filter(i => i.menu_infantil).length)
+
   protected readonly ingresaron = computed(() => this.todos().filter(i => i.ingreso).length)
   protected readonly faltan     = computed(() => this.todos().length - this.ingresaron())
 
-  protected readonly escaner_abierto = signal(false)
+  protected readonly escaner_abierto   = signal(false)
+  protected readonly descargar_abierto = signal(false)
 
   protected readonly busqueda = signal('')
   protected readonly vista    = signal<string>(TODOS)
@@ -59,6 +65,7 @@ export class InvitadosPage {
 
       return sin_acentos(i.nombre).includes(texto)
           || sin_acentos(i.tarjeta_nombre).includes(texto)
+          || sin_acentos(this.mesa(i)).includes(texto)
     })
   })
 
@@ -72,6 +79,10 @@ export class InvitadosPage {
   }
 
   protected readonly clave = (i: Invitado) => `${i.tarjeta_id}/${i.persona_id}`
+
+  /** Su mesa, para decirle a donde ir apenas entra. '' si todavia no tiene. */
+  protected readonly mesa = (i: Invitado) =>
+    nombre_mesa_de(XVStorage.plano(), clave_de(i.tarjeta_id, i.persona_id), XVStorage.configuracion().evento.festejada)
 
   /**
    * Marca o desmarca el ingreso de una sola persona. Escribe el array de

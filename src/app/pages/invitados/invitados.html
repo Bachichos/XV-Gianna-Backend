@@ -10,6 +10,11 @@
           <span class="xv-numero">{{ todos().length }}</span>
           {{ todos().length === 1 ? 'persona confirmada' : 'personas confirmadas' }}
         </p>
+        <p class="cabecera__menus">
+          <span class="xv-numero">{{ todos().length - infantiles() }}</span> {{ todos().length - infantiles() === 1 ? 'adulto' : 'adultos' }}
+          &middot;
+          <span class="xv-numero">{{ infantiles() }}</span> {{ infantiles() === 1 ? 'infantil' : 'infantiles' }}
+        </p>
       }
     </div>
 
@@ -38,7 +43,7 @@
       <p-inputicon styleClass="pi pi-search" />
       <input pInputText
              type="search"
-             placeholder="Buscar por nombre"
+             placeholder="Buscar por nombre o mesa"
              aria-label="Buscar invitado"
              [ngModel]="busqueda()"
              (ngModelChange)="busqueda.set($event)">
@@ -52,8 +57,14 @@
               [ngModel]="vista()"
               (ngModelChange)="vista.set($event)" />
 
-    <p-button class="filtros__escanear" label="Escanear" icon="pi pi-camera"
-              (onClick)="escaner_abierto.set(true)" />
+    <div class="filtros__acciones">
+      <p-button label="PDF" icon="pi pi-file-pdf" severity="secondary" [outlined]="true"
+                ariaLabel="Descargar la lista en PDF"
+                [disabled]="cargando() || todos().length === 0"
+                (onClick)="descargar_abierto.set(true)" />
+      <p-button label="Escanear" icon="pi pi-camera"
+                (onClick)="escaner_abierto.set(true)" />
+    </div>
   </div>
 
   @if (cargando()) {
@@ -87,7 +98,10 @@
 
           <span class="fila__datos">
             <span class="fila__nombre">{{ i.nombre }}</span>
-            <span class="fila__tarjeta">{{ i.tarjeta_nombre }} &middot; {{ i.categoria }}</span>
+            <span class="fila__tarjeta">
+              @if (mesa(i); as m) { <strong class="fila__mesa">{{ m }}</strong> &middot; }
+              {{ i.tarjeta_nombre }} &middot; {{ i.categoria }}
+            </span>
           </span>
 
           <button type="button"
@@ -111,5 +125,6 @@
   }
 
   <xv-escaner [(abierto)]="escaner_abierto" />
+  <xv-descargar-lista [(abierto)]="descargar_abierto" />
 
 </xv-layout>

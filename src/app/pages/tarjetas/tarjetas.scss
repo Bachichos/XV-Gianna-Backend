@@ -26,6 +26,9 @@
     font-weight: var(--xv-peso-fuerte);
 }
 
+.cabecera__menus { color: var(--xv-texto-tenue); }
+.cabecera__menus .xv-numero { font-weight: normal; }
+
 /* --- Filtros --- */
 
 .filtros {

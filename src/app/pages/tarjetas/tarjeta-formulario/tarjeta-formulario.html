@@ -25,7 +25,7 @@
       <legend>Personas</legend>
       <p class="campo__ayuda">
         Una fila por cupo. Si todavía no sabe con quién viene, deje el nombre en blanco:
-        el invitado lo completa al confirmar.
+        el invitado lo completa al confirmar. Marque «Menú infantil» en quienes comen ese menú.
       </p>
 
       @for (control of personas.controls; track control; let i = $index) {
@@ -34,6 +34,16 @@
                  placeholder="Ej. Laura Pérez. Dejar vacío si acompañante es desconocido."
                  autocomplete="off"
                  [attr.aria-label]="'Persona ' + (i + 1)">
+
+          <button type="button" class="integrante__menu"
+                  [class.integrante__menu--si]="infantiles.at(i).value"
+                  (click)="alternar_infantil(i)"
+                  [attr.aria-pressed]="infantiles.at(i).value"
+                  [attr.aria-label]="'Menú infantil para la persona ' + (i + 1)"
+                  title="Come el menú infantil">
+            <i class="pi" [class.pi-check-square]="infantiles.at(i).value" [class.pi-stop]="!infantiles.at(i).value" aria-hidden="true"></i>
+            Menú infantil
+          </button>
 
           <button type="button" class="integrante__quitar"
                   (click)="quitar_persona(i)"
@@ -143,6 +153,7 @@
                                    : p.estado === 'rechazado'  ? 'pi-times'
                                    : 'pi-minus'" aria-hidden="true"></i>
               <span [class.integrante--anonimo]="p.sin_nombre">{{ p.nombre }}</span>
+              @if (p.menu_infantil) { <span class="integrante__infantil" title="Menú infantil">infantil</span> }
               @if (p.declarado) {
                 <span class="integrante__declarado" title="Nombre agregado al momento de responder">&lowast;</span>
               }

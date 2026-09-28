@@ -351,7 +351,21 @@ code {
 .tema:has(input:focus-visible) { outline: 2px solid var(--p-primary-color, #5279a2); outline-offset: 2px; }
 
 .tema__nombre { font-family: var(--xv-display); font-size: var(--xv-texto-lg); }
-.tema__descripcion { font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
+.tema__nombre--chico { font-size: var(--xv-texto-md); }
+.tema__descripcion { font-size: var(--xv-texto-xs); font-weight: normal; color: var(--xv-texto-tenue); }
+
+/* Los adornos: las mismas tarjetas que los temas, mas chicas. */
+.temas--chicos { grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); margin: 0; }
+
+.abrir-imprimible { display: block; margin-top: 1rem; }
+
+.campo__etiqueta { font-size: var(--xv-texto-sm); font-weight: var(--xv-peso-medio); }
+
+.volver-tema {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0; background: none; border: 0;
+    color: var(--p-primary-700, #374e6b); font-size: var(--xv-texto-sm); cursor: pointer;
+}
 
 /* --- La vista previa: al costado de todas las pestanas, fija al bajar --- */
 

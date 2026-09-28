@@ -1,0 +1,58 @@
+<xv-layout>
+
+  <header class="cabecera">
+    <h1>Anfitriones</h1>
+    <p class="cabecera__resumen">
+      Quienes están en la fiesta sin recibir invitación: la cumpleañera y, si hace falta, la familia que organiza.
+      Cuentan como personas confirmadas en los totales, los menús y las mesas.
+    </p>
+  </header>
+
+  @if (cargando()) {
+    <p class="tenue">Cargando&hellip;</p>
+  } @else {
+
+  <section class="panel">
+    <ol class="lista">
+      @for (f of filas; track f.id; let i = $index) {
+        <li class="anfitrion">
+          <input pInputText [(ngModel)]="f.nombre" placeholder="Nombre" [attr.aria-label]="'Nombre del anfitrión ' + (i + 1)">
+
+          <button type="button" class="menu" [class.menu--si]="f.menu_infantil" (click)="f.menu_infantil = !f.menu_infantil"
+                  [attr.aria-pressed]="f.menu_infantil" title="Come el menú infantil">
+            <i class="pi" [class.pi-check-square]="f.menu_infantil" [class.pi-stop]="!f.menu_infantil" aria-hidden="true"></i>
+            Menú infantil
+          </button>
+
+          <input pInputText class="anfitrion__dieta" [(ngModel)]="f.alimentacion"
+                 placeholder="Alergia, intolerancia o dieta (opcional)" [attr.aria-label]="'Alimentación del anfitrión ' + (i + 1)">
+
+          <button type="button" class="icono" (click)="quitar(i)" [attr.aria-label]="'Quitar al anfitrión ' + (i + 1)">
+            <i class="pi pi-trash" aria-hidden="true"></i>
+          </button>
+        </li>
+      } @empty {
+        <li class="tenue">No hay anfitriones. Todos los que se sientan reciben invitación.</li>
+      }
+    </ol>
+
+    <p-button label="Agregar anfitrión" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true" (onClick)="agregar()" />
+  </section>
+
+  @if (sucio() || guardado()) {
+    <div class="barra" [class.barra--guardado]="!sucio()" role="status">
+      @if (sucio()) {
+        <span><i class="pi pi-pencil" aria-hidden="true"></i> Hay cambios sin guardar.
+          @if (error(); as e) { <strong class="barra__error">{{ e }}</strong> }</span>
+        <span class="barra__acciones">
+          <p-button label="Descartar" severity="secondary" [text]="true" (onClick)="descartar()" [disabled]="guardando()" />
+          <p-button label="Guardar" icon="pi pi-check" (onClick)="guardar()" [loading]="guardando()" />
+        </span>
+      } @else {
+        <span><i class="pi pi-check" aria-hidden="true"></i> Guardado.</span>
+      }
+    </div>
+  }
+
+  }
+</xv-layout>

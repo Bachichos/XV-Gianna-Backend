@@ -1,0 +1,47 @@
+.cabecera { margin-bottom: 1.5rem; }
+.cabecera__resumen { max-width: 46rem; margin-top: 0.5rem; font-size: var(--xv-texto-sm); color: var(--xv-texto-tenue); line-height: var(--xv-interlinea-texto); }
+.tenue { color: var(--xv-texto-tenue); font-size: var(--xv-texto-sm); }
+
+.panel {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
+    padding: 1.3rem 1.4rem; background: var(--xv-superficie); border: 1px solid var(--xv-borde); border-radius: 3px;
+}
+
+.lista { display: flex; flex-direction: column; gap: 0.6rem; align-self: stretch; margin: 0; padding: 0; list-style: none; }
+
+/* Nombre, menu, alimentacion y quitar, en un renglon; en el telefono, en dos. */
+.anfitrion { display: grid; grid-template-columns: minmax(10rem, 1fr) auto minmax(12rem, 1.4fr) auto; align-items: center; gap: 0.6rem; }
+
+.menu {
+    display: inline-flex; align-items: center; gap: 0.35rem; height: 2.5rem; padding: 0 0.7rem;
+    background: none; border: 1px solid var(--xv-borde); border-radius: 3px;
+    color: var(--xv-texto-tenue); font-size: var(--xv-texto-xs); white-space: nowrap; cursor: pointer;
+}
+.menu--si { background: #e6f4ee; border-color: #a9d8c2; color: #14684a; }
+
+.icono {
+    display: grid; place-items: center; width: 2.2rem; height: 2.2rem;
+    background: none; border: 0; border-radius: 3px; color: var(--xv-texto-tenue); cursor: pointer;
+}
+.icono:hover { background: var(--xv-fondo); }
+
+.barra {
+    position: sticky; bottom: 0.75rem; z-index: 5;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem;
+    margin-top: 1.25rem; padding: 0.7rem 1rem;
+    background: var(--xv-superficie); border: 1px solid var(--xv-borde-fuerte); border-radius: 3px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); font-size: var(--xv-texto-sm);
+}
+.barra--guardado { color: #14684a; }
+.barra__acciones { display: flex; gap: 0.5rem; }
+.barra__error { color: #8f2c2c; }
+
+@media (max-width: 44rem) {
+    .anfitrion {
+        grid-template-columns: 1fr auto;
+        padding: 0.7rem; border: 1px solid var(--xv-borde); border-radius: 3px;
+    }
+    .anfitrion .icono { grid-column: 2; grid-row: 1; }
+    .menu { grid-column: 1 / -1; justify-self: start; }
+    .anfitrion__dieta { grid-column: 1 / -1; }
+}

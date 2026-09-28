@@ -1,0 +1,49 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  header="Descargar la lista"
+  styleClass="xv-dialogo xv-dialogo--angosto">
+
+  <div class="descargar">
+
+    <p class="descargar__intro">
+      Todas las personas confirmadas.
+      ¿Cómo la ordenamos?
+    </p>
+
+    <div class="opciones">
+      @for (o of ordenes; track o.valor) {
+        <button type="button"
+                class="opcion"
+                [disabled]="generando() !== null"
+                [attr.aria-busy]="generando() === o.valor"
+                (click)="descargar(o.valor)">
+          <i class="opcion__icono"
+             [class]="generando() === o.valor ? 'pi pi-spin pi-spinner' : o.icono"
+             aria-hidden="true"></i>
+          <span class="opcion__textos">
+            <span class="opcion__titulo">{{ o.titulo }}</span>
+            <span class="opcion__detalle">{{ o.detalle }}</span>
+          </span>
+          <i class="pi pi-download opcion__descarga" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+
+    @if (error(); as mensaje) {
+      <p class="descargar__error" role="alert">{{ mensaje }}</p>
+    }
+
+    <p class="descargar__nota">
+      Tiene nombres y alergias: compártela solo con quien la necesite.
+    </p>
+
+    <div class="acciones">
+      <p-button label="Volver" severity="secondary" [text]="true" (onClick)="cerrar()" />
+    </div>
+
+  </div>
+
+</p-dialog>

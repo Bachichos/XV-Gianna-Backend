@@ -6,8 +6,10 @@ export const routes: Routes = [
 
     { path: '',                 pathMatch: 'full', redirectTo: 'estadisticas' },
     { path: 'estadisticas',     canActivate: [loginGuard],  loadComponent: () => import('./pages/estadisticas/estadisticas').then(m => m.EstadisticasPage) },
+    { path: 'anfitriones',      canActivate: [loginGuard], loadComponent: () => import('./pages/anfitriones/anfitriones').then(m => m.AnfitrionesPage) },
     { path: 'configuracion',    canActivate: [loginGuard], loadComponent: () => import('./pages/configuracion/configuracion').then(m => m.ConfiguracionPage) },
     { path: 'tarjetas',         canActivate: [loginGuard],      loadComponent: () => import('./pages/tarjetas/tarjetas').then(m => m.TarjetasPage) },
+    { path: 'mesas',            canActivate: [loginGuard], loadComponent: () => import('./pages/mesas/mesas').then(m => m.MesasPage) },
     { path: 'invitados',        canActivate: [loginGuard], loadComponent: () => import('./pages/invitados/invitados').then(m => m.InvitadosPage) },
     { path: 'solicitudes',      canActivate: [loginGuard],   loadComponent: () => import('./pages/solicitudes/solicitudes').then(m => m.SolicitudesPage) },
 

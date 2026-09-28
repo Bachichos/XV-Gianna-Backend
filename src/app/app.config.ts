@@ -13,6 +13,8 @@ import { Usuario } from './models/usuario';
 import { TarjetaConId } from './models/tarjeta';
 import { Configuracion, POR_DEFECTO } from './models/configuracion';
 import { Marca, MARCA_POR_DEFECTO } from './models/marca';
+import { PlanoMesas } from './models/mesas';
+import { Anfitrion } from './models/anfitriones';
 
 /* Fechas, numeros y meses en castellano: sin esto el DatePipe escribe en ingles. */
 registerLocaleData(es_AR);
@@ -30,6 +32,12 @@ export const XVStorage = {
    * (pantalla Configuracion). De aca salen las categorias y los mensajes.
    */
   configuracion:  signal<Configuracion>(POR_DEFECTO),
+
+  /** Las mesas y quien se sienta en cada una (models/mesas.ts). En vivo; null mientras llega. */
+  plano:          signal<PlanoMesas | null>(null),
+
+  /** Quienes estan sin invitacion (models/anfitriones.ts). En vivo; null mientras llega. */
+  anfitriones:    signal<Anfitrion[] | null>(null),
 
   /** El nombre del evento y su logo (models/marca.ts). Se lee al abrir, antes del login. */
   marca:          signal<Marca>(MARCA_POR_DEFECTO),

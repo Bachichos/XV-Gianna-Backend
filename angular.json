@@ -48,6 +48,7 @@
             },
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "externalDependencies": ["html2canvas", "dompurify", "canvg"],
             "inlineStyleLanguage": "scss",
             "assets": [
               {

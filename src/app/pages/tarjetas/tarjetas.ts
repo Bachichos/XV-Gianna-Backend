@@ -11,7 +11,7 @@ import { TarjetaEliminar } from './tarjeta-eliminar/tarjeta-eliminar';
 import { TarjetaCancelar } from './tarjeta-cancelar/tarjeta-cancelar';
 import { TarjetaRespuestas } from './tarjeta-respuestas/tarjeta-respuestas';
 import { TarjetaQr } from './tarjeta-qr/tarjeta-qr';
-import { link_whatsapp } from '../../models/mensaje';
+import { DESTINO_WHATSAPP, link_whatsapp } from '../../models/mensaje';
 import { FirebaseTarjetasService } from '../../services/firebase-tarjetas';
 import { cupos_de, estado_de, EstadoRsvp, Integrante, integrantes_de, se_puede_eliminar, se_puede_cancelar, se_puede_enviar, esta_cancelada, TarjetaConId } from '../../models/tarjeta';
 import { XVLayout } from "../../components/design/xv-layout/xv-layout";
@@ -29,6 +29,13 @@ const CLAVE_ORDEN = 'xv-tarjetas-orden';
  * Cuando arranque el calendario de envios, poner true.
  */
 const ENVIOS_HABILITADOS = false;
+
+/**
+ * Quienes pueden enviar aunque el interruptor este apagado: para probar el
+ * envio antes de que arranque el calendario. Es solo del boton: no es una
+ * regla de seguridad (la base no distingue entre administradores).
+ */
+const PUEDEN_ENVIAR_ANTES = ['derobertisalejandramicaela@gmail.com'];
 
 /** Los estados por los que tiene sentido filtrar el dia del envio. */
 const ESTADOS = [
@@ -140,7 +147,11 @@ export class TarjetasPage {
     this.eliminar_abierto.set(true)
   }
 
-  protected readonly envios_habilitados = ENVIOS_HABILITADOS
+  protected readonly envios_habilitados = computed(() =>
+    ENVIOS_HABILITADOS
+    || PUEDEN_ENVIAR_ANTES.includes((XVStorage.logged_user()?.email ?? '').toLowerCase())
+  )
+  protected readonly destino_whatsapp   = DESTINO_WHATSAPP
 
   protected readonly busqueda  = signal('')
   protected readonly categoria = signal<string>(TODAS)
@@ -167,6 +178,15 @@ export class TarjetasPage {
   /** Cupos totales: las personas con nombre mas los acompanantes sin nombre. */
   protected readonly personas = computed(() =>
     this.activas().reduce((suma, t) => suma + cupos_de(t), 0)
+  )
+
+  /** Quienes estan sin invitacion: suman al total (models/anfitriones.ts). */
+  protected readonly anfitriones = computed(() => XVStorage.anfitriones() ?? [])
+
+  /** De todas esas personas, anfitriones incluidos, cuantas comen el menu infantil. */
+  protected readonly infantiles = computed(() =>
+    this.activas().reduce((suma, t) => suma + (t.personas ?? []).filter(p => p.menu_infantil).length, 0)
+    + this.anfitriones().filter(a => a.menu_infantil).length
   )
 
   protected readonly respondidas = computed(() =>

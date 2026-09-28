@@ -2,8 +2,8 @@ import { Component, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { XVLayout } from "../../components/design/xv-layout/xv-layout";
 import { XVStorage } from '../../app.config';
-import { esta_cancelada, integrantes_de, TarjetaConId } from '../../models/tarjeta';
-import { link_recordatorio } from '../../models/mensaje';
+import { esta_cancelada, integrantes_de, menus_de, TarjetaConId } from '../../models/tarjeta';
+import { DESTINO_WHATSAPP, link_recordatorio } from '../../models/mensaje';
 
 /** Cuantas personas hay en cada estado. Base de todos los numeros de la pantalla. */
 type Conteo = {
@@ -47,6 +47,7 @@ export class EstadisticasPage {
   /** La escucha vive en app.ts: aca solo se lee lo que dejo en XVStorage. */
   protected readonly cargando = computed(() => XVStorage.tarjetas() === null)
   protected readonly error    = XVStorage.error_tarjetas.asReadonly()
+  protected readonly destino_whatsapp = DESTINO_WHATSAPP
 
   /** Las canceladas no cuentan en ningun numero. */
   private readonly activas = computed(() =>
@@ -60,6 +61,25 @@ export class EstadisticasPage {
     this.activas().reduce((n, t) =>
       n + (t.personas ?? []).filter(p => p.confirmado === true && !!p.ingreso).length, 0)
   )
+
+  /**
+   * Menus de adulto e infantiles. Los previstos suman a quienes todavia no
+   * respondieron: sirven para ir arreglando con el salon antes del cierre.
+   */
+  protected readonly menus = computed(() => {
+    const tarjetas    = XVStorage.tarjetas() ?? []
+    const anfitriones = XVStorage.anfitriones() ?? []
+    return [
+      { nombre: 'Confirmados', ...menus_de(tarjetas, true, anfitriones) },
+      { nombre: 'Previstos, con quienes no respondieron', ...menus_de(tarjetas, false, anfitriones) },
+    ]
+  })
+
+  /**
+   * Cuantos anfitriones hay: suman al total y a los confirmados (siempre
+   * vienen), pero no a la barra de respuestas, porque no responden nada.
+   */
+  protected readonly anfitriones = computed(() => (XVStorage.anfitriones() ?? []).length)
 
   protected readonly tarjetas = computed(() => {
     const activas = this.activas()
@@ -128,7 +148,7 @@ export class EstadisticasPage {
           pendientes: c.pendientes,
           total:      c.total,
           parcial:    c.pendientes > 0 && c.pendientes < c.total,
-          link:       link_recordatorio(t, XVStorage.configuracion().evento),
+          link:       link_recordatorio(t, XVStorage.configuracion().evento, XVStorage.plano()),
         }
       })
       .filter(f => f.pendientes > 0)

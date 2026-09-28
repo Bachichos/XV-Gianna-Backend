@@ -15,6 +15,12 @@
     font-size: var(--xv-texto-sm);
 }
 
+.cabecera__menus {
+    margin-top: 0.2rem;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-xs);
+}
+
 /* El tanteador de la puerta y su boton: se miran de reojo y se tocan seguido. */
 .tanteador { display: flex; }
 
@@ -59,8 +65,10 @@
 .filtros__vista { flex: 0 1 14rem; }
 
 /* A la derecha del todo: queda bajo el tanteador, a la altura del buscador. */
-.filtros__escanear {
+.filtros__acciones {
     flex: none;
+    display: flex;
+    gap: 0.5rem;
     margin-inline-start: auto;
 }
 
@@ -170,6 +178,8 @@
     white-space: nowrap;
 }
 
+.fila__mesa { color: var(--xv-texto); font-weight: var(--xv-peso-medio); }
+
 /* Blanco de toque grande: esto se usa de pie, con una mano, en la puerta. */
 .fila__boton {
     flex: none;
@@ -207,7 +217,7 @@
        comparten linea y quedan los dos al alcance del pulgar. */
     .filtros__buscador { flex: 1 1 100%; max-width: none; }
     .filtros__vista    { flex: 1 1 auto; }
-    .filtros__escanear { flex: none; margin-inline-start: 0; }
+    .filtros__acciones { flex: none; margin-inline-start: 0; }
     .fila { gap: 0.6rem; padding: 0.7rem; }
     .fila__numero { min-width: 1.5rem; }
     .fila__boton { min-width: 5rem; padding: 0 0.75rem; }

@@ -14,7 +14,7 @@ import { XVLayout } from "../../components/design/xv-layout/xv-layout";
 import { FirebaseConfiguracionService } from '../../services/firebase-configuracion';
 import { Configuracion, POR_DEFECTO } from '../../models/configuracion';
 import { Borrador, a_borrador, a_configuracion, textos_de } from './borrador';
-import { TEMAS_DISPONIBLES } from '../../models/temas';
+import { OPCIONES_ADORNO, OPCIONES_MARCA, TEMAS_DISPONIBLES, trae_el_tema } from '../../models/temas';
 import { ICONOS, MARCADORES, marcadores_de, SECCIONES, Seccion, es_opcional } from './etiquetas';
 import { ZONAS } from './fechas';
 import { URL_INVITACION } from '../../models/mensaje';
@@ -39,14 +39,14 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
   protected readonly estado = signal<'cargando' | 'lista' | 'error'>('cargando')
 
   /** La pestana abierta. La comparten la barra de la compu y el desplegable del telefono. */
-  protected readonly pestana = signal('fiesta')
+  protected readonly pestana = signal('tema')
   protected readonly pestanas = [
+    { etiqueta: 'Tema',                   valor: 'tema' },
     { etiqueta: 'Fiesta',                 valor: 'fiesta' },
     { etiqueta: 'Programa e información', valor: 'programa' },
     { etiqueta: 'Regalo',                 valor: 'regalo' },
     { etiqueta: 'Tarjetas y mensajes',    valor: 'mensajes' },
     { etiqueta: 'Secciones y textos',     valor: 'secciones' },
-    { etiqueta: 'Tema',                   valor: 'tema' },
   ]
 
   /** Lo que se edita. Es un objeto comun: los campos lo cambian directo con ngModel. */
@@ -96,6 +96,9 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
   protected readonly iconos     = ICONOS
   protected readonly secciones  = SECCIONES
   protected readonly temas      = TEMAS_DISPONIBLES
+  protected readonly trae_el_tema = trae_el_tema
+  protected readonly adornos    = OPCIONES_ADORNO
+  protected readonly marcas     = OPCIONES_MARCA
   /** Las categorias del borrador, para elegir quien ve el regalo. */
   protected readonly nombres_categorias = () => this.b.categorias.map(c => c.nombre.trim()).filter(Boolean)
 
@@ -113,6 +116,8 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
                           donde: 'Configuración → Fiesta → "A quién se festeja".' },
     { clave: 'fecha',     que: 'El día de la fiesta, por ejemplo "Sábado 3 de abril de 2027".',
                           donde: 'Configuración → Fiesta → Cuándo → "Empieza".' },
+    { clave: 'mesa',      que: 'La mesa de la tarjeta, por ejemplo "Tu mesa: Mesa 4." Si todavía no tiene, no se pone nada.',
+                          donde: 'En Mesas: se completa sola con la mesa donde está sentada esa familia.' },
     { clave: 'cierre',    que: 'El último día para confirmar, por ejemplo "13 de marzo".',
                           donde: 'Configuración → Fiesta → Cuándo → "Último día para confirmar".' },
   ]
@@ -215,6 +220,30 @@ export class ConfiguracionPage implements OnInit, OnDestroy {
     else
       this.coordenadas_aviso.set('No encontramos coordenadas en ese link.')
   }
+
+  /** La tarjeta para imprimir vive en la invitacion (frontend/src/Imprimir.svelte): se abre aparte. */
+  protected readonly abrir_imprimible = () =>
+    window.open(`${INVITACION}/?imprimir`, '_blank', 'noopener')
+
+  /**
+   * Otro tema: los ajustes arrancan de nuevo como los trae ese tema. Lo que
+   * quedaba bien con uno no tiene por que quedar bien con el otro.
+   */
+  protected readonly elegir_tema = (id: string) => {
+    this.b.tema = { ...trae_el_tema(id), id }
+  }
+
+  /** Cuales ajustes no son los del tema, para marcarlos y poder volver atras. */
+  protected readonly ajustado = (clave: 'adorno' | 'marca' | 'estrellas' | 'fugaces') =>
+    this.b.tema[clave] !== trae_el_tema(this.b.tema.id)[clave]
+
+  protected readonly hay_ajustes = () =>
+    (['adorno', 'marca', 'estrellas', 'fugaces'] as const).some(c => this.ajustado(c))
+
+  protected readonly volver_al_tema = () => this.elegir_tema(this.b.tema.id)
+
+  protected readonly etiqueta_adorno = (valor: string) => OPCIONES_ADORNO.find(o => o.valor === valor)?.etiqueta ?? valor
+  protected readonly etiqueta_marca  = (valor: string) => OPCIONES_MARCA.find(o => o.valor === valor)?.etiqueta ?? valor
 
   protected readonly mover = <T>(lista: T[], i: number, paso: -1 | 1) => {
     const j = i + paso

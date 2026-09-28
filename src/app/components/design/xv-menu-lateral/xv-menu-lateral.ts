@@ -50,9 +50,11 @@ export class XVMenuLateral {
 
   protected readonly items = computed(() => [
     { ruta: '/estadisticas',  etiqueta: 'Estadísticas',          icono: 'pi-chart-bar', contador: null as number | null },
+    { ruta: '/anfitriones',   etiqueta: 'Anfitriones',           icono: 'pi-home',      contador: null as number | null },
     // Sin contadores: los numeros estan en cada pantalla, no hace falta repetirlos en el menu.
     { ruta: '/tarjetas',      etiqueta: 'Tarjetas de invitados', icono: 'pi-id-card',   contador: null as number | null },
     { ruta: '/invitados',     etiqueta: 'Lista de invitados',    icono: 'pi-users',     contador: null as number | null },
+    { ruta: '/mesas',         etiqueta: 'Mesas',                 icono: 'pi-th-large',  contador: null as number | null },
     { ruta: '/solicitudes',   etiqueta: 'Solicitudes',           icono: 'pi-inbox',     contador: this.solicitudes() },
     { ruta: '/configuracion', etiqueta: 'Configuración',         icono: 'pi-sliders-h', contador: null as number | null }
   // En el riel el contador se reduce a un punto: el numero pasa al globo.

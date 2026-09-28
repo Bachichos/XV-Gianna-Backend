@@ -10,7 +10,8 @@
  *   evento      los datos de la fiesta: quien, cuando, donde, el programa,
  *               la informacion, el regalo, como se confirma.
  *   secciones   por cada seccion, si se ve y sus textos.
- *   tema        cual de los temas de fabrica esta elegido.
+ *   tema        cual de los temas de fabrica esta elegido, y lo que se le
+ *               cambio (el adorno, la marca del programa, las estrellas).
  *
  * Un proyecto de Firebase por fiesta: cada una tiene su propia
  * configuracion, y no hace falta decir a que fiesta pertenece.
@@ -138,9 +139,27 @@ export type ConfigSecciones = {
 
 // ---------------------------------------------------------------- tema
 
+export const ADORNOS = ['luna', 'silueta', 'constelacion', 'herradura', 'perfil'] as const
+export const MARCAS  = ['estrellas', 'iconos', 'circulos'] as const
+
+/**
+ * Lo que se puede cambiar del tema elegido, encima de como viene de
+ * fabrica. Colores y tipografias no: son del tema, probados juntos.
+ */
+export type AjustesTema = {
+    /** Que acompana al nombre en la presentacion (ver Tema en models/tema.ts). */
+    adorno?:    typeof ADORNOS[number]
+    /** Que marca cada momento del programa. */
+    marca?:     typeof MARCAS[number]
+    estrellas?: boolean
+    fugaces?:   boolean
+}
+
 export type ConfigTema = {
     /** El id de un tema de fabrica (models/tema.ts). */
     id: string
+    /** Solo lo que se cambio: lo que no esta, queda como lo trae el tema. */
+    ajustes?: AjustesTema
 }
 
 // ---------------------------------------------------------------- todo junto
@@ -214,6 +233,8 @@ Te escribo para recordarte que todavía no nos confirmaste si venís a los 15 de
 
 Podés responder desde tu invitación, con este mismo link:
 {link}
+
+{mesa}
 
 Las confirmaciones cierran el {cierre}. ¡Te esperamos!`,
         },

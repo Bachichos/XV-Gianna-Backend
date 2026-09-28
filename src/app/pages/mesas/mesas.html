@@ -1,0 +1,268 @@
+<xv-layout>
+
+  <header class="cabecera">
+    <div>
+      <h1>Mesas</h1>
+      @if (cargando()) {
+        <p class="cabecera__resumen">Cargando&hellip;</p>
+      } @else {
+        <p class="cabecera__resumen">
+          <span class="xv-numero">{{ personas() }}</span> {{ personas() === 1 ? 'persona' : 'personas' }}
+          &middot; <span class="xv-numero">{{ lugares() }}</span> lugares
+          &middot; <span class="xv-numero">{{ sin_mesa().length }}</span> sin mesa
+        </p>
+        @if (lugares() > 0 && personas() > lugares()) {
+          <p class="cabecera__falta">
+            <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+            Faltan {{ personas() - lugares() }} lugares para todos los invitados.
+          </p>
+        }
+        <p class="cabecera__nota">Cuentan quienes confirmaron, quienes todavía no respondieron y los anfitriones: todos ocupan lugar.</p>
+      }
+    </div>
+
+    @if (!cargando() && !salon_abierto()) {
+      <p-button label="El salón" icon="pi pi-sliders-h" severity="secondary" [outlined]="true" (onClick)="salon_abierto.set(true)" />
+    }
+  </header>
+
+  @if (error(); as mensaje) {
+    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (!cargando()) {
+
+  <!-- ============================== EL SALON -->
+  @if (salon_abierto()) {
+    <section class="salon">
+      <div>
+        <h2>El salón</h2>
+        <p class="tenue">Lo que suele definir el salón. Cada mesa se puede ajustar después, desde su lápiz.</p>
+      </div>
+
+      <!-- 1. Para cuantos hay que armar -->
+      <div class="bloque">
+        <h3>Capacidad del evento</h3>
+        <p>Personas esperadas: <strong class="xv-numero">{{ personas() }}</strong> {{ personas() === 1 ? 'persona' : 'personas' }}</p>
+        <small class="tenue">Quienes confirmaron, quienes todavía no respondieron y los anfitriones.</small>
+      </div>
+
+      <!-- 2. Las mesas: principal, comunes y especiales, una columna cada una -->
+      <div class="bloque">
+        <h3>Configuración de mesas</h3>
+        <div class="columnas">
+
+          <div class="columna">
+            <h4>Mesa principal</h4>
+            <label class="interruptor">
+              <p-toggleswitch [(ngModel)]="s.principal" />
+              {{ s.principal ? 'Mesa de ' + (festejada() || 'la fiesta') : 'Sin mesa principal' }}
+            </label>
+            @if (s.principal) {
+              <label class="dato">
+                <input pInputText type="number" min="1" [(ngModel)]="s.lugares_principal" aria-label="Lugares en la mesa principal">
+                lugares
+              </label>
+            }
+
+            @if (s.principal && anfitriones().length) {
+              <small class="tenue">Al guardar, los anfitriones sin mesa van acá. Se editan en Anfitriones.</small>
+            }
+          </div>
+
+          <div class="columna">
+            <h4>Mesas comunes</h4>
+            <label class="dato dato--fila">
+              <span>Número de mesas</span>
+              <input pInputText type="number" min="0" max="200" [(ngModel)]="s.cantidad">
+            </label>
+            <label class="dato dato--fila">
+              <span>Lugares por mesa</span>
+              <input pInputText type="number" min="1" [(ngModel)]="s.lugares" (ngModelChange)="tocar_lugares()">
+            </label>
+            <p class="subtotal">Total: <strong class="xv-numero">{{ (+s.cantidad || 0) * (+s.lugares || 0) }}</strong> lugares</p>
+          </div>
+
+          <div class="columna">
+            <h4>Mesas especiales</h4>
+            <small class="tenue">Con otra cantidad de lugares: una infantil, una que falta para cuadrar&hellip;</small>
+            @for (e of s.especiales; track $index; let i = $index) {
+              <div class="especial">
+                <input pInputText [(ngModel)]="e.nombre" [placeholder]="nombre_especial(i)" [attr.aria-label]="'Nombre de la mesa especial ' + (i + 1)">
+                <input pInputText type="number" min="1" [(ngModel)]="e.lugares" [attr.aria-label]="'Lugares de la mesa especial ' + (i + 1)">
+                <button type="button" class="icono" (click)="quitar_especial(i)" [attr.aria-label]="'Quitar la mesa especial ' + (i + 1)">
+                  <i class="pi pi-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            }
+            <p-button label="Agregar mesa especial" icon="pi pi-plus" size="small" severity="secondary" [outlined]="true" (onClick)="agregar_especial()" />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3. Lo que suma todo -->
+      <div class="bloque">
+        <h3>Resumen</h3>
+        <p class="resumen">
+          <span>Mesas totales: <strong class="xv-numero">{{ totales().mesas }}</strong></span>
+          <span>Lugares totales: <strong class="xv-numero">{{ totales().lugares }}</strong></span>
+          <span>Capacidad:
+            <strong class="xv-numero" [class.alcanza]="totales().lugares >= personas()" [class.no-alcanza]="totales().lugares < personas()">
+              {{ totales().lugares }} / {{ personas() }}
+            </strong>
+            @if (totales().lugares >= personas()) { <span class="alcanza">alcanza para todos</span> }
+            @else { <span class="no-alcanza">faltan {{ personas() - totales().lugares }} lugares</span> }
+          </span>
+        </p>
+      </div>
+
+      @if (a_liberar().claves.length) {
+        <p class="advertencia">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          Se sacan {{ a_liberar().mesas.join(', ') }}: {{ a_liberar().claves.length }}
+          {{ a_liberar().claves.length === 1 ? 'persona vuelve' : 'personas vuelven' }} a quedar sin mesa.
+        </p>
+      }
+
+      <div class="salon__acciones">
+        @if (lugares() > 0) {
+          <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cancelar_salon()" />
+        }
+        <p-button label="Guardar el salón" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar_salon()" />
+      </div>
+    </section>
+  }
+
+  @if (mesas().length) {
+  <div class="plano" cdkDropListGroup>
+
+    <!-- ============================== SIN MESA -->
+    <section class="pendientes">
+      <h2>Sin mesa <span class="xv-numero tenue">({{ sin_mesa().length }})</span></h2>
+
+      <div class="pendientes__filtros">
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input pInputText type="search" placeholder="Buscar" aria-label="Buscar invitado"
+                 [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)">
+        </p-iconfield>
+        <p-select [options]="categorias()" optionLabel="etiqueta" optionValue="valor" ariaLabel="Filtrar por categoría"
+                  [ngModel]="categoria()" (ngModelChange)="categoria.set($event)" />
+      </div>
+
+      <p class="pendientes__ayuda tenue">Arrastre una persona, o el nombre de la tarjeta para llevar a toda la familia. También puede tocar el lápiz de una mesa y elegir quiénes van.</p>
+
+      <ul class="lista" cdkDropList [cdkDropListData]="null" cdkDropListSortingDisabled
+          (cdkDropListDropped)="soltar($event)">
+        @for (f of filas(); track f.tipo + f.clave) {
+          @if (f.tipo === 'grupo') {
+            <li class="grupo" cdkDrag [cdkDragData]="f.claves" [cdkDragStartDelay]="{ touch: 250, mouse: 0 }"
+                [class.elegida]="grupo_elegido(f.claves)" (click)="alternar_grupo(f.claves)">
+              <span class="grupo__nombre">{{ f.tarjeta }}</span>
+              <span class="grupo__dato">{{ f.categoria }} &middot; {{ f.claves.length }}</span>
+            </li>
+          } @else {
+            <li class="persona" cdkDrag [cdkDragData]="[f.clave]" [cdkDragStartDelay]="{ touch: 250, mouse: 0 }"
+                [class.elegida]="seleccion().has(f.clave)" (click)="alternar(f.clave)">
+              <ng-container [ngTemplateOutlet]="persona" [ngTemplateOutletContext]="{ $implicit: f.c }" />
+            </li>
+          }
+        } @empty {
+          <li class="vacia tenue">
+            @if (hay_filtro()) { Nadie sin mesa con ese filtro. <button type="button" class="enlace" (click)="limpiar_filtros()">Ver todos</button> }
+            @else { Todos tienen mesa. }
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- ============================== LAS MESAS -->
+    <section class="mesas">
+      @for (m of mesas(); track m.mesa.id) {
+        <article class="mesa" [class.mesa--principal]="es_principal(m.mesa)" [class.mesa--excedida]="m.excedida">
+          @if (editando() === m.mesa.id) {
+            <div class="mesa__edicion">
+              <label class="mesa__campo">
+                <span>Nombre</span>
+                <input pInputText [(ngModel)]="nombre_edicion" [placeholder]="nombre_por_defecto(m.mesa)">
+              </label>
+              <label class="mesa__campo">
+                <span>Lugares</span>
+                <input pInputText type="number" min="1" [(ngModel)]="lugares_edicion">
+              </label>
+              <label class="mesa__campo">
+                <span>Quiénes van <span class="xv-numero" [class.mesa__pasada]="ocupados_edicion() > lugares_edicion">({{ ocupados_edicion() }}/{{ lugares_edicion }})</span></span>
+                <p-multiselect [options]="opciones_gente()" [(ngModel)]="gente_edicion"
+                               [group]="true" optionGroupLabel="etiqueta" optionGroupChildren="items"
+                               optionLabel="etiqueta" optionValue="valor"
+                               [filter]="true" filterBy="etiqueta" filterPlaceHolder="Buscar por nombre"
+                               emptyFilterMessage="Nadie con ese nombre" [showToggleAll]="false"
+                               display="chip" placeholder="Elija las personas" appendTo="body"
+                               scrollHeight="18rem" ariaLabel="Personas de la mesa" />
+              </label>
+              <span class="mesa__botones">
+                <p-button label="Listo" size="small" [loading]="guardando()" (onClick)="guardar_mesa(m.mesa.id)" />
+                <p-button label="Cancelar" size="small" severity="secondary" [text]="true" (onClick)="editando.set(null)" />
+              </span>
+            </div>
+          } @else {
+            <header class="mesa__cabecera">
+              <h3>{{ m.nombre }}</h3>
+              <span class="mesa__cuenta xv-numero" [title]="m.ocupados + ' de ' + m.mesa.lugares + ' lugares'">{{ m.ocupados }}/{{ m.mesa.lugares }}</span>
+              <button type="button" class="icono" (click)="editar(m)" [attr.aria-label]="'Editar ' + m.nombre"><i class="pi pi-pencil" aria-hidden="true"></i></button>
+            </header>
+            @if (m.infantiles || m.alergias) {
+              <p class="mesa__datos tenue">
+                @if (m.infantiles) { {{ m.infantiles }} {{ m.infantiles === 1 ? 'infantil' : 'infantiles' }} }
+                @if (m.infantiles && m.alergias) { &middot; }
+                @if (m.alergias) { {{ m.alergias }} con alergia o dieta }
+              </p>
+            }
+          }
+
+          <ul class="lista lista--mesa" cdkDropList [cdkDropListData]="m.mesa.id" cdkDropListSortingDisabled
+              (cdkDropListDropped)="soltar($event)">
+            @for (c of m.gente; track c.clave) {
+              <li class="persona" cdkDrag [cdkDragData]="[c.clave]" [cdkDragStartDelay]="{ touch: 250, mouse: 0 }"
+                  [class.elegida]="seleccion().has(c.clave)" (click)="alternar(c.clave)">
+                <ng-container [ngTemplateOutlet]="persona" [ngTemplateOutletContext]="{ $implicit: c, tarjeta: true }" />
+                <button type="button" class="icono icono--quitar" (click)="$event.stopPropagation(); quitar(c.clave)"
+                        [attr.aria-label]="'Sacar a ' + c.nombre + ' de la mesa'"><i class="pi pi-times" aria-hidden="true"></i></button>
+              </li>
+            } @empty {
+              <li class="vacia tenue">Suelte acá a quien va en esta mesa.</li>
+            }
+          </ul>
+        </article>
+      }
+    </section>
+
+  </div>
+  }
+
+  <!-- Lo seleccionado: se mueve de a varios. En el telefono es la forma de sentar. -->
+  @if (seleccion().size) {
+    <div class="barra" role="region" aria-label="Personas seleccionadas">
+      <span><span class="xv-numero">{{ seleccion().size }}</span> {{ seleccion().size === 1 ? 'seleccionada' : 'seleccionadas' }}</span>
+      <p-select [options]="opciones_mesa()" optionLabel="etiqueta" optionValue="valor" placeholder="Pasar a la mesa…"
+                ariaLabel="Pasar a la mesa" appendTo="body" [ngModel]="null" (ngModelChange)="pasar_a($event)" />
+      <p-button label="Sin mesa" severity="secondary" [outlined]="true" (onClick)="pasar_a(null)" />
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="limpiar_seleccion()" />
+    </div>
+  }
+
+  }
+
+  <ng-template #persona let-c let-tarjeta="tarjeta">
+    <span class="persona__estado integrante-linea" [class]="'integrante--' + c.estado"
+          [title]="c.estado === 'confirmado' ? 'Confirmó' : c.estado === 'rechazado' ? 'No viene' : 'Sin responder'">
+      <i class="pi" [class]="c.estado === 'confirmado' ? 'pi-check' : c.estado === 'rechazado' ? 'pi-times' : 'pi-minus'" aria-hidden="true"></i>
+      <span [class.integrante--anonimo]="c.sin_nombre">{{ c.nombre }}</span>
+      @if (c.menu_infantil) { <span class="integrante__infantil" title="Menú infantil">infantil</span> }
+      @if (c.alimentacion) { <i class="pi pi-info-circle persona__dieta" [title]="c.alimentacion" [attr.aria-label]="c.alimentacion"></i> }
+    </span>
+    @if (tarjeta) { <span class="persona__tarjeta">{{ c.tarjeta }}@if (c.estado === 'rechazado') { &middot; no viene: libere el lugar }</span> }
+  </ng-template>
+
+</xv-layout>

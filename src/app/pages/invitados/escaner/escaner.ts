@@ -5,6 +5,7 @@ import { XVStorage } from '../../../app.config';
 import { FirebaseTarjetasService } from '../../../services/firebase-tarjetas';
 import { token_de } from '../../../models/mensaje';
 import { estado_de, integrantes_de, sin_indefinidos, TarjetaConId } from '../../../models/tarjeta';
+import { clave_de, nombre_mesa_de } from '../../../models/mesas';
 
 type Estado = 'pidiendo' | 'escaneando' | 'encontrada' | 'desconocida' | 'error';
 
@@ -44,6 +45,12 @@ export class Escaner {
     const t = this.tarjeta()
     return t ? integrantes_de(t) : []
   })
+
+  /** La mesa de esa persona, para decirle a donde ir. '' si no tiene. */
+  protected readonly mesa = (persona_id: string): string => {
+    const t = this.tarjeta()
+    return t ? nombre_mesa_de(XVStorage.plano(), clave_de(t.id, persona_id), XVStorage.configuracion().evento.festejada) : ''
+  }
 
   protected readonly ingreso_de = (persona_id: string): string | null =>
     this.tarjeta()?.personas?.find(p => p.id === persona_id)?.ingreso ?? null

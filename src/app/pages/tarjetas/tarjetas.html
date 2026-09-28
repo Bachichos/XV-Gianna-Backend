@@ -14,8 +14,32 @@
                 }
             </p>
             <p class="cabecera__personas">
-                <span class="xv-numero">{{ personas() }}</span>
-                {{ personas() === 1 ? 'persona invitada en total' : 'personas invitadas en total' }}
+                <span class="xv-numero">{{ personas() }}</span> {{ personas() === 1 ? 'invitada' : 'invitadas' }}
+                @if (anfitriones().length) {
+                  + <span class="xv-numero">{{ anfitriones().length }}</span> {{ anfitriones().length === 1 ? 'anfitrión' : 'anfitriones' }}
+                }
+                <span class="cabecera__menus">&mdash;
+                    <span class="xv-numero">{{ personas() + anfitriones().length - infantiles() }}</span> {{ personas() + anfitriones().length - infantiles() === 1 ? 'adulto' : 'adultos' }} &middot;
+                    <span class="xv-numero">{{ infantiles() }}</span> {{ infantiles() === 1 ? 'infantil' : 'infantiles' }}
+                </span>
+            </p>
+            <!-- Como se lee cada persona de la tabla, y cuantas hay en cada estado. -->
+            <p class="leyenda">
+                <span class="integrante-linea integrante--confirmado">
+                    <i class="pi pi-check" aria-hidden="true"></i> confirmó
+                    <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().confirmados }}</span>
+                    {{ conteo_personas().confirmados === 1 ? 'persona' : 'personas' }})</span>
+                </span>
+                <span class="integrante-linea integrante--rechazado">
+                    <i class="pi pi-times" aria-hidden="true"></i> no viene
+                    <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().rechazados }}</span>
+                    {{ conteo_personas().rechazados === 1 ? 'persona' : 'personas' }})</span>
+                </span>
+                <span class="integrante-linea integrante--pendiente">
+                    <i class="pi pi-minus" aria-hidden="true"></i> sin responder
+                    <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().pendientes }}</span>
+                    {{ conteo_personas().pendientes === 1 ? 'persona' : 'personas' }})</span>
+                </span>
             </p>
             }
         </div>
@@ -125,6 +149,7 @@
                                          : p.estado === 'rechazado'  ? 'pi-times'
                                          : 'pi-minus'" aria-hidden="true"></i>
                                 <span [class.integrante--anonimo]="p.sin_nombre">{{ p.nombre }}</span>
+                                @if (p.menu_infantil) { <span class="integrante__infantil" title="Menú infantil">infantil</span> }
                                 @if (p.declarado) {
                                 <span class="integrante__declarado"
                                     title="Nombre agregado al momento de responder">&lowast;</span>
@@ -162,8 +187,8 @@
                             <span class="envio envio--hecho" [title]="f.tarjeta.fecha_envio">
                               <i class="pi pi-check" aria-hidden="true"></i> {{ f.tarjeta.fecha_envio | date:'d MMM' }}
                             </span>
-                          } @else if (envios_habilitados) {
-                            <a class="boton-wsp" [href]="f.link" target="_blank" rel="noopener"
+                          } @else if (envios_habilitados()) {
+                            <a class="boton-wsp" [href]="f.link" [attr.target]="destino_whatsapp" rel="noopener"
                                (click)="marcar_enviada(f.tarjeta)"
                                [attr.aria-label]="'Enviar la invitación a ' + f.tarjeta.nombre_mostrar">
                               <i class="pi pi-whatsapp" aria-hidden="true"></i> Enviar
@@ -209,24 +234,6 @@
         </table>
     </div>
 
-    <p class="leyenda">
-        <span class="integrante-linea integrante--confirmado">
-            <i class="pi pi-check" aria-hidden="true"></i> confirmó
-            <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().confirmados }}</span>
-            {{ conteo_personas().confirmados === 1 ? 'persona' : 'personas' }})</span>
-        </span>
-        <span class="integrante-linea integrante--rechazado">
-            <i class="pi pi-times" aria-hidden="true"></i> no viene
-            <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().rechazados }}</span>
-            {{ conteo_personas().rechazados === 1 ? 'persona' : 'personas' }})</span>
-        </span>
-        <span class="integrante-linea integrante--pendiente">
-            <i class="pi pi-minus" aria-hidden="true"></i> sin responder
-            <span class="leyenda__conteo">(<span class="xv-numero">{{ conteo_personas().pendientes }}</span>
-            {{ conteo_personas().pendientes === 1 ? 'persona' : 'personas' }})</span>
-        </span>
-    </p>
-
     <!-- Telefono y portatiles (hasta 1320px) -->
     <ul class="fichas">
         @for (f of filas(); track f.tarjeta.id) {
@@ -246,8 +253,8 @@
                     <i class="pi pi-check" aria-hidden="true"></i>
                     Enviada el {{ f.tarjeta.fecha_envio | date:'d MMM' }}
                 </span>
-                } @else if (envios_habilitados) {
-                <a class="boton-wsp" [href]="f.link" target="_blank" rel="noopener"
+                } @else if (envios_habilitados()) {
+                <a class="boton-wsp" [href]="f.link" [attr.target]="destino_whatsapp" rel="noopener"
                    (click)="marcar_enviada(f.tarjeta)"
                    [attr.aria-label]="'Enviar la invitación a ' + f.tarjeta.nombre_mostrar">
                     <i class="pi pi-whatsapp" aria-hidden="true"></i> Enviar
@@ -267,6 +274,7 @@
                                    : p.estado === 'rechazado'  ? 'pi-times'
                                    : 'pi-minus'" aria-hidden="true"></i>
                     <span [class.integrante--anonimo]="p.sin_nombre">{{ p.nombre }}</span>
+                    @if (p.menu_infantil) { <span class="integrante__infantil" title="Menú infantil">infantil</span> }
                     @if (p.declarado) {
                     <span class="integrante__declarado"
                         title="Nombre agregado al momento de responder">&lowast;</span>

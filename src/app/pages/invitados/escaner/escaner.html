@@ -54,6 +54,7 @@
                     {{ p.estado === 'confirmado' ? 'confirmó'
                      : p.estado === 'rechazado'  ? 'no venía'
                      : 'sin responder' }}
+                    @if (mesa(p.id); as m) { &middot; <strong class="persona__mesa">{{ m }}</strong> }
                   </span>
                 </span>
 

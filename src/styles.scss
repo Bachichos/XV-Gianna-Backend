@@ -217,6 +217,21 @@ strong, b { font-weight: var(--xv-peso-fuerte); }
     cursor: help;
 }
 
+/* Come el menu infantil: una etiqueta chica, al lado del nombre. */
+.integrante__infantil {
+    margin-inline-start: 0.2rem;
+    padding: 0 0.35rem;
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 999px;
+    font-size: 0.68rem;
+    line-height: 1.35;
+    color: var(--xv-texto-tenue);
+    white-space: nowrap;
+}
+
+/* En quien no viene, el nombre va tachado; la etiqueta no. */
+.integrante-linea span.integrante__infantil { text-decoration: none; }
+
 .leyenda {
     display: flex;
     flex-wrap: wrap;

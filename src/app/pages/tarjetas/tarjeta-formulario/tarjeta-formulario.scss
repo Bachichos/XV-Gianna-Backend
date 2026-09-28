@@ -116,6 +116,35 @@
 
 .integrante input { flex: 1; }
 
+/* Un interruptor chico, al lado del nombre: tildado se pone verde. */
+.integrante__menu {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 2.4rem;
+    padding: 0 0.6rem;
+    background: none;
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-xs);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.integrante__menu--si {
+    background: #e6f4ee;
+    border-color: #a9d8c2;
+    color: #14684a;
+}
+
+@media (max-width: 30rem) {
+    .integrante { flex-wrap: wrap; }
+    .integrante input { flex: 1 1 100%; }
+    .integrante__menu { flex: 1; }
+}
+
 .integrante__quitar {
     flex: none;
     display: grid;

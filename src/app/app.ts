@@ -4,6 +4,10 @@ import { RouterOutlet } from '@angular/router';
 import { FirebaseAuthService } from './services/firebase-auth';
 import { FirebaseTarjetasService } from './services/firebase-tarjetas';
 import { FirebaseConfiguracionService } from './services/firebase-configuracion';
+import { FirebaseMesasService } from './services/firebase-mesas';
+import { FirebaseAnfitrionesService } from './services/firebase-anfitriones';
+import { anfitriones_por_defecto } from './models/anfitriones';
+import { PLANO_VACIO } from './models/mesas';
 import { XVStorage } from './app.config';
 
 @Component({
@@ -17,6 +21,8 @@ export class App implements OnInit {
   private readonly firebase_auth     = inject(FirebaseAuthService)
   private readonly firebase_tarjetas = inject(FirebaseTarjetasService)
   private readonly firebase_config   = inject(FirebaseConfiguracionService)
+  private readonly firebase_mesas    = inject(FirebaseMesasService)
+  private readonly firebase_anfitriones = inject(FirebaseAnfitrionesService)
   private readonly injector          = inject(Injector)
   private readonly titulo            = inject(Title)
 
@@ -50,6 +56,42 @@ export class App implements OnInit {
         }
       })
 
+      onCleanup(() => suscripcion.unsubscribe())
+    })
+
+    // El plano de mesas, tambien en vivo: lo usan Mesas, la lista de la
+    // puerta y los recordatorios. Sin salon armado todavia, vale vacio.
+    effect(onCleanup => {
+      if(!XVStorage.logged_user()) {
+        XVStorage.plano.set(null)
+        return
+      }
+      const plano$ = runInInjectionContext(this.injector, () => this.firebase_mesas.get_plano())
+      const suscripcion = plano$.subscribe({
+        next:  plano => XVStorage.plano.set({ mesas: plano?.mesas ?? [], asientos: plano?.asientos ?? {} }),
+        error: e => {
+          console.error('[mesas]', e)
+          XVStorage.plano.set(PLANO_VACIO)
+        }
+      })
+      onCleanup(() => suscripcion.unsubscribe())
+    })
+
+    // Los anfitriones, en vivo: cuentan en los totales de casi todas las
+    // pantallas. Si nunca se guardaron, se propone a la festejada.
+    effect(onCleanup => {
+      if(!XVStorage.logged_user()) {
+        XVStorage.anfitriones.set(null)
+        return
+      }
+      const lista$ = runInInjectionContext(this.injector, () => this.firebase_anfitriones.get_lista())
+      const suscripcion = lista$.subscribe({
+        next:  d => XVStorage.anfitriones.set(d?.lista ?? anfitriones_por_defecto(XVStorage.configuracion().evento.festejada)),
+        error: e => {
+          console.error('[anfitriones]', e)
+          XVStorage.anfitriones.set([])
+        }
+      })
       onCleanup(() => suscripcion.unsubscribe())
     })
 

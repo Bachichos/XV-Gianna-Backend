@@ -23,15 +23,92 @@
 
     <p-tabs [value]="pestana()" (valueChange)="pestana.set($any($event))">
         <p-tablist class="pestanas-escritorio">
+            <p-tab value="tema">Tema</p-tab>
             <p-tab value="fiesta">Fiesta</p-tab>
             <p-tab value="programa">Programa e información</p-tab>
             <p-tab value="regalo">Regalo</p-tab>
             <p-tab value="mensajes">Tarjetas y mensajes</p-tab>
             <p-tab value="secciones">Secciones y textos</p-tab>
-            <p-tab value="tema">Tema</p-tab>
         </p-tablist>
 
         <p-tabpanels>
+
+            <!-- ============================== TEMA -->
+            <p-tabpanel value="tema">
+                <section class="panel">
+                    <h2>1 · El tema</h2>
+                    <p class="tenue">Los temas son de fábrica: cada uno trae sus colores, sus tipografías y sus adornos, probados para que todo se lea bien.</p>
+
+                    <div class="temas" role="radiogroup" aria-label="Tema de la invitación">
+                        @for (t of temas; track t.id) {
+                        <label class="tema" [class.tema--elegido]="b.tema.id === t.id">
+                            <input type="radio" name="tema" [value]="t.id" [ngModel]="b.tema.id" (ngModelChange)="elegir_tema($event)">
+                            <span class="tema__nombre">{{ t.nombre }}</span>
+                            <span class="tema__descripcion">{{ t.descripcion }}</span>
+                        </label>
+                        }
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel__cabecera">
+                        <h2>2 · Cómo se ve</h2>
+                        @if (hay_ajustes()) {
+                        <button type="button" class="volver-tema" (click)="volver_al_tema()">
+                            <i class="pi pi-replay" aria-hidden="true"></i> Volver a como viene el tema
+                        </button>
+                        }
+                    </div>
+                    <p class="tenue">Parten de como viene el tema elegido. Si se elige otro tema, vuelven a empezar desde ese.</p>
+
+                    <div class="grilla">
+                        <div class="campo campo--ancho">
+                            <span class="campo__etiqueta" id="c-adorno">Adorno de la presentación</span>
+                            <div class="temas temas--chicos" role="radiogroup" aria-labelledby="c-adorno">
+                                @for (a of adornos; track a.valor) {
+                                <label class="tema" [class.tema--elegido]="b.tema.adorno === a.valor">
+                                    <input type="radio" name="adorno" [value]="a.valor" [(ngModel)]="b.tema.adorno">
+                                    <span class="tema__nombre tema__nombre--chico">{{ a.etiqueta }}</span>
+                                    <span class="tema__descripcion">{{ a.detalle }}</span>
+                                </label>
+                                }
+                            </div>
+                            <small>Lo que acompaña al nombre en la primera pantalla.
+                                @if (ajustado('adorno')) { El tema trae «{{ etiqueta_adorno(trae_el_tema(b.tema.id).adorno) }}». }</small>
+                        </div>
+
+                        <div class="campo">
+                            <label for="c-marca">Marcas del programa</label>
+                            <p-select inputId="c-marca" [options]="marcas" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="b.tema.marca" />
+                            <small>Qué señala cada momento de la línea de tiempo.
+                                @if (ajustado('marca')) { El tema trae «{{ etiqueta_marca(trae_el_tema(b.tema.id).marca) }}». }</small>
+                        </div>
+
+                        <div class="campo">
+                            <span class="campo__etiqueta">Efectos del cielo</span>
+                            <label class="interruptor">
+                                <p-toggleswitch [(ngModel)]="b.tema.estrellas" />
+                                Estrellas que titilan
+                            </label>
+                            <label class="interruptor">
+                                <p-toggleswitch [(ngModel)]="b.tema.fugaces" />
+                                Estrellas fugaces
+                            </label>
+                            <small>En teléfonos viejos, apagarlos hace la invitación más liviana.</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>3 · El texto de la portada</h2>
+                    <div class="campo">
+                        <label for="c-previa-antetitulo">Antetítulo, sobre el nombre</label>
+                        <input pInputText id="c-previa-antetitulo" [(ngModel)]="b.secciones.presentacion.textos['antetitulo']"
+                               [placeholder]="por_defecto('presentacion', 'antetitulo')">
+                        <small>El nombre se cambia en la pestaña Fiesta. Todo se ve al instante en la vista previa.</small>
+                    </div>
+                </section>
+            </p-tabpanel>
 
             <!-- ============================== FIESTA -->
             <p-tabpanel value="fiesta">
@@ -235,6 +312,18 @@
             <!-- ============================== TARJETAS Y MENSAJES -->
             <p-tabpanel value="mensajes">
                 <section class="panel">
+                    <h2>Tarjeta para imprimir</h2>
+                    <p class="tenue">Una tarjeta A6 (10,5 × 14,8 cm), igual para todos, con el tema, la fecha, el lugar,
+                        la información importante y el regalo. Se descarga en PDF, sola o cuatro por hoja A4.</p>
+                    @if (sucio()) {
+                    <small class="advertencia"><i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                        Usa la configuración guardada: guarde los cambios antes de abrirla.</small>
+                    }
+                    <p-button class="abrir-imprimible" label="Abrir la tarjeta para imprimir" icon="pi pi-print"
+                              severity="secondary" [outlined]="true" (onClick)="abrir_imprimible()" />
+                </section>
+
+                <section class="panel">
                     <h2>Categorías de tarjetas</h2>
                     <p class="tenue">Sirven para filtrar las tarjetas, para las estadísticas y para elegir quién ve el regalo.
                         Cambiar el nombre de una no cambia las tarjetas que ya la tienen: esas se editan desde Tarjetas.</p>
@@ -336,34 +425,6 @@
                     </div>
                 </section>
                 }
-            </p-tabpanel>
-
-            <!-- ============================== TEMA -->
-            <p-tabpanel value="tema">
-                <section class="panel">
-                    <div>
-                        <h2>Tema</h2>
-                        <p class="tenue">Los temas son de fábrica: cada uno trae sus colores, sus tipografías y sus adornos, probados para que todo se lea bien.</p>
-
-                        <div class="temas" role="radiogroup" aria-label="Tema de la invitación">
-                            @for (t of temas; track t.id) {
-                            <label class="tema" [class.tema--elegido]="b.tema === t.id">
-                                <input type="radio" name="tema" [value]="t.id" [(ngModel)]="b.tema">
-                                <span class="tema__nombre">{{ t.nombre }}</span>
-                                <span class="tema__descripcion">{{ t.descripcion }}</span>
-                            </label>
-                            }
-                        </div>
-
-                        <div class="campo">
-                            <label for="c-previa-antetitulo">Antetítulo, sobre el nombre</label>
-                            <input pInputText id="c-previa-antetitulo" [(ngModel)]="b.secciones.presentacion.textos['antetitulo']"
-                                   [placeholder]="por_defecto('presentacion', 'antetitulo')">
-                            <small>El nombre se cambia en la pestaña Fiesta. Todo se ve al instante en la vista previa.</small>
-                        </div>
-                    </div>
-
-                </section>
             </p-tabpanel>
 
         </p-tabpanels>

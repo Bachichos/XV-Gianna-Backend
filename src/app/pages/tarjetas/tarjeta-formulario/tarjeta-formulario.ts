@@ -102,7 +102,9 @@ export class TarjetaFormulario {
      * apunta a la instancia del control y no a una posicion, que es lo que
      * hacia que la primera fila quedara conectada a un control viejo.
      */
-    personas:         this.fb.array<FormControl<string>>([])
+    personas:         this.fb.array<FormControl<string>>([]),
+    /** En paralelo con personas, fila por fila: si come el menu infantil. */
+    infantiles:       this.fb.array<FormControl<boolean>>([])
   })
 
   private ids: string[] = []
@@ -119,6 +121,16 @@ export class TarjetaFormulario {
     return this.formulario.controls.personas
   }
 
+  protected get infantiles(): FormArray<FormControl<boolean>> {
+    return this.formulario.controls.infantiles
+  }
+
+  protected readonly alternar_infantil = (i: number) => {
+    const c = this.infantiles.at(i)
+    c.setValue(!c.value)
+    c.markAsDirty()
+  }
+
   /**
    * Lo dispara el (onShow) del dialogo, que es el unico momento garantizado:
    * ocurre cada vez que se abre, sin depender de en que orden se actualicen
@@ -133,6 +145,7 @@ export class TarjetaFormulario {
     // reset() borra valores, touched y dirty de una sola vez. patchValue no:
     // dejaba el formulario en rojo con los datos de la tarjeta anterior.
     this.personas.clear()
+    this.infantiles.clear()
     this.ids = []
 
     // Un alta arranca en Argentina; una edicion, en el pais que ya tenia.
@@ -145,19 +158,21 @@ export class TarjetaFormulario {
       categoria:        t?.categoria      ?? '',
       prefijo:          telefono.prefijo,
       numero_telefono:  telefono.resto,
-      personas:         []
+      personas:         [],
+      infantiles:       []
     })
 
-    const iniciales = t?.personas?.length ? t.personas : [{ id: 'p1', nombre: '' }]
-    for(const p of iniciales) this.agregar_fila(p.id, p.nombre ?? '')
+    const iniciales: Persona[] = t?.personas?.length ? t.personas : [{ id: 'p1', nombre: '' }]
+    for(const p of iniciales) this.agregar_fila(p.id, p.nombre ?? '', !!p.menu_infantil)
 
     this.formulario.markAsPristine()
     this.formulario.markAsUntouched()
   }
 
-  private readonly agregar_fila = (id: string, nombre: string) => {
+  private readonly agregar_fila = (id: string, nombre: string, infantil = false) => {
     this.ids.push(id)
     this.personas.push(this.fb.nonNullable.control(nombre, [Validators.maxLength(60)]))
+    this.infantiles.push(this.fb.nonNullable.control(infantil))
   }
 
   protected readonly id_de = (i: number): string => this.ids[i] ?? ''
@@ -175,6 +190,7 @@ export class TarjetaFormulario {
 
   protected readonly quitar_persona = (i: number) => {
     this.personas.removeAt(i)
+    this.infantiles.removeAt(i)
     this.ids.splice(i, 1)
     if(this.personas.length === 0) this.agregar_persona()
   }
@@ -199,12 +215,12 @@ export class TarjetaFormulario {
     const v         = this.formulario.getRawValue()
     const existente = this.tarjeta()
 
-    // El formulario solo edita nombres. fusionar_personas() les vuelve a pegar
-    // el estado que cada persona ya tenia, para que guardar un nombre nunca
-    // pueda borrar una confirmacion del invitado.
+    // El formulario solo edita nombres y menus. fusionar_personas() les
+    // vuelve a pegar el estado que cada persona ya tenia, para que guardar
+    // un nombre nunca pueda borrar una confirmacion del invitado.
     const personas: Persona[] = fusionar_personas(
       existente?.personas,
-      v.personas.map((nombre, i) => ({ id: this.id_de(i), nombre: nombre.trim() }))
+      v.personas.map((nombre, i) => ({ id: this.id_de(i), nombre: nombre.trim(), menu_infantil: v.infantiles[i] }))
     )
 
     const editables = {
