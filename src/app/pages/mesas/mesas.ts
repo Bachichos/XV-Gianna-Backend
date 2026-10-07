@@ -10,11 +10,12 @@ import { InputIcon } from '@openng/optimus-ui/inputicon';
 import { ToggleSwitch } from '@openng/optimus-ui/toggleswitch';
 import { Button } from '@openng/optimus-ui/button';
 import { XVLayout } from '../../components/design/xv-layout/xv-layout';
+import { XVConfirmar } from '../../components/xv-confirmar/xv-confirmar';
 import { XVStorage } from '../../app.config';
 import { FirebaseMesasService } from '../../services/firebase-mesas';
 import { sin_acentos } from '../../models/texto';
 import {
-  armar_salon, Comensal, comensales_de, Mesa, mesa_de, nombre_de_mesa, ocupa_lugar,
+  armar_salon, Comensal, comensales_de, es_comun, Mesa, mesa_de, nombre_de_mesa, ocupa_lugar,
   PLANO_VACIO, PRINCIPAL, Salon, salon_de, sentar_anfitriones,
 } from '../../models/mesas';
 
@@ -39,7 +40,7 @@ type VistaMesa = {
 }
 
 @Component({
-  imports: [NgTemplateOutlet, FormsModule, CdkDropListGroup, CdkDropList, CdkDrag, Select, MultiSelect, InputText, IconField, InputIcon, ToggleSwitch, Button, XVLayout],
+  imports: [NgTemplateOutlet, FormsModule, CdkDropListGroup, CdkDropList, CdkDrag, Select, MultiSelect, InputText, IconField, InputIcon, ToggleSwitch, Button, XVLayout, XVConfirmar],
   selector: 'app-mesas',
   styleUrl: './mesas.scss',
   templateUrl: './mesas.html',
@@ -189,7 +190,29 @@ export class MesasPage {
     return { mesas: sacadas.map(m => nombre_de_mesa(m, this.festejada())), claves }
   }
 
-  protected readonly guardar_salon = () => this.escribir(async () => {
+  /**
+   * Las comunes que tenian lugares propios (ajustados desde su lapiz) y que
+   * el nuevo "lugares por mesa" pisaria: "Mesa 3 (12 → 10)".
+   */
+  protected readonly a_pisar = (): string[] => {
+    if(!this.lugares_tocado) return []
+    const habitual = salon_de(this.plano().mesas).lugares
+    const nuevos   = new Map(this.salon_nuevo().map(m => [m.id, m.lugares]))
+    return this.plano().mesas
+      .filter(m => es_comun(m) && m.lugares !== habitual && nuevos.has(m.id) && nuevos.get(m.id) !== m.lugares)
+      .map(m => `${nombre_de_mesa(m, this.festejada())} (${m.lugares} → ${nuevos.get(m.id)})`)
+  }
+
+  /** Guardar con consecuencias pide confirmacion: alguien queda sin mesa, o se pisan lugares propios. */
+  protected readonly confirmando_salon = signal(false)
+
+  protected readonly guardar_salon = () => {
+    if(this.a_liberar().claves.length || this.a_pisar().length) this.confirmando_salon.set(true)
+    else this.escribir_salon()
+  }
+
+  /** Guarda sin preguntar: lo llama el boton, o el modal ya confirmado. */
+  protected readonly escribir_salon = () => this.escribir(async () => {
     const mesas = this.salon_nuevo()
     await this.servicio.guardar({
       mesas,
@@ -199,10 +222,12 @@ export class MesasPage {
       },
     })
     this.lugares_tocado = false
+    this.confirmando_salon.set(false)
     this.salon_abierto.set(false)
   })
 
   protected readonly cancelar_salon = () => {
+    this.confirmando_salon.set(false)
     this.cargar_salon(this.plano().mesas)
     this.salon_abierto.set(false)
   }
@@ -262,6 +287,48 @@ export class MesasPage {
     for(const clave of antes) if(!elegidos.has(clave)) asientos[clave] = null
     await this.servicio.guardar({ mesas, asientos })
     this.editando.set(null)
+  })
+
+  // ------------------------------------------------ vaciar todas
+
+  /** Cuantos tienen mesa hoy: sin nadie sentado, no hay nada que vaciar. */
+  protected readonly sentados = computed(() =>
+    this.comensales().filter(c => mesa_de(this.plano(), c.clave)).length)
+
+  protected readonly vaciando = signal(false)
+
+  /**
+   * Todos vuelven a "Sin mesa"; las mesas quedan como estan. Para empezar
+   * a repartir de nuevo sin rearmar el salon.
+   */
+  protected readonly vaciar = () => this.escribir(async () => {
+    await this.servicio.guardar({
+      asientos: Object.fromEntries(Object.keys(this.plano().asientos).map(clave => [clave, null])),
+    })
+    this.limpiar_seleccion()
+    this.vaciando.set(false)
+  })
+
+  // ------------------------------------------------ quitar una mesa
+
+  /** La mesa que pide confirmacion para quitarse. */
+  protected readonly a_quitar = signal<VistaMesa | null>(null)
+
+  /**
+   * Quita esa mesa sola, sea cual sea: su gente vuelve a "Sin mesa". Las
+   * demas no se renumeran (queda Mesa 1, 2, 4...): renumerar cambiaria el
+   * "Tu mesa: Mesa 4" de recordatorios que quizas ya salieron.
+   */
+  protected readonly quitar_mesa = () => this.escribir(async () => {
+    const m = this.a_quitar()
+    if(!m) return
+    const mesas = this.plano().mesas.filter(x => x.id !== m.mesa.id)
+    const asientos = Object.fromEntries(m.gente.map(c => [c.clave, null]))
+    await this.servicio.guardar({ mesas, asientos })
+    // El formulario del salon se carga una vez: si no se recarga, al
+    // guardarlo volveria a crear la mesa que se acaba de quitar.
+    this.cargar_salon(mesas)
+    this.a_quitar.set(null)
   })
 
   /** Cuantos lugares ocuparia la mesa con lo elegido en el selector. */

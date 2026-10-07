@@ -10,29 +10,12 @@
 
 /* --- Cabecera --- */
 
-.cabecera { margin-bottom: 1.75rem; }
-
-.cabecera__resumen {
-    margin-top: 0.5rem;
-    color: var(--xv-texto-tenue);
-    font-size: var(--xv-texto-sm);
-}
-
 .cargando { color: var(--xv-texto-tenue); }
-
-.aviso--error {
-    margin-bottom: 1.5rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e4b9b9;
-    border-radius: 3px;
-    background: #fbf1f1;
-    color: #8f2c2c;
-}
 
 /* --- Los dos grupos: invitados (personas) y tarjetas (invitaciones) --- */
 
 /* Angular quita el espacio entre el icono y el texto: va como margen. */
-.cabecera__resumen .pi {
+.xv-cabecera__resumen .pi {
     margin-right: 0.4rem;
     font-size: var(--xv-texto-sm);
     color: var(--p-primary-color, #5279a2);
@@ -108,7 +91,7 @@
     background: var(--xv-superficie);
     border: 1px solid var(--xv-borde);
     border-top: 3px solid var(--xv-plata);
-    border-radius: 3px;
+    border-radius: var(--xv-radio-tarjeta);
 }
 
 .kpi--confirmado { border-top-color: var(--confirmado); }
@@ -122,19 +105,6 @@
 
 /* --- Paneles --- */
 
-.panel {
-    margin-bottom: 1.5rem;
-    padding: 1.4rem 1.5rem;
-    background: var(--xv-superficie);
-    border: 1px solid var(--xv-borde);
-    border-radius: 3px;
-}
-
-.panel h2 {
-    font-size: var(--xv-texto-xl);
-    margin-bottom: 1rem;
-}
-
 .panel__cabecera {
     display: flex;
     flex-wrap: wrap;
@@ -143,8 +113,6 @@
     gap: 0.5rem 1rem;
     margin-bottom: 1rem;
 }
-
-.panel__cabecera h2 { margin-bottom: 0; }
 
 .panel__dato {
     font-size: var(--xv-texto-sm);

@@ -1,0 +1,117 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="es_edicion() ? 'Editar presupuesto' : 'Nuevo presupuesto'"
+  (onShow)="reiniciar()"
+  styleClass="xv-dialogo">
+
+  <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+
+    <!-- Rubro -->
+    <div class="campo medio">
+      <label for="p-rubro">Rubro</label>
+      <p-select inputId="p-rubro" [options]="opciones_rubro()" optionLabel="etiqueta" optionValue="valor"
+                formControlName="rubro" placeholder="Elija un rubro" />
+      <xv-aviso-campo [control]="formulario.controls.rubro" vacio="Elija un rubro." />
+      @if (es_rubro_nuevo()) {
+        <input pInputText type="text" formControlName="rubro_nuevo" placeholder="Ej. Cotillón"
+               aria-label="Nombre del nuevo rubro" autocomplete="off">
+        @if (formulario.controls.rubro_nuevo.touched && !formulario.controls.rubro_nuevo.value.trim()) {
+          <p class="campo__error">Escriba el nombre del rubro.</p>
+        }
+        <xv-aviso-campo [control]="formulario.controls.rubro_nuevo" />
+      }
+    </div>
+
+    <!-- Proveedor y contacto -->
+    <div class="campo medio">
+      <label for="p-proveedor">Proveedor</label>
+      <input pInputText id="p-proveedor" type="text" formControlName="proveedor" placeholder="Ej. Foto Estudio Luna" autocomplete="off">
+      <xv-aviso-campo [control]="formulario.controls.proveedor" vacio="Hace falta el nombre del proveedor." />
+    </div>
+
+    <div class="campo medio">
+      <label for="p-contacto">Contacto <span class="campo__opcional">(opcional)</span></label>
+      <input pInputText id="p-contacto" type="text" formControlName="contacto" placeholder="Teléfono, Instagram o mail" autocomplete="off">
+      <xv-aviso-campo [control]="formulario.controls.contacto" />
+    </div>
+
+    <div class="campo medio">
+      <label for="p-direccion">Dirección <span class="campo__opcional">(opcional)</span></label>
+      <input pInputText id="p-direccion" type="text" formControlName="direccion" placeholder="Ej. Av. San Nicolás de Bari 450, La Rioja" autocomplete="off">
+      <xv-aviso-campo [control]="formulario.controls.direccion" />
+    </div>
+
+    <!-- Monto y fecha -->
+    <div class="campo medio">
+        <label for="p-monto">Monto <span class="campo__opcional">(si ya lo tiene)</span></label>
+        <div class="monto">
+          @if (varias_monedas) {
+            <p-select [options]="opciones_moneda" optionLabel="etiqueta" optionValue="valor" formControlName="moneda" ariaLabel="Moneda" />
+          }
+          <p-inputnumber inputId="p-monto" [fluid]="true" formControlName="monto" locale="es-AR" mode="decimal"
+                         [minFractionDigits]="0" [maxFractionDigits]="2" prefix="$ " placeholder="$ 0" />
+        </div>
+        <xv-aviso-campo [control]="formulario.controls.monto" vacio="El monto no puede ser negativo." />
+      </div>
+
+    <div class="campo medio">
+        <label for="p-fecha">Fecha del presupuesto</label>
+        <input pInputText id="p-fecha" type="date" formControlName="fecha">
+    </div>
+
+    <!-- Estado -->
+    <div class="campo">
+      <label id="p-estado">Estado</label>
+      <p-selectbutton [options]="opciones_estado" optionLabel="etiqueta" optionValue="valor"
+                      formControlName="estado" [allowEmpty]="false" ariaLabelledBy="p-estado" />
+      @if (pagado_en_juego(); as monto) {
+        <p class="campo__aviso">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          Tiene {{ monto }} pagados. Los pagos no se borran, pero dejan de contar en los totales.
+        </p>
+      }
+    </div>
+
+    <!-- Notas -->
+    <div class="campo">
+      <label for="p-notas">Notas <span class="campo__opcional">(opcional)</span></label>
+      <textarea pTextarea id="p-notas" rows="3" formControlName="notas"
+                placeholder="Qué incluye, condiciones, cuánto dura la oferta…"></textarea>
+      <xv-aviso-campo [control]="formulario.controls.notas" [maximo]="5000" />
+    </div>
+
+    <!-- Archivo -->
+    <div class="campo">
+      <span class="campo__etiqueta">Archivo <span class="campo__opcional">(opcional)</span></span>
+
+      <xv-selector-archivo [(actual)]="archivo_actual" [(nuevo)]="archivo_nuevo" [(preparando)]="preparando" />
+    </div>
+
+    @if (error(); as mensaje) {
+      <p class="campo__error" role="alert">{{ mensaje }}</p>
+    }
+
+    @if (bloqueado()) {
+      <p class="campo__error" role="alert">No se pudo guardar: revise los campos marcados en rojo.</p>
+    }
+
+    <!-- Acciones -->
+    <div class="acciones">
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+      <p-button label="Guardar" [loading]="guardando()" [disabled]="preparando()" (onClick)="guardar()" />
+    </div>
+
+  </form>
+
+</p-dialog>
+
+<!-- Las preguntas antes de hacer algo que no se deshace facil -->
+<xv-confirmar [abierto]="confirmar() === 'estado'" (abiertoChange)="$event || confirmar.set(null)"
+              titulo="Dejar de elegirlo" accion="Sí, cambiarlo" [cargando]="guardando()" (confirmar)="guardar()">
+  Este presupuesto tiene <strong>{{ pagado_en_juego() }}</strong> pagados. ¿Seguro que deja de estar elegido?
+  Los pagos no se borran, pero dejan de contar en los totales.
+</xv-confirmar>
+

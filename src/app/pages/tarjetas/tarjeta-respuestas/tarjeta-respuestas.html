@@ -70,10 +70,10 @@
 
             @if (valor_de(p.id) === true) {
               <input pInputText type="text" class="persona__declarado" maxlength="120"
-                     placeholder="Alergia, intolerancia o dieta (opcional)"
+                     placeholder="Alergia o intolerancia (opcional)"
                      [value]="alimentacion_de(p.id)"
                      (input)="escribir_alimentacion(p.id, $event)"
-                     [attr.aria-label]="'Alergia, intolerancia o dieta de ' + (p.nombre || 'acompañante')">
+                     [attr.aria-label]="'Alergia o intolerancia de ' + (p.nombre || 'acompañante')">
             }
 
           </li>

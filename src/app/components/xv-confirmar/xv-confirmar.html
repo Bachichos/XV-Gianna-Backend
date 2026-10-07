@@ -1,0 +1,25 @@
+<p-dialog
+  [visible]="abierto()"
+  (visibleChange)="abierto.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closeOnEscape]="!cargando()"
+  [header]="titulo()"
+  appendTo="body"
+  styleClass="xv-dialogo xv-dialogo--aviso">
+
+  <div class="confirmar">
+    <div class="confirmar__texto"><ng-content /></div>
+
+    @if (error(); as mensaje) {
+      <p class="confirmar__error" role="alert">{{ mensaje }}</p>
+    }
+
+    <div class="confirmar__acciones">
+      <p-button label="Cancelar" severity="secondary" [disabled]="cargando()" (onClick)="cerrar()" />
+      <p-button [label]="accion()" [severity]="peligro() ? 'danger' : 'primary'" [loading]="cargando()" (onClick)="confirmar.emit()" />
+    </div>
+  </div>
+
+</p-dialog>

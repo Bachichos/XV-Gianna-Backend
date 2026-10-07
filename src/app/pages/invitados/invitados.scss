@@ -1,20 +1,5 @@
 /* --- Cabecera --- */
 
-.cabecera {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-}
-
-.cabecera__resumen {
-    margin-top: 0.5rem;
-    color: var(--xv-texto-tenue);
-    font-size: var(--xv-texto-sm);
-}
-
 .cabecera__menus {
     margin-top: 0.2rem;
     color: var(--xv-texto-tenue);
@@ -81,15 +66,6 @@
     color: var(--xv-texto-tenue);
 }
 
-.aviso--error {
-    padding: 0.85rem 1rem;
-    margin-bottom: 1.25rem;
-    border: 1px solid #e4b9b9;
-    border-radius: 3px;
-    background: #fbf1f1;
-    color: #8f2c2c;
-}
-
 .vacio {
     display: flex;
     flex-direction: column;
@@ -99,7 +75,7 @@
     text-align: center;
     background: var(--xv-superficie);
     border: 1px solid var(--xv-borde);
-    border-radius: 3px;
+    border-radius: var(--xv-radio-tarjeta);
     color: var(--xv-texto-tenue);
 }
 
@@ -137,7 +113,7 @@
     padding: 0.7rem 0.9rem;
     background: var(--xv-superficie);
     border: 1px solid var(--xv-borde);
-    border-radius: 3px;
+    border-radius: var(--xv-radio-tarjeta);
     transition: background-color 140ms ease, border-color 140ms ease;
 }
 

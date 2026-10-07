@@ -1,0 +1,23 @@
+@if (nuevo(); as a) {
+  <div class="archivo">
+    <i class="pi pi-paperclip" aria-hidden="true"></i>
+    <span class="archivo__nombre">{{ a.nombre }}</span>
+    <span class="archivo__peso">{{ peso_legible(a.bytes) }} · se sube al guardar</span>
+    <button type="button" class="archivo__quitar" (click)="quitar()">Quitar</button>
+  </div>
+} @else if (actual(); as a) {
+  <div class="archivo">
+    <i class="pi pi-paperclip" aria-hidden="true"></i>
+    <span class="archivo__nombre">{{ a.nombre }}</span>
+    <span class="archivo__peso">{{ peso_legible(a.bytes) }}</span>
+    <button type="button" class="archivo__quitar" (click)="quitar()">Quitar</button>
+  </div>
+}
+
+<label class="adjuntar" [class.adjuntar--ocupado]="preparando()">
+  <input type="file" [accept]="acepta" (change)="elegir($event)" [disabled]="preparando()">
+  <i class="pi" [class.pi-upload]="!preparando()" [class.pi-spinner]="preparando()" [class.pi-spin]="preparando()" aria-hidden="true"></i>
+  {{ preparando() ? 'Preparando…' : (nuevo() || actual() ? 'Cambiar archivo' : texto()) }}
+</label>
+<p class="ayuda">Hasta 5 MB. Las fotos se achican solas.</p>
+@if (error(); as mensaje) { <p class="error">{{ mensaje }}</p> }

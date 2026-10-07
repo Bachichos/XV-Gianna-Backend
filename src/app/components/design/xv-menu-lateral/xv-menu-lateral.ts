@@ -56,6 +56,9 @@ export class XVMenuLateral {
     { ruta: '/invitados',     etiqueta: 'Lista de invitados',    icono: 'pi-users',     contador: null as number | null },
     { ruta: '/mesas',         etiqueta: 'Mesas',                 icono: 'pi-th-large',  contador: null as number | null },
     { ruta: '/solicitudes',   etiqueta: 'Solicitudes',           icono: 'pi-inbox',     contador: this.solicitudes() },
+    { ruta: '/presupuestos',  etiqueta: 'Presupuestos',          icono: 'pi-wallet',    contador: null as number | null },
+    { ruta: '/calendario',    etiqueta: 'Calendario',            icono: 'pi-calendar',  contador: null as number | null },
+    { ruta: '/album',         etiqueta: 'Álbum',                 icono: 'pi-images',    contador: null as number | null },
     { ruta: '/configuracion', etiqueta: 'Configuración',         icono: 'pi-sliders-h', contador: null as number | null }
   // En el riel el contador se reduce a un punto: el numero pasa al globo.
   ].map(item => ({ ...item, titulo: item.contador === null ? item.etiqueta : `${item.etiqueta} (${item.contador})` })))

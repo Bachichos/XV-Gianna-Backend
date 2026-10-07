@@ -1,24 +1,4 @@
-.cabecera { margin-bottom: 1.75rem; }
-
-.cabecera__resumen {
-    margin-top: 0.5rem;
-    color: var(--xv-texto-tenue);
-    font-size: var(--xv-texto-sm);
-}
-
 .cargando { color: var(--xv-texto-tenue); }
-
-/* --- El panel, como los de Estadisticas --- */
-
-.panel {
-    margin-bottom: 1.5rem;
-    padding: 1.4rem 1.5rem;
-    background: var(--xv-superficie);
-    border: 1px solid var(--xv-borde);
-    border-radius: 3px;
-}
-
-.panel h2 { font-size: var(--xv-texto-xl); }
 
 .panel__cabecera {
     display: flex;

@@ -1,0 +1,77 @@
+.ayuda {
+    margin-bottom: 1rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+.lista {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* En la compu, de a dos por renglon: el modal queda apaisado, sin scroll. El orden se lee de izquierda a derecha. */
+@media (min-width: 48rem) {
+    .lista { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.rubro {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rubro input { flex: 1; min-width: 0; }
+
+.rubro__acciones { display: flex; gap: 0.2rem; }
+
+/* Los mismos botones chicos que las listas de Configuracion. */
+.icono {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    cursor: pointer;
+}
+
+.icono:hover:not(:disabled) { border-color: var(--xv-borde-fuerte); color: var(--p-primary-color, #5279a2); }
+.icono:disabled { opacity: 0.35; cursor: default; }
+.icono--quitar:hover:not(:disabled) { color: var(--xv-error); border-color: var(--xv-error-borde); }
+
+.agregar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.9rem;
+    padding: 0.45rem 0.9rem;
+    background: none;
+    border: 1px dashed var(--xv-borde-fuerte);
+    border-radius: 3px;
+    color: var(--p-primary-700, #374e6b);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+}
+
+.agregar:hover { background: var(--p-primary-50, #f3f6fa); }
+
+.aviso {
+    margin-top: 0.9rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-error);
+}
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--xv-borde);
+}

@@ -1,0 +1,80 @@
+<xv-layout>
+    <a routerLink="/calendario" class="volver"><i class="pi pi-arrow-left" aria-hidden="true"></i> Calendario</a>
+
+    @if (cargando()) {
+    <p class="xv-tenue">Cargando&hellip;</p>
+    } @else if (c(); as c) {
+
+    <header class="xv-cabecera">
+        <div>
+            <h1>{{ c.titulo }}</h1>
+            <p class="xv-cabecera__resumen cabecera__datos">
+                <span class="etiqueta etiqueta--tipo"><i class="pi" [class]="'pi ' + icono()" aria-hidden="true"></i> {{ tipo() }}</span>
+                <span>{{ fecha() }}</span>
+                @if (c.lista) { <span class="lista-insignia"><i class="pi pi-check" aria-hidden="true"></i> Lista</span> }
+            </p>
+        </div>
+        <div class="cabecera__acciones">
+            <p-button label="Editar" icon="pi pi-pencil" severity="secondary" [outlined]="true" (onClick)="formulario_abierto.set(true)" />
+            <p-button [label]="c.lista ? 'Desmarcar' : 'Marcar lista'" [icon]="c.lista ? 'pi pi-replay' : 'pi pi-check'"
+                      [severity]="c.lista ? 'secondary' : 'success'" [outlined]="!!c.lista" [loading]="marcando()" (onClick)="marcar_lista()" />
+        </div>
+    </header>
+
+    <div class="secciones">
+        <section class="xv-panel">
+            <h2>Cuándo</h2>
+            <p class="dato"><i class="pi pi-calendar" aria-hidden="true"></i> {{ fecha() }}</p>
+            <p class="dato"><i class="pi pi-clock" aria-hidden="true"></i> <span class="xv-numero">{{ horario() }}</span></p>
+            <p class="dato"><i class="pi pi-bell" aria-hidden="true"></i> {{ aviso() }}</p>
+            @if (pasada()) { <p class="xv-tenue">Ya pasó.</p> }
+        </section>
+
+        <section class="xv-panel">
+            <h2>Dónde</h2>
+            @if (c.lugar) {
+            <p class="dato"><i class="pi pi-map-marker" aria-hidden="true"></i> {{ c.lugar }}</p>
+            <a class="mapa" [href]="mapa()" target="_blank" rel="noopener">Ver en el mapa</a>
+            } @else {
+            <p class="xv-tenue">Sin lugar. Se agrega desde Editar.</p>
+            }
+        </section>
+
+        <section class="xv-panel ancho">
+            <h2>Notas</h2>
+            @if (c.notas) {
+            <p class="notas">{{ c.notas }}</p>
+            } @else {
+            <p class="xv-tenue">Sin notas.</p>
+            }
+        </section>
+
+        @if (!pasada()) {
+        <section class="xv-panel ancho">
+            <h2>En tu calendario</h2>
+            <p class="estado" [class.estado--al-dia]="telefono() === 'al_dia'" [class.estado--cambio]="telefono() === 'cambio'">
+                <i class="pi" [class.pi-calendar-plus]="telefono() === 'no'" [class.pi-check-circle]="telefono() === 'al_dia'"
+                   [class.pi-exclamation-circle]="telefono() === 'cambio'" aria-hidden="true"></i>
+                @switch (telefono()) {
+                @case ('al_dia') { Ya está en el calendario de este teléfono. }
+                @case ('cambio') { Cambió desde que la agregaste: volvé a agregarla. }
+                @default { Todavía no la agregaste a este teléfono. }
+                }
+            </p>
+            <div class="botones">
+                <button type="button" class="opcion" (click)="a_google()"><i class="pi pi-google" aria-hidden="true"></i> Google Calendar</button>
+                <button type="button" class="opcion" (click)="a_ics()"><i class="pi pi-apple" aria-hidden="true"></i> Apple / iPhone</button>
+            </div>
+        </section>
+        }
+    </div>
+
+    <xv-cita-formulario [(abierto)]="formulario_abierto" [cita]="c" />
+
+    } @else {
+    <section class="xv-panel">
+        <h2>Esta cita ya no existe</h2>
+        <p class="xv-tenue">Puede que alguien la haya eliminado. Vuelva al calendario para ver las que hay.</p>
+    </section>
+    }
+</xv-layout>

@@ -16,7 +16,7 @@
 
 .eliminar__error {
     font-size: var(--xv-texto-sm);
-    color: #8f2c2c;
+    color: var(--xv-error);
 }
 
 .alerta {
@@ -33,7 +33,7 @@
 }
 
 .alerta--grave {
-    border-color: #e4bdbd;
+    border-color: var(--xv-error-borde);
     background: #fbeeee;
     color: #7d2b2b;
 }

@@ -1,20 +1,5 @@
 /* --- Cabecera --- */
 
-.cabecera {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-}
-
-.cabecera__resumen {
-    margin-top: 0.5rem;
-    color: var(--xv-texto-tenue);
-    font-size: var(--xv-texto-sm);
-}
-
 /* El dato que de verdad se le da al salon: personas, no tarjetas. */
 .cabecera__personas {
     margin-top: 0.2rem;
@@ -89,15 +74,6 @@
     color: var(--xv-texto-tenue);
 }
 
-.aviso--error {
-    padding: 0.85rem 1rem;
-    margin-bottom: 1.25rem;
-    border: 1px solid #e4b9b9;
-    border-radius: 3px;
-    background: #fbf1f1;
-    color: #8f2c2c;
-}
-
 .vacio {
     display: flex;
     flex-direction: column;
@@ -107,7 +83,7 @@
     text-align: center;
     background: var(--xv-superficie);
     border: 1px solid var(--xv-borde);
-    border-radius: 3px;
+    border-radius: var(--xv-radio-tarjeta);
     color: var(--xv-texto-tenue);
 }
 
@@ -168,7 +144,7 @@
 
 .estado--rechazada {
     background: #fbeeee;
-    border: 1px solid #e4bdbd;
+    border: 1px solid var(--xv-error-borde);
     color: #8f3131;
 }
 
@@ -209,18 +185,9 @@
 }
 
 .accion--peligro:not(:disabled):hover {
-    border-color: #e4bdbd;
+    border-color: var(--xv-error-borde);
     background: #fbeeee;
     color: #8f3131;
-}
-
-.visualmente-oculto {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
 }
 
 /* --- Tabla (escritorio) --- */
@@ -228,7 +195,7 @@
 .tabla-marco {
     background: var(--xv-superficie);
     border: 1px solid var(--xv-borde);
-    border-radius: 3px;
+    border-radius: var(--xv-radio-tarjeta);
     overflow-x: auto;
 }
 
@@ -373,7 +340,7 @@
         padding: 1rem 1.1rem;
         background: var(--xv-superficie);
         border: 1px solid var(--xv-borde);
-        border-radius: 3px;
+        border-radius: var(--xv-radio-tarjeta);
     }
 
     .ficha__alto {

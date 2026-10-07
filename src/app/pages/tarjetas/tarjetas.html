@@ -1,11 +1,11 @@
 <xv-layout>
-    <header class="cabecera">
+    <header class="xv-cabecera">
         <div>
             <h1>Tarjetas de invitados</h1>
             @if (cargando()) {
-            <p class="cabecera__resumen">Cargando&hellip;</p>
+            <p class="xv-cabecera__resumen">Cargando&hellip;</p>
             } @else {
-            <p class="cabecera__resumen">
+            <p class="xv-cabecera__resumen">
                 <span class="xv-numero">{{ total() }}</span> {{ total() === 1 ? 'tarjeta' : 'tarjetas' }} &middot;
                 <span class="xv-numero">{{ enviadas() }}</span> {{ enviadas() === 1 ? 'enviada' : 'enviadas' }} &middot;
                 <span class="xv-numero">{{ respondidas() }}</span> {{ respondidas() === 1 ? 'respondida' : 'respondidas' }}
@@ -48,7 +48,7 @@
     </header>
 
     @if (error(); as mensaje) {
-    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
     }
 
     <div class="filtros">

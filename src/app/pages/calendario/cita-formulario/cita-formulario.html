@@ -1,0 +1,103 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="es_edicion() ? 'Editar cita' : 'Nueva cita'"
+  (onShow)="reiniciar()"
+  styleClass="xv-dialogo">
+
+  <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+
+    <!-- Tipo y titulo -->
+    <div class="campo medio">
+      <label for="c-tipo">Tipo</label>
+      <p-select inputId="c-tipo" [options]="opciones_tipo()" optionLabel="etiqueta" optionValue="valor"
+                formControlName="tipo" placeholder="Elija un tipo" />
+      @if (es_tipo_nuevo()) {
+        <input pInputText type="text" formControlName="tipo_nuevo" placeholder="Ej. Prueba de zapatos"
+               aria-label="Nombre del nuevo tipo" autocomplete="off">
+        @if (formulario.controls.tipo_nuevo.touched && !formulario.controls.tipo_nuevo.value.trim()) {
+          <p class="campo__error">Escriba el nombre del tipo.</p>
+        }
+        <xv-aviso-campo [control]="formulario.controls.tipo_nuevo" />
+      }
+    </div>
+
+    <div class="campo medio">
+      <label for="c-titulo">Título</label>
+      <input pInputText id="c-titulo" type="text" formControlName="titulo" placeholder="Ej. Segunda prueba de vestido" autocomplete="off">
+      <p class="campo__ayuda">Así aparece en el calendario del teléfono.</p>
+      <xv-aviso-campo [control]="formulario.controls.titulo" vacio="Hace falta un título." />
+    </div>
+
+    <!-- Cuando -->
+    <div class="campo medio">
+      <label for="c-fecha">Fecha</label>
+      <input pInputText id="c-fecha" type="date" formControlName="fecha">
+    </div>
+    <div class="campo medio">
+        <span class="campo__etiqueta">Horario</span>
+        <label class="interruptor">
+          <p-toggleswitch formControlName="todo_el_dia" />
+          Todo el día
+        </label>
+    </div>
+
+    @if (!todo_el_dia()) {
+      <div class="campo medio">
+        <label for="c-hora">Hora</label>
+        <input pInputText id="c-hora" type="time" formControlName="hora">
+        @if (formulario.controls.hora.touched && !formulario.controls.hora.value) {
+          <p class="campo__error">Elija la hora.</p>
+        }
+      </div>
+      <div class="campo medio">
+        <label for="c-duracion">Duración</label>
+        <p-select inputId="c-duracion" [options]="opciones_duracion" optionLabel="etiqueta" optionValue="valor" formControlName="duracion" />
+      </div>
+    }
+
+    <div class="campo medio">
+      <label for="c-recordatorio">Aviso en el teléfono</label>
+      <p-select inputId="c-recordatorio" [options]="opciones_recordatorio" optionLabel="etiqueta" optionValue="valor" formControlName="recordatorio" />
+      <p class="campo__ayuda">Lo lleva el archivo para iPhone. Google Calendar usa el aviso que cada uno tenga por defecto.</p>
+    </div>
+
+    <!-- Donde -->
+    <div class="campo medio">
+      <label for="c-lugar">Lugar <span class="campo__opcional">(opcional)</span></label>
+      <input pInputText id="c-lugar" type="text" formControlName="lugar" placeholder="Ej. Taller Ana, Av. Perón 123" autocomplete="off">
+      <xv-aviso-campo [control]="formulario.controls.lugar" />
+    </div>
+
+    <div class="campo">
+      <label for="c-notas">Notas <span class="campo__opcional">(opcional)</span></label>
+      <textarea pTextarea id="c-notas" rows="3" formControlName="notas" placeholder="Qué llevar, con quién ir, qué preguntar…"></textarea>
+      <xv-aviso-campo [control]="formulario.controls.notas" [maximo]="5000" />
+    </div>
+
+    @if (error(); as mensaje) {
+      <p class="campo__error" role="alert">{{ mensaje }}</p>
+    }
+
+    @if (bloqueado()) {
+      <p class="campo__error" role="alert">No se pudo guardar: revise los campos marcados en rojo.</p>
+    }
+
+    <div class="acciones">
+      @if (es_edicion()) {
+        <p-button class="acciones__eliminar" label="Eliminar" severity="danger" [text]="true" (onClick)="eliminar()" />
+      }
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+      <p-button label="Guardar" [loading]="guardando()" (onClick)="guardar()" />
+    </div>
+
+  </form>
+
+</p-dialog>
+
+<xv-confirmar [abierto]="confirmar()" (abiertoChange)="confirmar.set($event)"
+              titulo="Eliminar cita" accion="Eliminar" [peligro]="true" [cargando]="guardando()" (confirmar)="eliminar()">
+  ¿Eliminar <strong>{{ cita()?.titulo }}</strong>? Si la agregó al calendario del teléfono, allá hay que borrarla a mano.
+</xv-confirmar>

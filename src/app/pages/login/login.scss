@@ -18,7 +18,7 @@
     text-align: center;
     background: var(--xv-superficie);
     border: 1px solid var(--xv-borde);
-    border-radius: 3px;
+    border-radius: var(--xv-radio-tarjeta);
     position: relative;
     overflow: hidden;
     box-shadow:

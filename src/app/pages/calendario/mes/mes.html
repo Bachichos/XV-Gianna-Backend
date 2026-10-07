@@ -1,0 +1,59 @@
+<div class="navegacion">
+  <button type="button" class="flecha" (click)="anterior()" aria-label="Mes anterior"><i class="pi pi-chevron-left" aria-hidden="true"></i></button>
+  <h2 class="navegacion__mes" aria-live="polite">{{ hoja().titulo }}</h2>
+  <button type="button" class="flecha" (click)="siguiente()" aria-label="Mes siguiente"><i class="pi pi-chevron-right" aria-hidden="true"></i></button>
+  <button type="button" class="hoy" (click)="a_hoy()" [disabled]="es_mes_actual()">Hoy</button>
+</div>
+
+<div class="grilla" role="grid" [attr.aria-label]="hoja().titulo">
+  <div class="semana semana--titulos" role="row">
+    @for (d of SEMANA; track $index) { <span class="titulo-dia" role="columnheader">{{ d }}</span> }
+  </div>
+
+  @for (semana of hoja().semanas; track $index) {
+  <div class="semana" role="row">
+    @for (dia of semana; track $index) {
+      @if (dia; as d) {
+      <div class="dia" role="gridcell"
+           [class.dia--hoy]="d.fecha === hoy"
+           [class.dia--pasado]="d.fecha < hoy"
+           [class.dia--elegido]="d.fecha === elegido()"
+           [class.dia--fiesta]="d.fecha === fiesta()">
+
+        <!-- Todo el dia es el boton: elegir el dia, o una cita nueva si esta vacio. -->
+        <button type="button" class="dia__tocar" (click)="tocar_dia(d.fecha, d.citas.length)"
+                [attr.aria-label]="etiqueta(d.fecha, d.citas.length)" [attr.aria-pressed]="d.fecha === elegido()"></button>
+
+        <span class="dia__numero">
+          {{ d.numero }}
+          @if (d.fecha === fiesta()) { <span class="dia__fiesta" title="El día de la fiesta">✦</span> }
+        </span>
+
+        <!-- Compu: las citas escritas. -->
+        <ul class="dia__citas">
+          @for (c of d.citas.slice(0, POR_DIA); track c.id) {
+          <li>
+            <button type="button" class="dia__cita" (click)="editar.emit(c)" [title]="(c.hora ?? 'Todo el día') + ' · ' + c.titulo">
+              @if (c.hora) { <span class="xv-numero">{{ c.hora }}</span> } {{ c.titulo }}
+            </button>
+          </li>
+          }
+          @if (d.citas.length > POR_DIA) {
+          <li class="dia__mas">+{{ d.citas.length - POR_DIA }} más</li>
+          }
+        </ul>
+
+        <!-- Telefono: un puntito por cita, hasta tres. -->
+        @if (d.citas.length) {
+        <span class="dia__puntos" aria-hidden="true">
+          @for (c of d.citas.slice(0, 3); track c.id) { <span class="punto"></span> }
+        </span>
+        }
+      </div>
+      } @else {
+      <div class="dia dia--hueco" role="gridcell" aria-hidden="true"></div>
+      }
+    }
+  </div>
+  }
+</div>

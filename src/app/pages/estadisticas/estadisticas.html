@@ -1,14 +1,16 @@
 <xv-layout>
-    <header class="cabecera">
-        <h1>Estadísticas</h1>
-        <p class="cabecera__resumen">
-            <i class="pi pi-user" aria-hidden="true"></i> <strong>Invitados</strong> son personas.
-            <i class="pi pi-envelope cabecera__segundo" aria-hidden="true"></i> <strong>Tarjetas</strong> son las invitaciones que se mandan: una por familia o grupo.
-        </p>
+    <header class="xv-cabecera">
+        <div>
+            <h1>Estadísticas</h1>
+            <p class="xv-cabecera__resumen">
+                <i class="pi pi-user" aria-hidden="true"></i> <strong>Invitados</strong> son personas.
+                <i class="pi pi-envelope cabecera__segundo" aria-hidden="true"></i> <strong>Tarjetas</strong> son las invitaciones que se mandan: una por familia o grupo.
+            </p>
+        </div>
     </header>
 
     @if (error(); as mensaje) {
-    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
     }
 
     @if (cargando()) {
@@ -48,7 +50,7 @@
     </section>
 
     <!-- El avance de las respuestas, hacia el cierre. -->
-    <section class="panel">
+    <section class="xv-panel">
         <div class="panel__cabecera">
             <h2>Respuestas</h2>
             <p class="panel__dato">
@@ -86,7 +88,7 @@
     </section>
 
     <!-- Lo que se arregla con el salon: cuantos menus de cada tipo. -->
-    <section class="panel">
+    <section class="xv-panel">
         <h2>Menús</h2>
         <ul class="categorias">
             @for (m of menus(); track m.nombre) {
@@ -104,7 +106,7 @@
     </section>
 
     <!-- Por categoria. -->
-    <section class="panel">
+    <section class="xv-panel">
         <h2>Por categoría</h2>
 
         <ul class="categorias">
@@ -128,7 +130,7 @@
     </section>
 
     <!-- Quienes faltan: en personas, como todo lo demas. -->
-    <section class="panel">
+    <section class="xv-panel">
         <h2>¿Quiénes faltan responder?</h2>
 
         <p class="faltan">
@@ -179,7 +181,7 @@
         </div>
     </section>
 
-    <section class="panel">
+    <section class="xv-panel">
         <div class="panel__cabecera">
             <h2><i class="pi pi-whatsapp titulo__icono" aria-hidden="true"></i> Para recordarles</h2>
             <p class="panel__dato">

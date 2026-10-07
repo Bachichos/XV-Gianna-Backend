@@ -16,7 +16,7 @@ import { Configuracion, POR_DEFECTO } from '../../models/configuracion';
 import { Borrador, a_borrador, a_configuracion, textos_de } from './borrador';
 import { OPCIONES_ADORNO, OPCIONES_MARCA, TEMAS_DISPONIBLES, trae_el_tema } from '../../models/temas';
 import { ICONOS, MARCADORES, marcadores_de, SECCIONES, Seccion, es_opcional } from './etiquetas';
-import { ZONAS } from './fechas';
+import { ZONAS } from '../../models/fechas';
 import { URL_INVITACION } from '../../models/mensaje';
 
 /**

@@ -6,8 +6,12 @@ import { FirebaseTarjetasService } from './services/firebase-tarjetas';
 import { FirebaseConfiguracionService } from './services/firebase-configuracion';
 import { FirebaseMesasService } from './services/firebase-mesas';
 import { FirebaseAnfitrionesService } from './services/firebase-anfitriones';
+import { FirebasePresupuestosService } from './services/firebase-presupuestos';
+import { FirebaseCitasService } from './services/firebase-citas';
 import { anfitriones_por_defecto } from './models/anfitriones';
 import { PLANO_VACIO } from './models/mesas';
+import { RUBROS_POR_DEFECTO } from './models/presupuestos';
+import { TIPOS_POR_DEFECTO } from './models/citas';
 import { XVStorage } from './app.config';
 
 @Component({
@@ -23,6 +27,8 @@ export class App implements OnInit {
   private readonly firebase_config   = inject(FirebaseConfiguracionService)
   private readonly firebase_mesas    = inject(FirebaseMesasService)
   private readonly firebase_anfitriones = inject(FirebaseAnfitrionesService)
+  private readonly firebase_presupuestos = inject(FirebasePresupuestosService)
+  private readonly firebase_citas    = inject(FirebaseCitasService)
   private readonly injector          = inject(Injector)
   private readonly titulo            = inject(Title)
 
@@ -90,6 +96,85 @@ export class App implements OnInit {
         error: e => {
           console.error('[anfitriones]', e)
           XVStorage.anfitriones.set([])
+        }
+      })
+      onCleanup(() => suscripcion.unsubscribe())
+    })
+
+    // Los presupuestos, en vivo, como las tarjetas: el resumen de lo pagado
+    // tiene que estar al dia aunque otra persona cargue un pago.
+    effect(onCleanup => {
+      if(!XVStorage.logged_user()) {
+        XVStorage.presupuestos.set(null)
+        XVStorage.error_presupuestos.set(null)
+        return
+      }
+      const lista$ = runInInjectionContext(this.injector, () => this.firebase_presupuestos.get_lista())
+      const suscripcion = lista$.subscribe({
+        next: lista => {
+          XVStorage.error_presupuestos.set(null)
+          XVStorage.presupuestos.set(lista)
+        },
+        error: e => {
+          console.error('[presupuestos]', e)
+          XVStorage.error_presupuestos.set('No pudimos leer los presupuestos. Revise la conexión y los permisos.')
+          XVStorage.presupuestos.set([])
+        }
+      })
+      onCleanup(() => suscripcion.unsubscribe())
+    })
+
+    // Los rubros, en vivo. Si nunca se guardaron, los de fabrica.
+    effect(onCleanup => {
+      if(!XVStorage.logged_user()) {
+        XVStorage.rubros.set(null)
+        return
+      }
+      const rubros$ = runInInjectionContext(this.injector, () => this.firebase_presupuestos.get_rubros())
+      const suscripcion = rubros$.subscribe({
+        next:  d => XVStorage.rubros.set(d?.lista ?? RUBROS_POR_DEFECTO),
+        error: e => {
+          console.error('[rubros]', e)
+          XVStorage.rubros.set(RUBROS_POR_DEFECTO)
+        }
+      })
+      onCleanup(() => suscripcion.unsubscribe())
+    })
+
+    // Las citas, en vivo: la proxima de la cabecera tiene que estar al dia.
+    effect(onCleanup => {
+      if(!XVStorage.logged_user()) {
+        XVStorage.citas.set(null)
+        XVStorage.error_citas.set(null)
+        return
+      }
+      const lista$ = runInInjectionContext(this.injector, () => this.firebase_citas.get_lista())
+      const suscripcion = lista$.subscribe({
+        next: lista => {
+          XVStorage.error_citas.set(null)
+          XVStorage.citas.set(lista)
+        },
+        error: e => {
+          console.error('[citas]', e)
+          XVStorage.error_citas.set('No pudimos leer las citas. Revise la conexión y los permisos.')
+          XVStorage.citas.set([])
+        }
+      })
+      onCleanup(() => suscripcion.unsubscribe())
+    })
+
+    // Los tipos de cita, en vivo. Si nunca se guardaron, los de fabrica.
+    effect(onCleanup => {
+      if(!XVStorage.logged_user()) {
+        XVStorage.tipos_cita.set(null)
+        return
+      }
+      const tipos$ = runInInjectionContext(this.injector, () => this.firebase_citas.get_tipos())
+      const suscripcion = tipos$.subscribe({
+        next:  d => XVStorage.tipos_cita.set(d?.lista ?? TIPOS_POR_DEFECTO),
+        error: e => {
+          console.error('[tipos de cita]', e)
+          XVStorage.tipos_cita.set(TIPOS_POR_DEFECTO)
         }
       })
       onCleanup(() => suscripcion.unsubscribe())

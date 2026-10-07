@@ -10,7 +10,7 @@
   <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
 
     <!-- Nombre de la invitación -->
-    <div class="campo">
+    <div class="campo medio">
       <label for="f-nombre">Nombre de la invitación</label>
       <input pInputText id="f-nombre" type="text" formControlName="nombre_mostrar"
              placeholder="Ej. Familia Pérez" autocomplete="off">
@@ -20,48 +20,8 @@
       }
     </div>
 
-    <!-- Personas -->
-    <fieldset class="campo campo--grupo">
-      <legend>Personas</legend>
-      <p class="campo__ayuda">
-        Una fila por cupo. Si todavía no sabe con quién viene, deje el nombre en blanco:
-        el invitado lo completa al confirmar. Marque «Menú infantil» en quienes comen ese menú.
-      </p>
-
-      @for (control of personas.controls; track control; let i = $index) {
-        <div class="integrante">
-          <input pInputText type="text" [formControl]="control"
-                 placeholder="Ej. Laura Pérez. Dejar vacío si acompañante es desconocido."
-                 autocomplete="off"
-                 [attr.aria-label]="'Persona ' + (i + 1)">
-
-          <button type="button" class="integrante__menu"
-                  [class.integrante__menu--si]="infantiles.at(i).value"
-                  (click)="alternar_infantil(i)"
-                  [attr.aria-pressed]="infantiles.at(i).value"
-                  [attr.aria-label]="'Menú infantil para la persona ' + (i + 1)"
-                  title="Come el menú infantil">
-            <i class="pi" [class.pi-check-square]="infantiles.at(i).value" [class.pi-stop]="!infantiles.at(i).value" aria-hidden="true"></i>
-            Menú infantil
-          </button>
-
-          <button type="button" class="integrante__quitar"
-                  (click)="quitar_persona(i)"
-                  [disabled]="tiene_respuesta(i)"
-                  [attr.aria-label]="'Quitar persona ' + (i + 1)"
-                  [title]="tiene_respuesta(i) ? 'Esta persona ya respondió: quitarla borraría su respuesta' : 'Quitar'">
-            <i class="pi pi-times" aria-hidden="true"></i>
-          </button>
-        </div>
-      }
-
-      <button type="button" class="agregar" (click)="agregar_persona()">
-        <i class="pi pi-plus" aria-hidden="true"></i> Agregar persona
-      </button>
-    </fieldset>
-
     <!-- Categoría -->
-    <div class="campo">
+    <div class="campo medio">
       <label for="f-categoria">Categoría</label>
       <p-select inputId="f-categoria"
                 [options]="opciones_categoria()"
@@ -127,6 +87,46 @@
         </p>
       }
     </div>
+
+    <!-- Personas -->
+    <fieldset class="campo campo--grupo">
+      <legend>Personas</legend>
+      <p class="campo__ayuda">
+        Una fila por cupo. Si todavía no sabe con quién viene, deje el nombre en blanco:
+        el invitado lo completa al confirmar. Marque «Menú infantil» en quienes comen ese menú.
+      </p>
+
+      @for (control of personas.controls; track control; let i = $index) {
+        <div class="integrante">
+          <input pInputText type="text" [formControl]="control"
+                 placeholder="Ej. Laura Pérez. Dejar vacío si acompañante es desconocido."
+                 autocomplete="off"
+                 [attr.aria-label]="'Persona ' + (i + 1)">
+
+          <button type="button" class="integrante__menu"
+                  [class.integrante__menu--si]="infantiles.at(i).value"
+                  (click)="alternar_infantil(i)"
+                  [attr.aria-pressed]="infantiles.at(i).value"
+                  [attr.aria-label]="'Menú infantil para la persona ' + (i + 1)"
+                  title="Come el menú infantil">
+            <i class="pi" [class.pi-check-square]="infantiles.at(i).value" [class.pi-stop]="!infantiles.at(i).value" aria-hidden="true"></i>
+            Menú infantil
+          </button>
+
+          <button type="button" class="integrante__quitar"
+                  (click)="quitar_persona(i)"
+                  [disabled]="tiene_respuesta(i)"
+                  [attr.aria-label]="'Quitar persona ' + (i + 1)"
+                  [title]="tiene_respuesta(i) ? 'Esta persona ya respondió: quitarla borraría su respuesta' : 'Quitar'">
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+
+      <button type="button" class="agregar" (click)="agregar_persona()">
+        <i class="pi pi-plus" aria-hidden="true"></i> Agregar persona
+      </button>
+    </fieldset>
 
     <!-- Lo que respondió el invitado: informativo -->
     @if (respuesta(); as r) {

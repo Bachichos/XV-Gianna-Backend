@@ -1,12 +1,12 @@
 <xv-layout>
 
-  <header class="cabecera">
+  <header class="xv-cabecera">
     <div>
       <h1>Lista de invitados</h1>
       @if (cargando()) {
-        <p class="cabecera__resumen">Cargando&hellip;</p>
+        <p class="xv-cabecera__resumen">Cargando&hellip;</p>
       } @else {
-        <p class="cabecera__resumen">
+        <p class="xv-cabecera__resumen">
           <span class="xv-numero">{{ todos().length }}</span>
           {{ todos().length === 1 ? 'persona confirmada' : 'personas confirmadas' }}
         </p>
@@ -35,7 +35,7 @@
   </header>
 
   @if (error(); as mensaje) {
-    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
   }
 
   <div class="filtros">

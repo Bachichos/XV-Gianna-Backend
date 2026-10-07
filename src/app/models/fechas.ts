@@ -52,3 +52,12 @@ export const cierre_desde_ultimo_dia = (dia: string): string => {
 
 export const ultimo_dia_desde_cierre = (cierre: string): string =>
     new Date(new Date(cierre).getTime() - 1).toISOString().slice(0, 10)
+
+/**
+ * AAAA-MM-DD de hoy, en la hora de quien lo usa. Con toISOString() saldria
+ * en hora de Londres: en Argentina, despues de las 21, ya seria manana.
+ */
+export const hoy = (): string => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}

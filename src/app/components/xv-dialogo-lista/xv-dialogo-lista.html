@@ -1,0 +1,37 @@
+<p-dialog
+  [(visible)]="abierto"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [header]="titulo()"
+  (onShow)="reiniciar()"
+  styleClass="xv-dialogo">
+
+  @if (ayuda()) { <p class="ayuda">{{ ayuda() }}</p> }
+
+  <ol class="lista">
+    @for (r of filas; track r.id; let i = $index) {
+    <li class="rubro">
+      <input pInputText [(ngModel)]="r.nombre" [placeholder]="placeholder()" [attr.aria-label]="titulo() + ' ' + (i + 1)">
+      <span class="rubro__acciones">
+        <button type="button" class="icono icono--quitar" (click)="quitar(i)" [disabled]="usos_de(r.id) > 0"
+                [title]="usos_de(r.id) > 0 ? 'Está en uso (' + usos_de(r.id) + ')' : 'Quitar'"
+                aria-label="Quitar"><i class="pi pi-trash"></i></button>
+      </span>
+    </li>
+    }
+  </ol>
+
+  <button type="button" class="agregar" (click)="agregar()">
+    <i class="pi pi-plus" aria-hidden="true"></i> Agregar
+  </button>
+
+  @if (problema(); as p) { <p class="aviso">{{ p }}</p> }
+  @if (error(); as e) { <p class="aviso" role="alert">{{ e }}</p> }
+
+  <div class="acciones">
+    <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cerrar()" />
+    <p-button label="Guardar" [loading]="guardando()" [disabled]="!!problema()" (onClick)="confirmar()" />
+  </div>
+
+</p-dialog>
