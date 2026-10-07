@@ -1,0 +1,72 @@
+/* Los mismos campos que el formulario de tarjetas. */
+
+.formulario {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.35rem 1.5rem;
+    padding-top: 0.25rem;
+}
+
+/*
+ * En la compu, de a dos campos por renglon: el modal queda apaisado. Todo
+ * va a lo ancho, salvo lo marcado .medio, que ocupa una columna.
+ */
+@media (min-width: 48rem) {
+    .formulario { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.formulario > * { grid-column: 1 / -1; }
+.formulario > .medio { grid-column: auto; }
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.campo label,
+.campo__etiqueta {
+    font-size: var(--xv-texto-sm);
+    font-weight: var(--xv-peso-medio);
+    color: var(--xv-texto);
+}
+
+.campo__opcional { font-weight: normal; color: var(--xv-texto-tenue); }
+
+.campo input,
+.campo textarea,
+.campo p-select,
+.campo p-inputnumber { width: 100%; }
+
+.campo__ayuda {
+    font-size: var(--xv-texto-xs);
+    line-height: var(--xv-interlinea-compacta);
+    color: var(--xv-texto-tenue);
+}
+
+.campo__error {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-error);
+}
+
+.campo__aviso {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-espera);
+}
+
+.monto { display: flex; gap: 0.5rem; }
+.monto p-select { flex: 0 0 8rem; width: auto; }
+
+/* --- Abajo: las acciones --- */
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--xv-borde);
+}

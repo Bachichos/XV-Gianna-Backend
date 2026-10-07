@@ -79,9 +79,9 @@ export const TEXTOS = {
         cancelada:      'Esta invitación fue dada de baja. Si creés que es un error, escribinos.',
         cerrado:        'Las confirmaciones ya cerraron el {cierre}. Escribinos por WhatsApp y vemos qué podemos hacer.',
         sin_enviar:     'Esta invitación todavía no fue enviada.',
-        dieta_persona:  '¿Tiene alguna alergia, intolerancia o dieta especial?',
-        dieta_general:  '¿Alguien tiene alguna alergia, intolerancia o dieta especial?',
-        dieta_ejemplo:  'Por ejemplo: celiaquía, frutos secos, vegetariana.',
+        dieta_persona:  '¿Tiene alguna alergia o intolerancia alimentaria?',
+        dieta_general:  '¿Alguien tiene alguna alergia o intolerancia alimentaria?',
+        dieta_ejemplo:  'Por ejemplo: celiaquía, frutos secos, lactosa.',
         // El pase: el QR que se muestra en la puerta, una vez que confirmaron.
         pase_titulo:    'Tu pase para la entrada',
         pase_texto:     'Mostrá este código en la puerta del salón: con él recibimos a todo tu grupo.',

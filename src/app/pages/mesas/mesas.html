@@ -1,12 +1,12 @@
 <xv-layout>
 
-  <header class="cabecera">
+  <header class="xv-cabecera">
     <div>
       <h1>Mesas</h1>
       @if (cargando()) {
-        <p class="cabecera__resumen">Cargando&hellip;</p>
+        <p class="xv-cabecera__resumen">Cargando&hellip;</p>
       } @else {
-        <p class="cabecera__resumen">
+        <p class="xv-cabecera__resumen">
           <span class="xv-numero">{{ personas() }}</span> {{ personas() === 1 ? 'persona' : 'personas' }}
           &middot; <span class="xv-numero">{{ lugares() }}</span> lugares
           &middot; <span class="xv-numero">{{ sin_mesa().length }}</span> sin mesa
@@ -22,12 +22,18 @@
     </div>
 
     @if (!cargando() && !salon_abierto()) {
-      <p-button label="El salón" icon="pi pi-sliders-h" severity="secondary" [outlined]="true" (onClick)="salon_abierto.set(true)" />
+      <span class="cabecera__acciones">
+        @if (sentados()) {
+          <p-button label="Vaciar mesas" icon="pi pi-eraser" severity="secondary" [text]="true" (onClick)="vaciando.set(true)" />
+        }
+        <p-button label="El salón" icon="pi pi-sliders-h" severity="secondary" [outlined]="true" (onClick)="salon_abierto.set(true)" />
+      </span>
     }
   </header>
 
+
   @if (error(); as mensaje) {
-    <p class="aviso aviso--error" role="alert">{{ mensaje }}</p>
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
   }
 
   @if (!cargando()) {
@@ -37,14 +43,14 @@
     <section class="salon">
       <div>
         <h2>El salón</h2>
-        <p class="tenue">Lo que suele definir el salón. Cada mesa se puede ajustar después, desde su lápiz.</p>
+        <p class="xv-tenue">Lo que suele definir el salón. Cada mesa se puede ajustar después, desde su lápiz.</p>
       </div>
 
       <!-- 1. Para cuantos hay que armar -->
       <div class="bloque">
         <h3>Capacidad del evento</h3>
         <p>Personas esperadas: <strong class="xv-numero">{{ personas() }}</strong> {{ personas() === 1 ? 'persona' : 'personas' }}</p>
-        <small class="tenue">Quienes confirmaron, quienes todavía no respondieron y los anfitriones.</small>
+        <small class="xv-tenue">Quienes confirmaron, quienes todavía no respondieron y los anfitriones.</small>
       </div>
 
       <!-- 2. Las mesas: principal, comunes y especiales, una columna cada una -->
@@ -66,7 +72,7 @@
             }
 
             @if (s.principal && anfitriones().length) {
-              <small class="tenue">Al guardar, los anfitriones sin mesa van acá. Se editan en Anfitriones.</small>
+              <small class="xv-tenue">Al guardar, los anfitriones sin mesa van acá. Se editan en Anfitriones.</small>
             }
           </div>
 
@@ -85,7 +91,7 @@
 
           <div class="columna">
             <h4>Mesas especiales</h4>
-            <small class="tenue">Con otra cantidad de lugares: una infantil, una que falta para cuadrar&hellip;</small>
+            <small class="xv-tenue">Con otra cantidad de lugares: una infantil, una que falta para cuadrar&hellip;</small>
             @for (e of s.especiales; track $index; let i = $index) {
               <div class="especial">
                 <input pInputText [(ngModel)]="e.nombre" [placeholder]="nombre_especial(i)" [attr.aria-label]="'Nombre de la mesa especial ' + (i + 1)">
@@ -125,6 +131,13 @@
         </p>
       }
 
+      @if (a_pisar().length) {
+        <p class="advertencia">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          Estas mesas tenían lugares propios y pasan a {{ +s.lugares || 0 }}: {{ a_pisar().join(', ') }}.
+        </p>
+      }
+
       <div class="salon__acciones">
         @if (lugares() > 0) {
           <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cancelar_salon()" />
@@ -139,7 +152,7 @@
 
     <!-- ============================== SIN MESA -->
     <section class="pendientes">
-      <h2>Sin mesa <span class="xv-numero tenue">({{ sin_mesa().length }})</span></h2>
+      <h2>Sin mesa <span class="xv-numero xv-tenue">({{ sin_mesa().length }})</span></h2>
 
       <div class="pendientes__filtros">
         <p-iconfield>
@@ -151,7 +164,7 @@
                   [ngModel]="categoria()" (ngModelChange)="categoria.set($event)" />
       </div>
 
-      <p class="pendientes__ayuda tenue">Arrastre una persona, o el nombre de la tarjeta para llevar a toda la familia. También puede tocar el lápiz de una mesa y elegir quiénes van.</p>
+      <p class="pendientes__ayuda xv-tenue">Arrastre una persona, o el nombre de la tarjeta para llevar a toda la familia. También puede tocar el lápiz de una mesa y elegir quiénes van.</p>
 
       <ul class="lista" cdkDropList [cdkDropListData]="null" cdkDropListSortingDisabled
           (cdkDropListDropped)="soltar($event)">
@@ -169,7 +182,7 @@
             </li>
           }
         } @empty {
-          <li class="vacia tenue">
+          <li class="vacia xv-tenue">
             @if (hay_filtro()) { Nadie sin mesa con ese filtro. <button type="button" class="enlace" (click)="limpiar_filtros()">Ver todos</button> }
             @else { Todos tienen mesa. }
           </li>
@@ -211,12 +224,13 @@
               <h3>{{ m.nombre }}</h3>
               <span class="mesa__cuenta xv-numero" [title]="m.ocupados + ' de ' + m.mesa.lugares + ' lugares'">{{ m.ocupados }}/{{ m.mesa.lugares }}</span>
               <button type="button" class="icono" (click)="editar(m)" [attr.aria-label]="'Editar ' + m.nombre"><i class="pi pi-pencil" aria-hidden="true"></i></button>
+              <button type="button" class="icono icono--borrar" (click)="a_quitar.set(m)" [attr.aria-label]="'Quitar ' + m.nombre"><i class="pi pi-trash" aria-hidden="true"></i></button>
             </header>
             @if (m.infantiles || m.alergias) {
-              <p class="mesa__datos tenue">
+              <p class="mesa__datos xv-tenue">
                 @if (m.infantiles) { {{ m.infantiles }} {{ m.infantiles === 1 ? 'infantil' : 'infantiles' }} }
                 @if (m.infantiles && m.alergias) { &middot; }
-                @if (m.alergias) { {{ m.alergias }} con alergia o dieta }
+                @if (m.alergias) { {{ m.alergias }} con alergia o intolerancia }
               </p>
             }
           }
@@ -231,7 +245,7 @@
                         [attr.aria-label]="'Sacar a ' + c.nombre + ' de la mesa'"><i class="pi pi-times" aria-hidden="true"></i></button>
               </li>
             } @empty {
-              <li class="vacia tenue">Suelte acá a quien va en esta mesa.</li>
+              <li class="vacia xv-tenue">Suelte acá a quien va en esta mesa.</li>
             }
           </ul>
         </article>
@@ -253,6 +267,38 @@
   }
 
   }
+
+  <!-- ============================== LAS PREGUNTAS -->
+
+  <xv-confirmar [abierto]="vaciando()" (abiertoChange)="vaciando.set($event)"
+                titulo="Vaciar mesas" accion="Vaciar" [peligro]="true" [cargando]="guardando()" [error]="error()"
+                (confirmar)="vaciar()">
+    ¿Vaciar todas las mesas? Las <strong class="xv-numero">{{ sentados() }}</strong> personas sentadas vuelven a «Sin mesa».
+    Las mesas quedan como están. <strong>No se puede deshacer.</strong>
+  </xv-confirmar>
+
+  <xv-confirmar [abierto]="!!a_quitar()" (abiertoChange)="$event || a_quitar.set(null)"
+                titulo="Quitar mesa" accion="Quitar" [peligro]="true" [cargando]="guardando()" [error]="error()"
+                (confirmar)="quitar_mesa()">
+    @if (a_quitar(); as m) {
+      ¿Quitar <strong>{{ m.nombre }}</strong>?
+      @if (m.gente.length) {
+        {{ m.gente.length === 1 ? 'Su persona vuelve' : 'Sus ' + m.gente.length + ' personas vuelven' }} a «Sin mesa».
+      }
+    }
+  </xv-confirmar>
+
+  <xv-confirmar [abierto]="confirmando_salon()" (abiertoChange)="confirmando_salon.set($event)"
+                titulo="Guardar el salón" accion="Guardar" [cargando]="guardando()" [error]="error()"
+                (confirmar)="escribir_salon()">
+    ¿Guardar el salón así?
+    @if (a_liberar().claves.length) {
+      {{ a_liberar().claves.length === 1 ? 'Una persona vuelve' : a_liberar().claves.length + ' personas vuelven' }} a «Sin mesa».
+    }
+    @if (a_pisar().length) {
+      {{ a_pisar().length === 1 ? 'Una mesa pierde sus lugares propios' : a_pisar().length + ' mesas pierden sus lugares propios' }}.
+    }
+  </xv-confirmar>
 
   <ng-template #persona let-c let-tarjeta="tarjeta">
     <span class="persona__estado integrante-linea" [class]="'integrante--' + c.estado"

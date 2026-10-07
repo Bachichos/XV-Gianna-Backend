@@ -2,7 +2,7 @@ import { AjustesTema, Configuracion, ConfigSecciones, SECCIONES_OPCIONALES } fro
 import { trae_el_tema } from '../../models/temas';
 import { TEXTOS } from '../../models/textos';
 import { SECCIONES, Seccion } from './etiquetas';
-import { partes, instante, cierre_desde_ultimo_dia, ultimo_dia_desde_cierre } from './fechas';
+import { partes, instante, cierre_desde_ultimo_dia, ultimo_dia_desde_cierre } from '../../models/fechas';
 
 /**
  * El borrador: la configuracion como la edita una persona. Las fechas van

@@ -1,8 +1,8 @@
 <xv-layout>
-    <header class="cabecera">
+    <header class="xv-cabecera">
         <div>
             <h1>Configuración</h1>
-            <p class="cabecera__resumen">Los datos de la fiesta, los textos de cada sección y el tema de la invitación.</p>
+            <p class="xv-cabecera__resumen">Los datos de la fiesta, los textos de cada sección y el tema de la invitación.</p>
         </div>
         <button type="button" class="ver-previa" (click)="ver_previa.set(!ver_previa())" [attr.aria-pressed]="ver_previa()">
             <i class="pi" [class.pi-eye]="!ver_previa()" [class.pi-eye-slash]="ver_previa()" aria-hidden="true"></i>
@@ -11,9 +11,9 @@
     </header>
 
     @if (estado() === 'cargando') {
-    <p class="tenue">Cargando&hellip;</p>
+    <p class="xv-tenue">Cargando&hellip;</p>
     } @else if (estado() === 'error') {
-    <p class="aviso aviso--error" role="alert">No pudimos leer la configuración. Revise la conexión y vuelva a intentar.</p>
+    <p class="xv-aviso-error" role="alert">No pudimos leer la configuración. Revise la conexión y vuelva a intentar.</p>
     } @else {
 
     <div class="con-previa" [class.con-previa--sin]="!ver_previa()">
@@ -35,9 +35,9 @@
 
             <!-- ============================== TEMA -->
             <p-tabpanel value="tema">
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>1 · El tema</h2>
-                    <p class="tenue">Los temas son de fábrica: cada uno trae sus colores, sus tipografías y sus adornos, probados para que todo se lea bien.</p>
+                    <p class="xv-tenue">Los temas son de fábrica: cada uno trae sus colores, sus tipografías y sus adornos, probados para que todo se lea bien.</p>
 
                     <div class="temas" role="radiogroup" aria-label="Tema de la invitación">
                         @for (t of temas; track t.id) {
@@ -50,7 +50,7 @@
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <div class="panel__cabecera">
                         <h2>2 · Cómo se ve</h2>
                         @if (hay_ajustes()) {
@@ -59,7 +59,7 @@
                         </button>
                         }
                     </div>
-                    <p class="tenue">Parten de como viene el tema elegido. Si se elige otro tema, vuelven a empezar desde ese.</p>
+                    <p class="xv-tenue">Parten de como viene el tema elegido. Si se elige otro tema, vuelven a empezar desde ese.</p>
 
                     <div class="grilla">
                         <div class="campo campo--ancho">
@@ -99,7 +99,7 @@
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>3 · El texto de la portada</h2>
                     <div class="campo">
                         <label for="c-previa-antetitulo">Antetítulo, sobre el nombre</label>
@@ -112,7 +112,7 @@
 
             <!-- ============================== FIESTA -->
             <p-tabpanel value="fiesta">
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>La fiesta</h2>
                     <div class="grilla">
                         <div class="campo">
@@ -128,7 +128,7 @@
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>Cuándo</h2>
                     <div class="grilla">
                         <div class="campo">
@@ -161,7 +161,7 @@
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>Dónde</h2>
                     <div class="grilla">
                         <div class="campo">
@@ -191,10 +191,10 @@
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>Confirmación</h2>
                     <div class="campo">
-                        <label for="c-alergias">Dónde se pregunta por alergias, intolerancias y dietas</label>
+                        <label for="c-alergias">Dónde se pregunta por alergias e intolerancias</label>
                         <p-select inputId="c-alergias" [options]="opciones_alergias" optionLabel="etiqueta" optionValue="valor" [(ngModel)]="b.alergias" />
                         <small>En las dos formas es obligatoria para poder confirmar.</small>
                     </div>
@@ -203,7 +203,7 @@
 
             <!-- ============================== PROGRAMA E INFORMACION -->
             <p-tabpanel value="programa">
-                <section class="panel">
+                <section class="xv-panel">
                     <div class="panel__cabecera">
                         <h2>Programa</h2>
                         <label class="interruptor">
@@ -232,7 +232,7 @@
                     </button>
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <div class="panel__cabecera">
                         <h2>Información importante</h2>
                         <label class="interruptor">
@@ -240,8 +240,8 @@
                             {{ b.secciones.informacion.visible ? 'Se muestra' : 'No se muestra' }}
                         </label>
                     </div>
-                    <p class="tenue">Un título corto y una o dos líneas: más largo, en un teléfono, deja de leerse.</p>
-                    <p class="tenue">
+                    <p class="xv-tenue">Un título corto y una o dos líneas: más largo, en un teléfono, deja de leerse.</p>
+                    <p class="xv-tenue">
                         <code>{{ '{' }}cierre{{ '}' }}</code> se reemplaza solo por el último día para confirmar,
                         por ejemplo "{{ ejemplo_cierre() }}". Sale de <strong>Fiesta → Cuándo → Último día para confirmar</strong>:
                         para cambiarlo, se cambia ahí.
@@ -269,7 +269,7 @@
 
             <!-- ============================== REGALO -->
             <p-tabpanel value="regalo">
-                <section class="panel">
+                <section class="xv-panel">
                     <div class="panel__cabecera">
                         <h2>Regalo</h2>
                         <label class="interruptor">
@@ -311,9 +311,9 @@
 
             <!-- ============================== TARJETAS Y MENSAJES -->
             <p-tabpanel value="mensajes">
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>Tarjeta para imprimir</h2>
-                    <p class="tenue">Una tarjeta A6 (10,5 × 14,8 cm), igual para todos, con el tema, la fecha, el lugar,
+                    <p class="xv-tenue">Una tarjeta A6 (10,5 × 14,8 cm), igual para todos, con el tema, la fecha, el lugar,
                         la información importante y el regalo. Se descarga en PDF, sola o cuatro por hoja A4.</p>
                     @if (sucio()) {
                     <small class="advertencia"><i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
@@ -323,9 +323,9 @@
                               severity="secondary" [outlined]="true" (onClick)="abrir_imprimible()" />
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>Categorías de tarjetas</h2>
-                    <p class="tenue">Sirven para filtrar las tarjetas, para las estadísticas y para elegir quién ve el regalo.
+                    <p class="xv-tenue">Sirven para filtrar las tarjetas, para las estadísticas y para elegir quién ve el regalo.
                         Cambiar el nombre de una no cambia las tarjetas que ya la tienen: esas se editan desde Tarjetas.</p>
 
                     <ol class="lista">
@@ -346,9 +346,9 @@
                     </button>
                 </section>
 
-                <section class="panel">
+                <section class="xv-panel">
                     <h2>Mensajes de WhatsApp</h2>
-                    <p class="tenue">Lo que va entre llaves se completa solo, para cada tarjeta. Para cambiar lo que dice, cambie el dato de origen:</p>
+                    <p class="xv-tenue">Lo que va entre llaves se completa solo, para cada tarjeta. Para cambiar lo que dice, cambie el dato de origen:</p>
 
                     <table class="marcadores">
                         <thead>
@@ -390,14 +390,14 @@
 
             <!-- ============================== SECCIONES Y TEXTOS -->
             <p-tabpanel value="secciones">
-                <p class="tenue intro">
+                <p class="xv-tenue intro">
                     Cada campo muestra en gris el texto que viene de fábrica. Déjelo vacío para usar ese;
                     escriba para cambiarlo. Lo que va entre llaves, como <code>{{ '{' }}hora{{ '}' }}</code>,
                     se completa solo: puede moverlo dentro de la frase, pero no borrarlo.
                 </p>
 
                 @for (s of secciones; track s.id) {
-                <section class="panel">
+                <section class="xv-panel">
                     <div class="panel__cabecera">
                         <h2>{{ s.nombre }}</h2>
                         @if (es_opcional(s.id)) {
@@ -436,7 +436,7 @@
             <div class="telefono__pantalla">
                 <iframe #previa [src]="url_vista_previa" title="Vista previa de la invitación" (load)="enviar_vista_previa(true)"></iframe>
             </div>
-            <figcaption class="tenue">
+            <figcaption class="xv-tenue">
                 @if (vista_previa_lista()) { Vista previa, sin guardar. Tocá el sobre para abrirla. }
                 @else { Abriendo la vista previa&hellip; }
             </figcaption>

@@ -1,0 +1,211 @@
+<xv-layout>
+    <header class="xv-cabecera">
+        <div>
+            <h1>Álbum</h1>
+            @if (cargando()) {
+            <p class="xv-cabecera__resumen">Cargando&hellip;</p>
+            } @else {
+            <p class="xv-cabecera__resumen">
+                <span class="xv-numero">{{ cuentas().todas }}</span> {{ cuentas().todas === 1 ? 'foto' : 'fotos' }}
+                @if (cuentas().telefonos) {
+                &middot; desde <span class="xv-numero">{{ cuentas().telefonos }}</span> {{ cuentas().telefonos === 1 ? 'teléfono' : 'teléfonos' }}
+                }
+            </p>
+            }
+        </div>
+        @if (!cargando() && (clave() || cuentas().todas)) {
+        <div class="cabecera__acciones">
+            @if (clave()) {
+            <p-button label="Ajustes" icon="pi pi-sliders-h" severity="secondary" [outlined]="true" (onClick)="abrir_ajustes()" />
+            }
+            @if (cuentas().todas) {
+            <p-button [label]="progreso() ? 'Bajando ' + progreso()!.hechas + ' de ' + progreso()!.total + '…' : 'Descargar todas'"
+                      icon="pi pi-download" severity="secondary" [outlined]="true" [loading]="!!progreso()" (onClick)="descargar_todas()" />
+            }
+        </div>
+        }
+    </header>
+
+    @if (error(); as mensaje) {
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
+    }
+
+    @if (!cargando()) {
+
+    <!-- ============================== EL QR -->
+    <section class="xv-panel qr">
+        @if (clave(); as c) {
+        <div class="qr__imagen">
+            @if (qr(); as png) { <img [src]="png" alt="Código QR del álbum"> }
+        </div>
+        <div class="qr__datos">
+            <h2>El código para el salón</h2>
+            <p class="xv-tenue">Imprimilo y repartilo por las mesas. Quien lo escanee llega a una página para subir sus fotos: tres misiones y las mejores de la noche, hasta 15 por teléfono.</p>
+
+            @if (ventana(); as v) {
+            <div class="ventana">
+                <div class="ventana__extremo">
+                    <span class="ventana__titulo">Abre</span>
+                    <span class="ventana__dia">{{ v.abre.dia }}</span>
+                    <span class="ventana__hora xv-numero">{{ v.abre.hora }} h</span>
+                </div>
+                <i class="pi pi-arrow-right ventana__flecha" aria-hidden="true"></i>
+                <div class="ventana__extremo">
+                    <span class="ventana__titulo">Cierra</span>
+                    <span class="ventana__dia">{{ v.cierra.dia }}</span>
+                    <span class="ventana__hora xv-numero">{{ v.cierra.hora }} h</span>
+                </div>
+                <span class="ventana__estado" [class]="'ventana__estado ventana__estado--' + v.estado.tipo">{{ v.estado.texto }}</span>
+            </div>
+            }
+
+            <p class="qr__link">
+                <span class="qr__url">{{ link() }}</span>
+                <button type="button" class="enlace" (click)="copiar()">{{ copiado() ? '¡Copiado!' : 'Copiar' }}</button>
+            </p>
+
+            <div class="qr__acciones">
+                <p-button label="Cartel para imprimir (PDF)" icon="pi pi-print" [loading]="armando_cartel()" [disabled]="!qr()" (onClick)="descargar_cartel()" />
+                <p-button label="Solo el QR (PNG)" icon="pi pi-qrcode" severity="secondary" [outlined]="true" [disabled]="!qr()" (onClick)="descargar_qr()" />
+                <p-button label="Cambiar la clave" severity="danger" [text]="true" (onClick)="cambiando.set(true)" />
+            </div>
+        </div>
+        } @else {
+        <div class="qr__vacio">
+            <i class="pi pi-qrcode" aria-hidden="true"></i>
+            <h2>Todavía no hay código</h2>
+            <p class="xv-tenue">Se genera una sola vez. Después se descarga el cartel para imprimir y repartir por el salón.</p>
+            <p-button label="Generar el código" icon="pi pi-sparkles" [loading]="guardando()" (onClick)="generar()" />
+        </div>
+        }
+    </section>
+
+    <!-- ============================== LAS MISIONES -->
+    <section class="misiones">
+        @for (m of misiones(); track m.id) {
+        <button type="button" class="mision" [class.mision--elegida]="filtro() === m.id" (click)="filtro.set(filtro() === m.id ? 'todas' : m.id)">
+            <span class="mision__emoji" aria-hidden="true">{{ m.emoji }}</span>
+            <span class="mision__titulo">{{ m.titulo }}</span>
+            <span class="mision__cuenta"><span class="xv-numero">{{ cuentas().por_mision[m.id] }}</span> {{ cuentas().por_mision[m.id] === 1 ? 'foto' : 'fotos' }}</span>
+        </button>
+        }
+    </section>
+
+    <!-- ============================== LAS FOTOS -->
+    <section class="xv-panel">
+        <div class="fotos__cabecera">
+            <h2>Las fotos</h2>
+            <div class="filtros" role="group" aria-label="Qué fotos mostrar">
+                <button type="button" class="filtro" [class.filtro--activo]="filtro() === 'todas'" (click)="filtro.set('todas')">Todas <span class="xv-numero">{{ cuentas().todas }}</span></button>
+                @for (m of misiones(); track m.id) {
+                <button type="button" class="filtro" [class.filtro--activo]="filtro() === m.id" (click)="filtro.set(m.id)" [title]="m.titulo">{{ m.emoji }} <span class="xv-numero">{{ cuentas().por_mision[m.id] }}</span></button>
+                }
+                <button type="button" class="filtro" [class.filtro--activo]="filtro() === 'libres'" (click)="filtro.set('libres')">Las mejores <span class="xv-numero">{{ cuentas().libres }}</span></button>
+            </div>
+        </div>
+
+        @if (filtradas().length) {
+        <ul class="grilla">
+            @for (v of filtradas(); track v.f.id + v.f.creada_ms) {
+            <li>
+                <button type="button" class="foto" (click)="ver(v)" [attr.aria-label]="'Ver la foto' + (v.f.nombre ? ' de ' + v.f.nombre : '')">
+                    <img [src]="v.url" alt="" loading="lazy">
+                    @if (v.mision) { <span class="foto__mision" [title]="v.mision.titulo">{{ v.mision.emoji }}</span> }
+                    <span class="foto__pie">{{ v.f.nombre || 'Anónimo' }}</span>
+                </button>
+            </li>
+            }
+        </ul>
+        } @else {
+        <p class="sin-fotos xv-tenue">
+            {{ cuentas().todas ? 'No hay fotos de esta misión todavía.' : 'Todavía no subieron fotos. Van a aparecer acá, en vivo, a medida que lleguen.' }}
+        </p>
+        }
+    </section>
+    }
+
+    <!-- ============================== UNA FOTO, EN GRANDE -->
+    <p-dialog [visible]="!!viendo()" (visibleChange)="$event || cerrar_foto()" [modal]="true" [draggable]="false" [resizable]="false"
+              [header]="viendo()?.mision?.titulo ?? 'Las mejores de la noche'" styleClass="xv-dialogo">
+        @if (viendo(); as v) {
+        <div class="grande">
+            @if (grande(); as url) {
+            <img [src]="url" [alt]="'Foto de ' + (v.f.nombre || 'un invitado')">
+            } @else {
+            <img class="grande__previa" [src]="v.url" alt="">
+            }
+        </div>
+        <p class="grande__datos">
+            <span>{{ v.f.nombre || 'Anónimo' }} &middot; <span class="xv-numero">{{ v.cuando }}</span></span>
+            <span class="xv-tenue xv-numero">{{ v.f.ancho }} × {{ v.f.alto }}</span>
+        </p>
+        <div class="grande__acciones">
+            <p-button label="Eliminar" icon="pi pi-trash" severity="danger" [text]="true" (onClick)="a_eliminar.set(v)" />
+            <p-button label="Descargar" icon="pi pi-download" [loading]="bajando()" [disabled]="!grande()" (onClick)="descargar_foto()" />
+        </div>
+        }
+    </p-dialog>
+
+    <!-- ============================== AJUSTES -->
+    <p-dialog [visible]="ajustes_abiertos()" (visibleChange)="ajustes_abiertos.set($event)" [modal]="true" [draggable]="false" [resizable]="false"
+              header="Ajustes del álbum" styleClass="xv-dialogo">
+        <div class="ajustes">
+            <section class="ajustes__bloque">
+                <h3>Cuándo se puede subir</h3>
+                <p class="xv-tenue">En la hora de la fiesta. Fuera de estas fechas, ni el QR ni el botón de la invitación dejan subir.</p>
+                <div class="fechas">
+                    <span class="fechas__columna" aria-hidden="true"></span>
+                    <span class="fechas__columna">Día</span>
+                    <span class="fechas__columna">Hora</span>
+
+                    <label class="fechas__titulo" for="a-desde">Abre</label>
+                    <input pInputText id="a-desde" type="date" [(ngModel)]="aj.desde_dia">
+                    <input pInputText type="time" [(ngModel)]="aj.desde_hora" aria-label="Hora en que abre">
+
+                    <label class="fechas__titulo" for="a-hasta">Cierra</label>
+                    <input pInputText id="a-hasta" type="date" [(ngModel)]="aj.hasta_dia">
+                    <input pInputText type="time" [(ngModel)]="aj.hasta_hora" aria-label="Hora en que cierra">
+                </div>
+                <p class="fechas__resumen" [class.fechas__resumen--error]="resumen_ajustes().error">
+                    <i class="pi" [class.pi-clock]="!resumen_ajustes().error" [class.pi-exclamation-triangle]="resumen_ajustes().error" aria-hidden="true"></i>
+                    {{ resumen_ajustes().texto }}
+                </p>
+                <button type="button" class="enlace" (click)="fechas_de_la_fiesta()">Usar las de la fiesta: desde esa mañana hasta una semana después</button>
+            </section>
+
+            <section class="ajustes__bloque">
+                <h3>Las misiones</h3>
+                <p class="xv-tenue">Lo que se lee en la mini web y en el cartel. Vacío = el texto de siempre, que se ve en gris.</p>
+                @for (m of MISIONES_DE_FABRICA; track m.id) {
+                <div class="ajustes__mision">
+                    <span class="ajustes__numero" aria-hidden="true">{{ m.numero }}</span>
+                    <div class="campo">
+                        <input pInputText [(ngModel)]="aj.misiones[m.id].titulo" [placeholder]="m.titulo" maxlength="60" [attr.aria-label]="'Título de la misión ' + m.numero">
+                        <input pInputText [(ngModel)]="aj.misiones[m.id].detalle" [placeholder]="m.detalle" maxlength="80" [attr.aria-label]="'Frase de la misión ' + m.numero">
+                    </div>
+                </div>
+                }
+            </section>
+
+            @if (error_ajustes(); as e) { <p class="ajustes__error" role="alert">{{ e }}</p> }
+
+            <div class="ajustes__acciones">
+                <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="ajustes_abiertos.set(false)" />
+                <p-button label="Guardar" [loading]="guardando()" (onClick)="guardar_ajustes()" />
+            </div>
+        </div>
+    </p-dialog>
+
+    <xv-confirmar [abierto]="cambiando()" (abiertoChange)="cambiando.set($event)"
+                  titulo="Cambiar la clave" accion="Cambiar" [peligro]="true" [cargando]="guardando()" [error]="error()"
+                  (confirmar)="generar()">
+        El QR que ya imprimiste <strong>deja de funcionar</strong>: hay que imprimir el cartel de nuevo. Las fotos que ya subieron no se tocan.
+        Sirve si el link circuló fuera de la fiesta.
+    </xv-confirmar>
+
+    <xv-confirmar [abierto]="!!a_eliminar()" (abiertoChange)="$event || a_eliminar.set(null)"
+                  titulo="Eliminar foto" accion="Eliminar" [peligro]="true" [cargando]="guardando()" [error]="error()"
+                  (confirmar)="eliminar()">
+        ¿Eliminar esta foto{{ a_eliminar()?.f?.nombre ? ' de ' + a_eliminar()!.f.nombre : '' }}? No se puede deshacer.
+    </xv-confirmar>
+</xv-layout>

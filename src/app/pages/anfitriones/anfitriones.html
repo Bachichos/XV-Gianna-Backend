@@ -1,18 +1,20 @@
 <xv-layout>
 
-  <header class="cabecera">
-    <h1>Anfitriones</h1>
-    <p class="cabecera__resumen">
-      Quienes están en la fiesta sin recibir invitación: la cumpleañera y, si hace falta, la familia que organiza.
-      Cuentan como personas confirmadas en los totales, los menús y las mesas.
-    </p>
+  <header class="xv-cabecera">
+    <div>
+      <h1>Anfitriones</h1>
+      <p class="xv-cabecera__resumen">
+        Quienes están en la fiesta sin recibir invitación: la cumpleañera y, si hace falta, la familia que organiza.
+        Cuentan como personas confirmadas en los totales, los menús y las mesas.
+      </p>
+    </div>
   </header>
 
   @if (cargando()) {
-    <p class="tenue">Cargando&hellip;</p>
+    <p class="xv-tenue">Cargando&hellip;</p>
   } @else {
 
-  <section class="panel">
+  <section class="xv-panel">
     <ol class="lista">
       @for (f of filas; track f.id; let i = $index) {
         <li class="anfitrion">
@@ -25,14 +27,14 @@
           </button>
 
           <input pInputText class="anfitrion__dieta" [(ngModel)]="f.alimentacion"
-                 placeholder="Alergia, intolerancia o dieta (opcional)" [attr.aria-label]="'Alimentación del anfitrión ' + (i + 1)">
+                 placeholder="Alergia o intolerancia (opcional)" [attr.aria-label]="'Alimentación del anfitrión ' + (i + 1)">
 
           <button type="button" class="icono" (click)="quitar(i)" [attr.aria-label]="'Quitar al anfitrión ' + (i + 1)">
             <i class="pi pi-trash" aria-hidden="true"></i>
           </button>
         </li>
       } @empty {
-        <li class="tenue">No hay anfitriones. Todos los que se sientan reciben invitación.</li>
+        <li class="xv-tenue">No hay anfitriones. Todos los que se sientan reciben invitación.</li>
       }
     </ol>
 

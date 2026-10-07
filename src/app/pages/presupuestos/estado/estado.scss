@@ -1,0 +1,19 @@
+:host { display: inline-flex; }
+
+.estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.18rem 0.6rem;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    white-space: nowrap;
+}
+
+.estado .pi { font-size: 0.85rem; }
+
+.estado--elegido    { background: var(--xv-exito-fondo);  border-color: var(--xv-exito-borde);  color: var(--xv-exito); }
+.estado--pendiente  { background: var(--xv-espera-fondo); border-color: var(--xv-espera-borde); color: var(--xv-espera); }
+.estado--descartado { background: var(--xv-fondo);        border-color: var(--xv-borde);        color: var(--xv-texto-tenue); }

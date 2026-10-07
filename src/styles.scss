@@ -51,8 +51,30 @@
     --xv-texto-tenue:  #566577;
     --xv-brillo:       rgba(82, 121, 162, 0.08);
 
+    /* --- Formas --- */
+    --xv-radio-tarjeta: 8px;   /* paneles, tablas, mesas: todo lo que es una tarjeta */
+
     --xv-plata:        #c3ccd8;
     --xv-plata-brillo: #eef2f7;
+
+    /* --- Error: avisos, textos de error, acciones de borrar --- */
+    --xv-error:        #8f2c2c;
+    --xv-error-fondo:  #fbf1f1;
+    --xv-error-borde:  #e4b9b9;
+    --xv-error-suave:  #fdf6f6;   /* fondo apenas rosado: una mesa excedida */
+
+    /* --- Azules claros: el fondo de la tarjeta abierta del calendario, el
+           mismo de la cabecera de las tablas de Presupuestos. --- */
+    --xv-azul-claro:        var(--p-primary-100, #e4ecf4);
+    --xv-azul-claro-borde:  var(--p-primary-200, #c8d8e8);
+
+    /* --- Estados: lo resuelto (verde) y lo que espera (ambar) --- */
+    --xv-exito:        #1d6b4a;
+    --xv-exito-fondo:  #e6f4ee;
+    --xv-exito-borde:  #a9d8c2;
+    --xv-espera:       #8a6115;
+    --xv-espera-fondo: #fdf4e3;
+    --xv-espera-borde: #edd6a8;
 
     color-scheme: light;
 }
@@ -160,11 +182,13 @@ strong, b { font-weight: var(--xv-peso-fuerte); }
 
 /* El modal se renderiza con la encapsulacion de la libreria: su ancho va aca. */
 .xv-dialogo {
-    width: 38rem;
+    /* Apaisados en la compu, todos del mismo ancho: aprovechan la pantalla. En el telefono, lo que haya. */
+    width: 48rem;
     max-width: calc(100vw - 2rem);
 }
 
-.xv-dialogo--angosto { width: 30rem; }
+/* Los avisos ("¿Eliminar…?"): dos renglones y dos botones. Anchos quedaban desproporcionados. */
+.xv-dialogo--aviso { width: 32rem; }
 
 /* --- Integrantes de una tarjeta, persona por persona --- */
 
@@ -243,7 +267,91 @@ strong, b { font-weight: var(--xv-peso-fuerte); }
 
 .leyenda .integrante-linea { font-size: var(--xv-texto-xs); }
 
+/* --- Cabecera de cada pantalla --- */
+
+/*
+ * A la izquierda, un <div> con el titulo y su resumen; a la derecha, si
+ * hace falta, los botones. Sin botones, el <div> queda solo a la izquierda.
+ */
+.xv-cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+/* La linea gris debajo del titulo: de que se trata, o los numeros del momento. */
+.xv-cabecera__resumen {
+    margin-top: 0.5rem;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+}
+
+/* --- Paneles: la caja blanca con borde que agrupa un tema --- */
+
+.xv-panel {
+    margin-bottom: 1.5rem;
+    padding: 1.4rem 1.5rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: var(--xv-radio-tarjeta);
+}
+
+.xv-panel h2 { font-size: var(--xv-texto-xl); }
+
+/* Solo el titulo suelto: si va dentro de una cabecera con botones, el aire lo pone ella. */
+.xv-panel > h2 { margin-bottom: 1rem; }
+
+/* --- Texto secundario: ayudas, notas, "Cargando…" --- */
+
+.xv-tenue {
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-sm);
+}
+
+/* --- Campos con problema --- */
+
+/*
+ * Optimus pinta de rojo un campo invalido solo si ya se escribio en el
+ * (ng-dirty), y con un rojo claro que casi no se ve. Al tocar Guardar sin
+ * haberlo tocado, quedaba gris aunque no dejara guardar.
+ *
+ * Aca: con ng-touched (que Guardar marca en todos) o ng-dirty, nuestro
+ * rojo y de 2 px. El `body` adelante le da mas peso que al tema, que se
+ * carga despues: a igual peso, ganaria el suyo.
+ */
+body :is(.p-inputtext, .p-textarea, .p-select, .p-multiselect).ng-invalid:is(.ng-touched, .ng-dirty),
+body .p-inputnumber.ng-invalid:is(.ng-touched, .ng-dirty) .p-inputnumber-input {
+    border-color: var(--xv-error);
+    box-shadow: 0 0 0 1px var(--xv-error);
+}
+
+/* --- Avisos --- */
+
+/* Algo salio mal: no se pudo leer, no se pudo guardar. Va arriba del contenido. */
+.xv-aviso-error {
+    margin-bottom: 1.25rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--xv-error-borde);
+    border-radius: 3px;
+    background: var(--xv-error-fondo);
+    color: var(--xv-error);
+}
+
 /* --- Varios --- */
+
+/* Texto solo para lectores de pantalla. */
+.visualmente-oculto {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
 
 /* La pone el layout cuando se abre el cajon del menu en movil. */
 .xv-sin-scroll { overflow: hidden; }

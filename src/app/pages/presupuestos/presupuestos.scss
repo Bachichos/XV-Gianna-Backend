@@ -1,0 +1,239 @@
+/* --- Cabecera: los rubros que todavia no tienen nada elegido --- */
+
+.cabecera__sin-elegir {
+    margin-top: 0.3rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+.cabecera__acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* --- Un panel por rubro: su titulo y la tabla, de borde a borde --- */
+
+.rubro {
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--xv-radio-tarjeta);
+}
+
+.rubro__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    padding: 1.1rem 1.5rem;
+}
+
+.rubro__cabecera h2 { margin: 0; }
+
+/* --- La tabla --- */
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--xv-texto-sm);
+}
+
+.tabla th {
+    padding: 0.65rem 1rem;
+    /* Azul porcelana: con el gris del fondo de la pagina se confundia. */
+    background: var(--p-primary-100, #e4ecf4);
+    border-top: 1px solid var(--xv-borde);
+    border-bottom: 1px solid var(--xv-borde);
+    text-align: start;
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--p-primary-800, #31435a);
+    white-space: nowrap;
+}
+
+.tabla td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--xv-borde);
+    vertical-align: middle;
+}
+
+/* Cada columna, separada por una linea fina, como en la referencia. */
+.tabla th + th,
+.tabla td + td { border-left: 1px solid var(--xv-borde); }
+
+.tabla th:first-child,
+.tabla td:first-child { padding-left: 1.5rem; }
+
+.tabla tbody tr:last-child td { border-bottom: 0; }
+.tabla tbody tr:hover { background: var(--xv-fondo); }
+
+.tabla__num { text-align: end; white-space: nowrap; }
+
+.tabla__proveedor { min-width: 12rem; }
+.tabla__proveedor .xv-tenue { display: block; margin-top: 0.15rem; font-size: var(--xv-texto-xs); }
+
+.tabla__nombre {
+    font-weight: var(--xv-peso-medio);
+    color: var(--xv-texto);
+    text-decoration: none;
+}
+
+.tabla__nombre:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.tabla__monto { font-weight: var(--xv-peso-medio); }
+.tabla__monto--sin { font-weight: normal; color: var(--xv-texto-tenue); }
+
+.fila--descartada td > * { opacity: 0.55; }
+/* Tachado solo el monto (no el titulo que lleva al lado en el telefono). */
+.fila--descartada .tabla__monto span { text-decoration: line-through; }
+
+/* --- Resumen de pago --- */
+
+.pago { display: flex; flex-direction: column; gap: 0.4rem; min-width: 14rem; }
+
+.pago__avance { display: flex; align-items: center; gap: 0.6rem; }
+
+.barra {
+    flex: 1;
+    height: 0.4rem;
+    overflow: hidden;
+    background: var(--xv-borde);
+    border-radius: 999px;
+}
+
+.barra__llena {
+    display: block;
+    height: 100%;
+    background: var(--xv-exito);
+    border-radius: 999px;
+}
+
+.pago__porcentaje { font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
+
+.pago__datos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem 0.75rem;
+}
+
+.pago__cifras {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--xv-texto-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--xv-texto-tenue);
+}
+
+.pago__cifras strong { color: var(--xv-texto); font-weight: var(--xv-peso-medio); }
+
+.pago__cargar {
+    /* Un boton, como "Rubros" (secundario con borde): sin subrayado, sin fondo. */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.75rem;
+    background: none;
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 6px;
+    color: var(--xv-texto-tenue);
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.pago__cargar:hover { background: var(--xv-fondo); color: var(--xv-texto); }
+
+/* --- Acciones: editar, eliminar y ver --- */
+
+.tabla__fin { text-align: end; }
+.tabla__acciones { display: flex; align-items: center; justify-content: flex-end; gap: 0.15rem; white-space: nowrap; }
+
+.accion {
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.accion:hover { border-color: var(--xv-borde); color: var(--p-primary-color, #5279a2); }
+.accion--borrar:hover { color: var(--xv-error); border-color: var(--xv-error-borde); }
+
+
+/*
+ * En el telefono (y en compus angostas) cinco columnas no entran: la tabla
+ * deja de ser tabla. Cada fila es una fichita: el proveedor arriba y,
+ * debajo, cada dato con su titulo al costado (sale de data-titulo).
+ */
+@media (max-width: 62rem) {
+    .tabla thead { display: none; }
+
+    .tabla,
+    .tabla tbody,
+    .tabla tr,
+    .tabla td { display: block; }
+
+    /* Cada proveedor, separado del siguiente por la misma linea fina de siempre. */
+    .tabla tr {
+        padding: 0.9rem 1.25rem;
+        border-top: 1px solid var(--xv-borde);
+    }
+
+    .tabla td,
+    .tabla td:first-child,
+    .tabla td + td {
+        padding: 0.3rem 0;
+        border: 0;
+    }
+
+    .tabla td[data-titulo] {
+        display: grid;
+        grid-template-columns: 8.5rem minmax(0, 1fr);
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .tabla td[data-titulo]::before {
+        content: attr(data-titulo);
+        font-size: var(--xv-texto-xs);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--xv-texto-tenue);
+    }
+
+    .tabla td.tabla__proveedor { padding-bottom: 0.5rem; }
+    .tabla__num { text-align: start; }
+
+    /* En la compu, Acciones va a la derecha; en la fichita, como los demas: titulo y valor alineados. */
+    .tabla td.tabla__fin { text-align: start; }
+    .tabla__acciones { justify-content: flex-start; margin-left: -0.5rem; }   /* el hueco del boton, para que el icono quede en la linea de los valores */
+    .pago { min-width: 0; }
+}
+
+/* --- Sin nada cargado --- */
+
+.vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: var(--xv-radio-tarjeta);
+    color: var(--xv-texto-tenue);
+}
+
+.vacio__icono {
+    font-size: 2rem;
+    color: var(--xv-borde-fuerte);
+}

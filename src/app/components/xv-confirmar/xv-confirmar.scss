@@ -1,0 +1,25 @@
+.confirmar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-top: 0.25rem;
+}
+
+.confirmar__texto {
+    line-height: var(--xv-interlinea-texto);
+    color: var(--xv-texto);
+}
+
+.confirmar__error {
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-error);
+}
+
+.confirmar__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--xv-borde);
+}

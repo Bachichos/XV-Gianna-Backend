@@ -1,0 +1,197 @@
+:host { display: block; }
+
+/* --- ‹ Octubre 2026 ›  [Hoy] --- */
+
+.navegacion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.navegacion__mes {
+    min-width: 11rem;
+    text-align: center;
+    font-size: var(--xv-texto-xl);
+}
+
+.flecha,
+.hoy {
+    display: grid;
+    place-items: center;
+    height: 2.2rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    color: var(--xv-texto-tenue);
+    cursor: pointer;
+}
+
+.flecha { width: 2.2rem; }
+.hoy { margin-left: auto; padding: 0 0.9rem; font-size: var(--xv-texto-sm); }
+
+.flecha:hover,
+.hoy:hover:not(:disabled) { border-color: var(--xv-borde-fuerte); color: var(--p-primary-color, #5279a2); }
+.hoy:disabled { opacity: 0.45; cursor: default; }
+
+/* --- La grilla --- */
+
+.grilla {
+    border: 1px solid var(--xv-borde);
+    border-radius: var(--xv-radio-tarjeta);
+    background: var(--xv-superficie);
+    overflow: hidden;
+}
+
+.semana {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.semana + .semana { border-top: 1px solid var(--xv-borde); }
+
+.titulo-dia {
+    padding: 0.5rem 0;
+    text-align: center;
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--xv-texto-tenue);
+}
+
+/* --- Un dia --- */
+
+.dia {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    min-height: 6.5rem;
+    padding: 0.35rem 0.4rem;
+}
+
+.dia + .dia { border-left: 1px solid var(--xv-borde); }
+
+.dia--hueco { background: var(--xv-fondo); }
+
+/* El boton cubre todo el dia; las citas escritas quedan encima. */
+.dia__tocar {
+    position: absolute;
+    inset: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+.dia__tocar:hover { background: var(--p-primary-50, #f3f6fa); }
+.dia__tocar:focus-visible { outline: 2px solid var(--p-primary-color, #5279a2); outline-offset: -2px; }
+
+.dia__numero {
+    position: relative;
+    align-self: flex-start;   /* si no, el circulo de hoy se estira a todo lo ancho */
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--xv-texto-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--xv-texto);
+}
+
+.dia--pasado .dia__numero,
+.dia--pasado .dia__citas { opacity: 0.45; }
+
+/* Hoy: el numero en un circulo. */
+.dia--hoy .dia__numero {
+    justify-content: center;
+    min-width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 999px;
+    background: var(--p-primary-color, #5279a2);
+    color: var(--xv-superficie);
+    font-weight: var(--xv-peso-medio);
+}
+
+.dia--elegido { box-shadow: inset 0 0 0 2px var(--p-primary-color, #5279a2); }
+
+.dia--fiesta { background: var(--xv-plata-brillo); }
+.dia__fiesta { color: var(--p-primary-color, #5279a2); }
+
+/* --- Las citas escritas (compu) --- */
+
+.dia__citas {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;   /* deja pasar el toque al dia... */
+}
+
+.dia__cita {
+    pointer-events: auto;   /* ...salvo sobre una cita */
+    display: block;
+    width: 100%;
+    padding: 0.1rem 0.3rem;
+    overflow: hidden;
+    background: var(--p-primary-50, #f3f6fa);
+    border: 1px solid var(--p-primary-100, #e4ecf4);
+    border-radius: 2px;
+    color: var(--p-primary-800, #31435a);
+    font-size: var(--xv-texto-xs);
+    text-align: start;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.dia__cita:hover { border-color: var(--p-primary-color, #5279a2); }
+.dia__cita .xv-numero { font-weight: var(--xv-peso-medio); }
+
+.dia__mas {
+    padding: 0 0.3rem;
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+/* --- Los puntitos (telefono) --- */
+
+.dia__puntos { display: none; }
+
+@media (max-width: 40rem) {
+    .navegacion__mes { min-width: 0; flex: 1; font-size: var(--xv-texto-lg); }
+    .hoy { margin-left: 0; }
+
+    .titulo-dia { font-size: 0.65rem; letter-spacing: 0; }
+
+    .dia {
+        align-items: center;
+    }
+
+    .dia__numero { align-self: center; }
+
+    .dia {
+        min-height: 3.2rem;
+        padding: 0.3rem 0;
+    }
+
+    .dia__citas { display: none; }
+
+    .dia__puntos {
+        position: relative;
+        pointer-events: none;
+        display: flex;
+        gap: 0.15rem;
+    }
+
+    .punto {
+        width: 0.35rem;
+        height: 0.35rem;
+        border-radius: 999px;
+        background: var(--p-primary-color, #5279a2);
+    }
+}

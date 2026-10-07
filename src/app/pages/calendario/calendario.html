@@ -1,0 +1,237 @@
+<xv-layout>
+    <header class="xv-cabecera">
+        <div>
+            <h1>Calendario</h1>
+            @if (cargando()) {
+            <p class="xv-cabecera__resumen">Cargando&hellip;</p>
+            } @else if (proxima(); as p) {
+            <p class="xv-cabecera__resumen">
+                Próxima: <strong>{{ p.c.titulo }}</strong> &middot; <span class="xv-numero">{{ p.cuando }}</span>
+            </p>
+            } @else {
+            <p class="xv-cabecera__resumen">No hay citas por delante.</p>
+            }
+        </div>
+        @if (!cargando()) {
+        <div class="cabecera__acciones">
+            <p-selectbutton class="vista" [options]="VISTAS" optionLabel="etiqueta" optionValue="valor" [allowEmpty]="false"
+                            [ngModel]="vista()" (ngModelChange)="elegir_vista($event)" ariaLabel="Vista" />
+            <p-button label="Tipos" icon="pi pi-tags" severity="secondary" [outlined]="true" (onClick)="tipos_abierto.set(true)" />
+            <p-button label="Nueva cita" icon="pi pi-plus" (onClick)="nueva()" />
+        </div>
+        }
+    </header>
+
+    @if (error(); as mensaje) {
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
+    }
+
+    @if (!cargando() && vista() === 'mes') {
+        <section class="xv-panel">
+            <xv-mes [citas]="citas()" [zona]="zona()" [fiesta]="dia_fiesta()" [(elegido)]="dia_elegido"
+                    (editar)="editar($event)" (nueva)="nueva($event)" />
+        </section>
+
+        @if (dia_elegido(); as dia) {
+        <section class="grupo">
+            <div class="dia__cabecera">
+                <h2>{{ titulo_del_dia() }}</h2>
+                <p-button label="Nueva cita este día" icon="pi pi-plus" severity="secondary" [outlined]="true" size="small" (onClick)="nueva(dia)" />
+            </div>
+            <ul class="citas">
+                @for (f of citas_del_dia(); track f.c.id) {
+                <ng-container *ngTemplateOutlet="fila; context: { $implicit: f }" />
+                }
+            </ul>
+        </section>
+        }
+    }
+
+    @if (!cargando() && vista() === 'lista') {
+        @for (m of meses(); track m.clave) {
+        <section class="grupo">
+            <h2 class="grupo__titulo">{{ m.titulo }}</h2>
+            <ul class="citas">
+                @for (f of m.filas; track f.c.id) {
+                <ng-container *ngTemplateOutlet="fila; context: { $implicit: f }" />
+                }
+            </ul>
+        </section>
+        }
+
+        @if (pasadas().length) {
+        <section class="grupo">
+            <h2 class="grupo__titulo">Ya pasaron</h2>
+            <ul class="citas">
+                @for (f of pasadas(); track f.c.id) {
+                <ng-container *ngTemplateOutlet="fila; context: { $implicit: f }" />
+                }
+            </ul>
+        </section>
+        }
+
+        @if (!meses().length && !pasadas().length) {
+        <div class="vacio">
+            <i class="pi pi-calendar vacio__icono" aria-hidden="true"></i>
+            <p>Todavía no hay citas cargadas.</p>
+        </div>
+        }
+    }
+
+    <xv-cita-formulario [(abierto)]="formulario_abierto" [cita]="editando()" [fecha]="fecha_nueva()" />
+    <xv-dialogo-lista [(abierto)]="tipos_abierto" titulo="Tipos de cita" prefijo="t" placeholder="Ej. Prueba de zapatos"
+                      ayuda="Cambiar un nombre cambia todas sus citas. Un tipo con citas no se puede quitar."
+                      [lista]="tipos()" [usos]="usos_tipos()" [guardar]="guardar_tipos" />
+
+    <!-- Una cita: igual arriba y en "Ya pasaron". -->
+    <!-- ======== Tarjeta plegable (en prueba). La anterior quedo comentada abajo. -->
+    <ng-template #fila let-f>
+        <li class="plegable" [class.plegable--pasada]="f.pasada" [class.plegable--abierta]="abierta(f.c)" [class.plegable--lista]="f.c.lista">
+            <div class="plegable__cabeza">
+                <div class="plegable__fecha" aria-hidden="true">
+                    <span class="plegable__mes">{{ f.fecha.mes }}</span>
+                    <span class="plegable__dia xv-numero">{{ f.fecha.dia }}</span>
+                </div>
+
+                <div class="plegable__que">
+                    <h3 class="plegable__titulo">
+                        {{ f.c.titulo }}
+                        <span class="plegable__hora xv-numero">&bull; {{ f.c.hora ? f.c.hora + ' hs' : 'todo el día' }}</span>
+                        <span class="visualmente-oculto">, {{ f.cuando }}</span>
+                        @if (f.c.lista) { <span class="lista-insignia"><i class="pi pi-check" aria-hidden="true"></i> Lista</span> }
+                    </h3>
+                    <p class="plegable__lugar">
+                        <i class="pi" [class]="'pi ' + f.icono" aria-hidden="true"></i> {{ f.tipo }}@if (f.c.lugar) { &middot; {{ f.c.lugar }} }
+                    </p>
+                </div>
+
+                <div class="plegable__acciones">
+                    @if (!f.pasada && f.telefono !== 'no') {
+                    <span class="estado-telefono" [class.estado-telefono--cambio]="f.telefono === 'cambio'"
+                          [title]="f.telefono === 'al_dia' ? 'Ya está en el calendario de este teléfono' : 'Cambió desde que la agregaste: volvé a agregarla'">
+                        <i class="pi" [class.pi-check-circle]="f.telefono === 'al_dia'" [class.pi-exclamation-circle]="f.telefono === 'cambio'" aria-hidden="true"></i>
+                    </span>
+                    }
+                    <a class="accion" [routerLink]="['/calendario', f.c.id]" title="Ver la cita" [attr.aria-label]="'Ver ' + f.c.titulo">
+                        <i class="pi pi-file" aria-hidden="true"></i>
+                    </a>
+                    <button type="button" class="plegable__flecha" (click)="alternar(f.c)" [attr.aria-expanded]="abierta(f.c)"
+                            [attr.aria-label]="(abierta(f.c) ? 'Plegar ' : 'Desplegar ') + f.c.titulo">
+                        <i class="pi pi-chevron-down" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            @if (abierta(f.c)) {
+            <div class="plegable__cuerpo">
+                <div class="datos">
+                    <div class="dato">
+                        <span class="dato__titulo">Horario y duración</span>
+                        <span class="dato__valor"><i class="pi pi-clock" aria-hidden="true"></i> {{ f.fecha_corta }} &bull; <span class="xv-numero">{{ f.hora_corta }}</span></span>
+                    </div>
+                    <div class="dato">
+                        <span class="dato__titulo">Ubicación</span>
+                        <span class="dato__valor"><i class="pi pi-map-marker" aria-hidden="true"></i> {{ f.c.lugar || 'Sin lugar' }}</span>
+                    </div>
+                    <div class="dato">
+                        <span class="dato__titulo">Aviso en el teléfono</span>
+                        <span class="dato__valor"><i class="pi pi-bell" aria-hidden="true"></i> {{ f.aviso_corto }}</span>
+                    </div>
+                    <div class="dato dato--notas">
+                        <span class="dato__titulo">Notas de la cita</span>
+                        @if (f.c.notas) { <span class="dato__nota">“{{ f.c.notas }}”</span> }
+                        @else { <span class="dato__vacio">Sin notas.</span> }
+                    </div>
+                </div>
+
+                <div class="plegable__pie">
+                    @if (!f.pasada) {
+                    <span class="plegable__calendarios">
+                        <button type="button" class="opcion" (click)="a_google(f.c)"><i class="pi pi-google" aria-hidden="true"></i> Google Calendar</button>
+                        <button type="button" class="opcion" (click)="a_ics(f.c)"><i class="pi pi-apple" aria-hidden="true"></i> iPhone / iCal</button>
+                        @if (f.telefono === 'cambio') { <span class="plegable__cambio">Cambió: volvé a agregarla</span> }
+                    </span>
+                    } @else {
+                    <span class="dato__vacio">Ya pasó.</span>
+                    }
+                    <span class="plegable__botones">
+                        <button type="button" class="editar" (click)="editar(f.c)"><i class="pi pi-pencil" aria-hidden="true"></i> Editar cita</button>
+                        <button type="button" class="marcar" [class.marcar--hecho]="f.c.lista" [disabled]="marcando() === f.c.id" (click)="marcar_lista(f.c)">
+                            <i class="pi" [class.pi-check]="!f.c.lista" [class.pi-replay]="f.c.lista" aria-hidden="true"></i>
+                            {{ f.c.lista ? 'Desmarcar' : 'Marcar lista' }}
+                        </button>
+                    </span>
+                </div>
+            </div>
+            }
+        </li>
+    </ng-template>
+
+    <!-- ======== Tarjeta anterior (con la fecha grande y la franja de calendario). Para volver a ella,
+         reemplazar el ng-template de arriba por este y descomentar su CSS en calendario.scss.
+    <ng-template #fila let-f>
+        <li class="cita" [class.cita--pasada]="f.pasada">
+            <div class="cita__cuerpo">
+                <!-- El dia, grande, a la izquierda - ->
+                <div class="cita__fecha" aria-hidden="true">
+                    <span class="cita__dia xv-numero">{{ f.fecha.dia }}</span>
+                    <span class="cita__semana">{{ f.fecha.semana }}</span>
+                    <span class="cita__mes">{{ f.fecha.mes }} {{ f.fecha.anio }}</span>
+                </div>
+
+                <div class="cita__contenido">
+                    <div class="cita__etiquetas">
+                        <span class="etiqueta etiqueta--tipo"><i class="pi" [class]="'pi ' + f.icono" aria-hidden="true"></i> {{ f.tipo }}</span>
+                        <span class="etiqueta"><i class="pi pi-clock" aria-hidden="true"></i> <span class="xv-numero">{{ f.horario }}</span></span>
+                    </div>
+
+                    <h3 class="cita__titulo">
+                        <a [routerLink]="['/calendario', f.c.id]">{{ f.c.titulo }}</a>
+                        <span class="visualmente-oculto">, {{ f.cuando }}</span>
+                    </h3>
+
+                    <div class="cita__etiquetas">
+                        @if (f.c.lugar) { <span class="etiqueta"><i class="pi pi-map-marker" aria-hidden="true"></i> {{ f.c.lugar }}</span> }
+                        <span class="etiqueta"><i class="pi pi-bell" aria-hidden="true"></i> {{ f.aviso }}</span>
+                    </div>
+
+                    @if (f.c.notas) {
+                    <p class="cita__notas"><i class="pi pi-file-edit" aria-hidden="true"></i> <span><strong>Notas:</strong> {{ f.c.notas }}</span></p>
+                    }
+                </div>
+
+                <span class="cita__acciones">
+                    @if (!f.pasada && f.telefono !== 'no') {
+                    <span class="estado-telefono" [class.estado-telefono--cambio]="f.telefono === 'cambio'"
+                          [title]="f.telefono === 'al_dia' ? 'Ya está en el calendario de este teléfono' : 'Cambió desde que la agregaste: volvé a agregarla'">
+                        <i class="pi" [class.pi-check-circle]="f.telefono === 'al_dia'" [class.pi-exclamation-circle]="f.telefono === 'cambio'" aria-hidden="true"></i>
+                        <span class="visualmente-oculto">{{ f.telefono === 'al_dia' ? 'Ya está en tu calendario' : 'Cambió desde que la agregaste' }}</span>
+                    </span>
+                    }
+                    <a class="accion" [routerLink]="['/calendario', f.c.id]" title="Ver la cita" [attr.aria-label]="'Ver ' + f.c.titulo">
+                        <i class="pi pi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                    <button type="button" class="accion" (click)="editar(f.c)" title="Editar" [attr.aria-label]="'Editar ' + f.c.titulo">
+                        <i class="pi pi-pencil" aria-hidden="true"></i>
+                    </button>
+                </span>
+            </div>
+
+            <!-- Abajo: pasarla al telefono. Las que ya pasaron, no. - ->
+            @if (!f.pasada) {
+            <div class="cita__pie">
+                <span class="cita__pie-texto">
+                    <i class="pi pi-calendar-plus" aria-hidden="true"></i>
+                    @if (f.telefono === 'cambio') { Cambió desde que la agregaste: volvé a agregarla }
+                    @else { Agregar a tu calendario personal: }
+                </span>
+                <span class="cita__pie-botones">
+                    <button type="button" class="opcion" (click)="a_google(f.c)"><i class="pi pi-google" aria-hidden="true"></i> Google Calendar</button>
+                    <button type="button" class="opcion" (click)="a_ics(f.c)"><i class="pi pi-apple" aria-hidden="true"></i> Apple / iPhone</button>
+                </span>
+            </div>
+            }
+        </li>
+    </ng-template>
+    -->
+</xv-layout>

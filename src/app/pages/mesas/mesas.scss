@@ -1,24 +1,14 @@
 /* --- Cabecera y avisos --- */
 
-.cabecera {
-    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
-    gap: 1rem; margin-bottom: 1.5rem;
-}
-.cabecera__resumen { margin-top: 0.5rem; font-size: var(--xv-texto-sm); color: var(--xv-texto-tenue); }
-.cabecera__falta { margin-top: 0.3rem; font-size: var(--xv-texto-sm); color: #8a6115; }
+.cabecera__falta { margin-top: 0.3rem; font-size: var(--xv-texto-sm); color: var(--xv-espera); }
 .cabecera__nota { margin-top: 0.2rem; font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
 
-.tenue { color: var(--xv-texto-tenue); font-size: var(--xv-texto-sm); }
-.aviso--error {
-    margin-bottom: 1.25rem; padding: 0.85rem 1rem;
-    border: 1px solid #e4b9b9; border-radius: 3px; background: #fbf1f1; color: #8f2c2c;
-}
-.advertencia { display: flex; gap: 0.4rem; align-items: baseline; font-size: var(--xv-texto-sm); color: #8a6115; }
+.advertencia { display: flex; gap: 0.4rem; align-items: baseline; font-size: var(--xv-texto-sm); color: var(--xv-espera); }
 
 /* --- El salon --- */
 
 .salon, .pendientes, .mesa {
-    background: var(--xv-superficie); border: 1px solid var(--xv-borde); border-radius: 3px;
+    background: var(--xv-superficie); border: 1px solid var(--xv-borde); border-radius: var(--xv-radio-tarjeta);
 }
 .salon { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; padding: 1.3rem 1.4rem; }
 .salon h2, .pendientes h2 { font-size: var(--xv-texto-xl); }
@@ -45,7 +35,7 @@
 
 .resumen { display: flex; flex-wrap: wrap; gap: 0.5rem 2rem; }
 .alcanza { color: #14684a; }
-.no-alcanza { color: #8a6115; }
+.no-alcanza { color: var(--xv-espera); }
 
 @media (max-width: 52rem) {
     .columnas { grid-template-columns: minmax(0, 1fr); }
@@ -72,17 +62,17 @@
 
 .mesa { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.9rem 1rem; }
 .mesa--principal { border-top: 3px solid var(--p-primary-color, #5279a2); }
-.mesa--excedida { border-color: #e4b9b9; background: #fdf6f6; }
+.mesa--excedida { border-color: var(--xv-error-borde); background: var(--xv-error-suave); }
 .mesa__cabecera { display: flex; align-items: center; gap: 0.5rem; }
 .mesa__cabecera h3 { flex: 1; min-width: 0; font-size: var(--xv-texto-md); font-weight: var(--xv-peso-medio); }
 .mesa__cuenta { font-size: var(--xv-texto-sm); color: var(--xv-texto-tenue); }
-.mesa--excedida .mesa__cuenta { color: #8f2c2c; font-weight: var(--xv-peso-fuerte); }
+.mesa--excedida .mesa__cuenta { color: var(--xv-error); font-weight: var(--xv-peso-fuerte); }
 .mesa__datos { font-size: var(--xv-texto-xs); }
 .mesa__edicion { display: flex; flex-direction: column; gap: 0.5rem; }
 .mesa__botones { display: flex; gap: 0.4rem; }
 .mesa__campo { display: flex; flex-direction: column; gap: 0.3rem; font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
 .mesa__campo input, .mesa__campo p-multiselect { width: 100%; }
-.mesa__pasada { color: #8f2c2c; }
+.mesa__pasada { color: var(--xv-error); }
 
 /* --- Las listas y sus filas --- */
 
@@ -113,6 +103,9 @@
     background: none; border: 0; border-radius: 3px; color: var(--xv-texto-tenue); cursor: pointer;
 }
 .icono:hover { background: var(--xv-fondo); }
+.icono--borrar:hover { color: var(--xv-error); }
+
+.cabecera__acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .enlace { padding: 0; background: none; border: 0; color: var(--p-primary-700, #374e6b); text-decoration: underline; cursor: pointer; }
 
 /* Lo que se esta arrastrando y el hueco que deja. */

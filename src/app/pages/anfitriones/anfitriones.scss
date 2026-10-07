@@ -1,11 +1,7 @@
-.cabecera { margin-bottom: 1.5rem; }
-.cabecera__resumen { max-width: 46rem; margin-top: 0.5rem; font-size: var(--xv-texto-sm); color: var(--xv-texto-tenue); line-height: var(--xv-interlinea-texto); }
-.tenue { color: var(--xv-texto-tenue); font-size: var(--xv-texto-sm); }
+/* El resumen es largo: que no se estire de punta a punta. */
+.xv-cabecera__resumen { max-width: 46rem; }
 
-.panel {
-    display: flex; flex-direction: column; align-items: flex-start; gap: 1rem;
-    padding: 1.3rem 1.4rem; background: var(--xv-superficie); border: 1px solid var(--xv-borde); border-radius: 3px;
-}
+.xv-panel { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; }
 
 .lista { display: flex; flex-direction: column; gap: 0.6rem; align-self: stretch; margin: 0; padding: 0; list-style: none; }
 
@@ -34,7 +30,7 @@
 }
 .barra--guardado { color: #14684a; }
 .barra__acciones { display: flex; gap: 0.5rem; }
-.barra__error { color: #8f2c2c; }
+.barra__error { color: var(--xv-error); }
 
 @media (max-width: 44rem) {
     .anfitrion {

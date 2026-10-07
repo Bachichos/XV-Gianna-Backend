@@ -1,0 +1,138 @@
+<xv-layout>
+    <header class="xv-cabecera">
+        <div>
+            <h1>Presupuestos</h1>
+            @if (cargando()) {
+            <p class="xv-cabecera__resumen">Cargando&hellip;</p>
+            } @else {
+                @for (r of resumen(); track $index) {
+                <p class="xv-cabecera__resumen">
+                    Elegido <span class="xv-numero">{{ r.elegido }}</span> &middot;
+                    pagado <span class="xv-numero">{{ r.pagado }}</span> &middot;
+                    falta <span class="xv-numero">{{ r.falta }}</span>
+                </p>
+                } @empty {
+                <p class="xv-cabecera__resumen">
+                    {{ presupuestos().length }} {{ presupuestos().length === 1 ? 'presupuesto' : 'presupuestos' }}, ninguno elegido todavía.
+                </p>
+                }
+                @if (sin_elegir()) {
+                <p class="cabecera__sin-elegir">Sin elegir: {{ sin_elegir() }}</p>
+                }
+            }
+        </div>
+        @if (!cargando()) {
+        <div class="cabecera__acciones">
+            <p-button label="Rubros" icon="pi pi-tags" severity="secondary" [outlined]="true" (onClick)="rubros_abierto.set(true)" />
+            <p-button label="Nuevo presupuesto" icon="pi pi-plus" (onClick)="nuevo()" />
+        </div>
+        }
+    </header>
+
+    @if (error(); as mensaje) {
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
+    }
+
+
+    @if (!cargando()) {
+        @for (g of grupos(); track g.id) {
+        <section class="xv-panel rubro">
+            <div class="rubro__cabecera">
+                <h2>{{ g.nombre }}</h2>
+                <span class="xv-tenue">{{ g.filas.length }} {{ g.filas.length === 1 ? 'presupuesto' : 'presupuestos' }}</span>
+            </div>
+
+            <!-- En el telefono no entran cinco columnas: cada fila se apila como una fichita (ver el .scss). -->
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th scope="col">Proveedor</th>
+                        <th scope="col" class="tabla__num">Precio total</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Resumen de pago</th>
+                        <th scope="col" class="tabla__fin">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (f of g.filas; track f.p.id) {
+                    <tr [class.fila--descartada]="f.p.estado === 'descartado'">
+                        <td class="tabla__proveedor">
+                            <a class="tabla__nombre" [routerLink]="['/presupuestos', f.p.id]">{{ f.p.proveedor || 'Sin nombre' }}</a>
+                            @if (f.p.direccion) { <span class="xv-tenue">Dirección: {{ f.p.direccion }}</span> }
+                            @if (f.p.contacto) { <span class="xv-tenue">{{ f.p.contacto }}</span> }
+                        </td>
+
+                        <td class="tabla__num tabla__monto xv-numero" data-titulo="Precio total" [class.tabla__monto--sin]="f.p.centavos == null"><span>{{ f.monto }}</span></td>
+
+                        <td data-titulo="Estado"><xv-estado [estado]="f.p.estado" /></td>
+
+                        <td data-titulo="Resumen de pago">
+                            @if (f.pagos; as pg) {
+                            <div class="pago">
+                                @if (pg.avance !== null) {
+                                <div class="pago__avance">
+                                    <span class="barra" role="progressbar" [attr.aria-valuenow]="pg.avance" aria-valuemin="0" aria-valuemax="100">
+                                        <span class="barra__llena" [style.width.%]="pg.avance"></span>
+                                    </span>
+                                    <span class="pago__porcentaje xv-numero">{{ pg.avance }} %</span>
+                                </div>
+                                }
+                                <div class="pago__datos">
+                                    <span class="pago__cifras">
+                                        <span>Pagado: <strong class="xv-numero">{{ pg.pagado }}</strong></span>
+                                        <span>Falta: <span class="xv-numero">{{ pg.falta }}</span></span>
+                                    </span>
+                                    <a class="pago__cargar" [routerLink]="['/presupuestos', f.p.id]" fragment="pagos">
+                                        <i class="pi pi-receipt" aria-hidden="true"></i>
+                                        {{ f.p.pagos.length ? 'Pagos (' + f.p.pagos.length + ')' : 'Cargar un pago' }}
+                                    </a>
+                                </div>
+                            </div>
+                            } @else {
+                            <span class="xv-tenue" aria-label="No corresponde">—</span>
+                            }
+                        </td>
+
+                        <td class="tabla__fin" data-titulo="Acciones">
+                            <span class="tabla__acciones">
+                                <button type="button" class="accion" (click)="editar(f.p)" [attr.aria-label]="'Editar ' + (f.p.proveedor || 'presupuesto')" title="Editar">
+                                    <i class="pi pi-pencil" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" class="accion accion--borrar" (click)="a_eliminar.set(f.p)" [attr.aria-label]="'Eliminar ' + (f.p.proveedor || 'presupuesto')" title="Eliminar">
+                                    <i class="pi pi-trash" aria-hidden="true"></i>
+                                </button>
+                                <a class="accion" [routerLink]="['/presupuestos', f.p.id]" [attr.aria-label]="'Ver ' + (f.p.proveedor || 'presupuesto')" title="Ver presupuesto">
+                                    <i class="pi pi-file" aria-hidden="true"></i>
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+        } @empty {
+        <div class="vacio">
+            <i class="pi pi-wallet vacio__icono" aria-hidden="true"></i>
+            <p>Todavía no hay presupuestos cargados.</p>
+        </div>
+        }
+    }
+
+    <xv-presupuesto-formulario [(abierto)]="formulario_abierto" [presupuesto]="editando()" />
+    <xv-dialogo-lista [(abierto)]="rubros_abierto" titulo="Rubros" prefijo="r" placeholder="Ej. Cotillón"
+                      ayuda="Cambiar un nombre cambia todos sus presupuestos. Un rubro con presupuestos no se puede quitar."
+                      [lista]="rubros()" [usos]="usos_rubros()" [guardar]="guardar_rubros" />
+
+    <xv-confirmar [abierto]="!!a_eliminar()" (abiertoChange)="$event || a_eliminar.set(null)"
+                  titulo="Eliminar presupuesto" accion="Eliminar" [peligro]="true" [cargando]="eliminando()" [error]="error_eliminar()"
+                  (confirmar)="eliminar()">
+        @if (a_eliminar(); as p) {
+            ¿Eliminar el presupuesto de <strong>{{ p.proveedor }}</strong>?
+            @if (cuantos_archivos(p) > 0) {
+                Se borran también {{ cuantos_archivos(p) === 1 ? 'su archivo' : 'sus ' + cuantos_archivos(p) + ' archivos' }}.
+            }
+            No se puede deshacer.
+        }
+    </xv-confirmar>
+</xv-layout>

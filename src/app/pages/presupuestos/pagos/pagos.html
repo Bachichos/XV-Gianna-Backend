@@ -1,0 +1,87 @@
+@if (resumen(); as r) {
+<div class="resumen">
+  <p>
+    Pagado <strong class="xv-numero">{{ r.pagado }}</strong> de <span class="xv-numero">{{ r.total }}</span>
+    &middot; falta <strong class="xv-numero">{{ r.falta }}</strong>
+  </p>
+  @if (r.avance !== null) {
+  <div class="barra" role="progressbar" [attr.aria-valuenow]="r.avance" aria-valuemin="0" aria-valuemax="100"
+       [attr.aria-label]="'Pagado el ' + r.avance + ' %'">
+    <span class="barra__llena" [style.width.%]="r.avance"></span>
+  </div>
+  }
+</div>
+}
+
+<!-- Los pagos cargados -->
+@if (pagos().length) {
+<ul class="pagos">
+  @for (g of pagos(); track g.id) {
+  <li class="pago" [class.pago--editando]="editando() === g.id">
+    <span class="pago__fecha xv-numero">{{ fecha_de(g) }}</span>
+    <span class="pago__concepto">{{ g.concepto }}</span>
+    <span class="pago__monto xv-numero">{{ monto_de(g) }}</span>
+    <span class="pago__acciones">
+      @if (g.comprobante; as c) {
+      <button type="button" class="icono" (click)="abrir(c)" [disabled]="abriendo() === c.id"
+              [title]="'Comprobante · ' + c.nombre" aria-label="Abrir el comprobante">
+        <i class="pi" [class.pi-paperclip]="abriendo() !== c.id" [class.pi-spinner]="abriendo() === c.id" [class.pi-spin]="abriendo() === c.id"></i>
+      </button>
+      }
+      <button type="button" class="icono" (click)="corregir(g)" aria-label="Corregir el pago"><i class="pi pi-pencil"></i></button>
+      <button type="button" class="icono icono--quitar" (click)="a_borrar.set(g)" aria-label="Borrar el pago"><i class="pi pi-trash"></i></button>
+    </span>
+  </li>
+  }
+</ul>
+} @else {
+<p class="sin-pagos">Todavía no hay pagos cargados.</p>
+}
+
+<!-- Cargar o corregir uno -->
+<form class="nuevo" [formGroup]="formulario" (ngSubmit)="guardar()">
+  <h3>{{ editando() ? 'Corregir pago' : 'Cargar un pago' }}</h3>
+
+  <div class="nuevo__campos">
+    <div class="campo">
+      <label for="g-fecha">Fecha</label>
+      <input pInputText id="g-fecha" type="date" formControlName="fecha">
+      <xv-aviso-campo [control]="formulario.controls.fecha" vacio="Elija la fecha." />
+    </div>
+    <div class="campo">
+      <label for="g-concepto">Concepto</label>
+      <input pInputText id="g-concepto" type="text" formControlName="concepto" placeholder="Seña, Cuota 1, Saldo" autocomplete="off">
+      <xv-aviso-campo [control]="formulario.controls.concepto" vacio="Escriba el concepto." />
+    </div>
+    <div class="campo">
+      <label for="g-monto">Monto</label>
+      <p-inputnumber inputId="g-monto" [fluid]="true" formControlName="monto" locale="es-AR" mode="decimal"
+                     [minFractionDigits]="0" [maxFractionDigits]="2" prefix="$ " placeholder="$ 0" />
+      <xv-aviso-campo [control]="formulario.controls.monto" vacio="Escriba el monto." />
+    </div>
+  </div>
+  @if (excede(); as sobra) {
+    <p class="campo__aviso"><i class="pi pi-exclamation-triangle" aria-hidden="true"></i> Con este pago se pasa del total por {{ sobra }}.</p>
+  }
+
+  <!-- Comprobante -->
+  <xv-selector-archivo [(actual)]="comprobante_actual" [(nuevo)]="comprobante_nuevo" [(preparando)]="preparando"
+                       texto="Adjuntar comprobante" />
+
+  @if (error(); as mensaje) { <p class="campo__error" role="alert">{{ mensaje }}</p> }
+
+  <div class="acciones">
+    @if (editando()) {
+      <p-button label="Cancelar la corrección" severity="secondary" [text]="true" (onClick)="limpiar()" />
+    }
+    <p-button [label]="editando() ? 'Guardar la corrección' : 'Agregar el pago'" [loading]="guardando()" [disabled]="preparando()" (onClick)="guardar()" />
+  </div>
+</form>
+
+<xv-confirmar [abierto]="!!a_borrar()" (abiertoChange)="$event || a_borrar.set(null)"
+            titulo="Borrar pago" accion="Borrar" [peligro]="true" [cargando]="guardando()" [error]="error()"
+            (confirmar)="borrar()">
+@if (a_borrar(); as g) {
+  ¿Borrar el pago <strong>{{ g.concepto }}</strong> de <strong>{{ monto_de(g) }}</strong>{{ g.comprobante ? ' y su comprobante' : '' }}?
+}
+</xv-confirmar>

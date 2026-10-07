@@ -1,7 +1,7 @@
 import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners, signal } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import es_AR from '@angular/common/locales/es-AR';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
@@ -15,6 +15,8 @@ import { Configuracion, POR_DEFECTO } from './models/configuracion';
 import { Marca, MARCA_POR_DEFECTO } from './models/marca';
 import { PlanoMesas } from './models/mesas';
 import { Anfitrion } from './models/anfitriones';
+import { PresupuestoConId, Rubro } from './models/presupuestos';
+import { CitaConId, TipoCita } from './models/citas';
 
 /* Fechas, numeros y meses en castellano: sin esto el DatePipe escribe en ingles. */
 registerLocaleData(es_AR);
@@ -41,15 +43,30 @@ export const XVStorage = {
 
   /** El nombre del evento y su logo (models/marca.ts). Se lee al abrir, antes del login. */
   marca:          signal<Marca>(MARCA_POR_DEFECTO),
+
+  /** Los presupuestos (models/presupuestos.ts). En vivo; null mientras llega. */
+  presupuestos:       signal<PresupuestoConId[] | null>(null),
+  /** Con plata de por medio, una lista vacia por error no puede pasar por "no hay ninguno". */
+  error_presupuestos: signal<string | null>(null),
+
+  /** Los rubros de los presupuestos. En vivo; null mientras llega. */
+  rubros:         signal<Rubro[] | null>(null),
+
+  /** Las citas de la organizacion (models/citas.ts). En vivo; null mientras llega. */
+  citas:          signal<CitaConId[] | null>(null),
+  error_citas:    signal<string | null>(null),
+
+  /** Los tipos de cita. En vivo; null mientras llega. */
+  tipos_cita:     signal<TipoCita[] | null>(null),
 }
 
 const firebase_config = {
-  projectId:         'gianna-drs-xv',
-  appId:             '1:1039836116529:web:ebda967c70f152bf884710',
-  storageBucket:     'gianna-drs-xv.firebasestorage.app',
-  apiKey:            'AIzaSyA4EOllYUMzOvT8V8TFN3MZ4JmRodb3pys',
-  authDomain:        'gianna-drs-xv.firebaseapp.com',
-  messagingSenderId: '1039836116529'
+  apiKey: "AIzaSyDTeR8rNZOFmsN9kAB2WdFvaJfo0IB7OIk",
+  authDomain: "dev-creatusinvitaciones.firebaseapp.com",
+  projectId: "dev-creatusinvitaciones",
+  storageBucket: "dev-creatusinvitaciones.firebasestorage.app",
+  messagingSenderId: "821120569335",
+  appId: "1:821120569335:web:d9cfcdc3a10aa9ab03a8f2"
 }
 
 /** Aura con la paleta del proyecto: azul porcelana, grisado y frio. */
@@ -75,7 +92,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'es-AR' },
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    // anchorScrolling: "Pagos (2)" en la lista lleva a /presupuestos/{id}#pagos, a esa seccion.
+    provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' })),
     provideFirebaseApp(() => initializeApp(firebase_config)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),

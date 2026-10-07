@@ -1,0 +1,115 @@
+<xv-layout>
+    <a routerLink="/presupuestos" class="volver"><i class="pi pi-arrow-left" aria-hidden="true"></i> Presupuestos</a>
+
+    @if (cargando()) {
+    <p class="xv-tenue">Cargando&hellip;</p>
+    } @else if (p(); as p) {
+
+    <header class="xv-cabecera">
+        <div>
+            <h1>{{ p.proveedor || 'Sin nombre' }}</h1>
+            <p class="xv-cabecera__resumen cabecera__datos">
+                <span>{{ rubro() }}</span>
+                <xv-estado [estado]="p.estado" />
+            </p>
+        </div>
+        <div class="cabecera__acciones">
+            <p-button label="Editar" icon="pi pi-pencil" severity="secondary" [outlined]="true" (onClick)="formulario_abierto.set(true)" />
+        </div>
+    </header>
+
+    @if (error(); as mensaje) {
+    <p class="xv-aviso-error" role="alert">{{ mensaje }}</p>
+    }
+
+    <div class="secciones">
+
+        <!-- ============================== EL PRESUPUESTO -->
+        <section class="xv-panel">
+            <h2>El presupuesto</h2>
+            <p class="monto" [class.monto--sin]="p.centavos == null">{{ monto() }}</p>
+            @if (fecha()) { <p class="xv-tenue">Recibido el <span class="xv-numero">{{ fecha() }}</span></p> }
+            @if (p.estado !== 'elegido') {
+            <p-button class="elegir" label="Marcar como elegido" icon="pi pi-check" size="small" severity="secondary" [outlined]="true"
+                      [loading]="guardando()" (onClick)="elegir()" />
+            }
+        </section>
+
+        <!-- ============================== CONTACTO -->
+        <section class="xv-panel">
+            <h2>Contacto</h2>
+            @if (p.direccion) {
+            <p class="direccion">
+                <i class="pi pi-map-marker" aria-hidden="true"></i>
+                <span>{{ p.direccion }}</span>
+                <a class="direccion__mapa" [href]="mapa()" target="_blank" rel="noopener">Ver en el mapa</a>
+            </p>
+            }
+            @if (p.contacto) {
+            <p class="contacto">{{ p.contacto }}</p>
+            @if (enlaces().length) {
+            <div class="enlaces">
+                @for (e of enlaces(); track e.url) {
+                <a class="enlace" [href]="e.url" target="_blank" rel="noopener">
+                    <i class="pi" [class]="'pi ' + e.icono" aria-hidden="true"></i> {{ e.etiqueta }}
+                </a>
+                }
+            </div>
+            }
+            } @else if (!p.direccion) {
+            <p class="xv-tenue">Sin contacto ni dirección. Se agregan desde Editar.</p>
+            }
+        </section>
+
+        <!-- ============================== PAGOS -->
+        <section class="xv-panel ancho" id="pagos">
+            <h2>Pagos</h2>
+            @if (p.estado === 'elegido') {
+            <xv-pagos [presupuesto_id]="p.id" />
+            } @else {
+            <p class="xv-tenue">Los pagos se cargan cuando el presupuesto está elegido.</p>
+            }
+        </section>
+
+        <!-- ============================== NOTAS -->
+        <section class="xv-panel ancho">
+            <h2>Notas</h2>
+            @if (p.notas) {
+            <p class="notas">{{ p.notas }}</p>
+            } @else {
+            <p class="xv-tenue">Sin notas.</p>
+            }
+        </section>
+
+        <!-- ============================== ARCHIVO -->
+        <section class="xv-panel ancho">
+            <h2>Archivo</h2>
+            @if (p.archivo; as a) {
+            @if (vista_previa(); as url) {
+            <button type="button" class="previa" (click)="abrir(a)" [attr.aria-label]="'Abrir ' + a.nombre">
+                <img [src]="url" [alt]="a.nombre">
+            </button>
+            }
+            <p class="archivo">
+                <i class="pi" [class.pi-file-pdf]="a.tipo === 'application/pdf'" [class.pi-image]="a.tipo.startsWith('image/')"
+                   [class.pi-file]="a.tipo !== 'application/pdf' && !a.tipo.startsWith('image/')" aria-hidden="true"></i>
+                <span class="archivo__nombre">{{ a.nombre }}</span>
+                <span class="xv-tenue">{{ peso_legible(a.bytes) }}</span>
+            </p>
+            <p-button label="Abrir" icon="pi pi-external-link" size="small" severity="secondary" [outlined]="true"
+                      [loading]="abriendo()" (onClick)="abrir(a)" />
+            } @else {
+            <p class="xv-tenue">Sin archivo. Se adjunta desde Editar.</p>
+            }
+        </section>
+    </div>
+
+    <xv-presupuesto-formulario [(abierto)]="formulario_abierto" [presupuesto]="p" />
+
+    } @else {
+    <section class="xv-panel">
+        <h2>Este presupuesto ya no existe</h2>
+        <p class="xv-tenue">Puede que alguien lo haya eliminado. Vuelva a la lista para ver los que hay.</p>
+    </section>
+    }
+</xv-layout>

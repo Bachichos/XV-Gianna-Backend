@@ -1,0 +1,63 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.archivo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.6rem;
+    padding: 0.6rem 0.8rem;
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde);
+    border-radius: 3px;
+    font-size: var(--xv-texto-sm);
+}
+
+.archivo .pi { color: var(--xv-texto-tenue); }
+.archivo__nombre { min-width: 0; overflow-wrap: anywhere; color: var(--xv-texto); }
+.archivo__peso { font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
+
+.archivo__quitar {
+    margin-left: auto;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--xv-error);
+    font-size: var(--xv-texto-xs);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+/* El input de archivo de verdad queda invisible: se ve el boton punteado. */
+.adjuntar {
+    position: relative;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    border: 1px dashed var(--xv-borde-fuerte);
+    border-radius: 3px;
+    color: var(--p-primary-700, #374e6b);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+}
+
+.adjuntar:hover { background: var(--p-primary-50, #f3f6fa); }
+.adjuntar:has(input:focus-visible) { outline: 2px solid var(--p-primary-color, #5279a2); outline-offset: 2px; }
+.adjuntar--ocupado { cursor: wait; opacity: 0.7; }
+.adjuntar input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+.ayuda {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-texto-tenue);
+}
+
+.error {
+    font-size: var(--xv-texto-xs);
+    color: var(--xv-error);
+}

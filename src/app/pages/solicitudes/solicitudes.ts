@@ -35,7 +35,7 @@ export class SolicitudesPage {
     const texto = [
       `Menús (confirmados y anfitriones): ${m.adultos} de adulto · ${m.infantiles} ${m.infantiles === 1 ? 'infantil' : 'infantiles'}`,
       '',
-      `Alergias, intolerancias y dietas: ${lista.length} ${lista.length === 1 ? 'persona' : 'personas'}`,
+      `Alergias e intolerancias: ${lista.length} ${lista.length === 1 ? 'persona' : 'personas'}`,
       ...lista.map(d => `• ${d.nombre}${d.menu_infantil ? ' (menú infantil)' : ''}: ${d.alimentacion}`),
     ].join('\n')
 

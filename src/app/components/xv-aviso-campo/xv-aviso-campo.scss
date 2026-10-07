@@ -1,0 +1,9 @@
+:host { display: contents; }
+
+.aviso {
+    font-size: var(--xv-texto-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--xv-texto-tenue);
+}
+
+.aviso--error { color: var(--xv-error); }

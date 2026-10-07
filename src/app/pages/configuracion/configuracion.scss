@@ -1,21 +1,7 @@
-.cabecera { margin-bottom: 1.5rem; }
-
-.cabecera__resumen,
-.tenue {
-    margin-top: 0.5rem;
-    color: var(--xv-texto-tenue);
-    font-size: var(--xv-texto-sm);
-}
+/* Bajo un titulo, un poco de aire. */
+.xv-tenue { margin-top: 0.5rem; }
 
 .intro { margin: 1.25rem 0 1rem; max-width: 46rem; }
-
-.aviso--error {
-    padding: 0.75rem 1rem;
-    border: 1px solid #e4b9b9;
-    border-radius: 3px;
-    background: #fbf1f1;
-    color: #8f2c2c;
-}
 
 code {
     padding: 0.05rem 0.3rem;
@@ -42,18 +28,8 @@ code {
 
 /* --- Paneles, como los de Estadisticas --- */
 
-.panel {
-    margin-top: 1.25rem;
-    padding: 1.4rem 1.5rem;
-    background: var(--xv-superficie);
-    border: 1px solid var(--xv-borde);
-    border-radius: 3px;
-}
-
-.panel h2 {
-    margin-bottom: 1rem;
-    font-size: var(--xv-texto-xl);
-}
+/* Las pestanas van pegadas arriba: el primer panel se separa de ellas. */
+.xv-panel { margin-top: 1.25rem; }
 
 .panel__cabecera {
     display: flex;
@@ -64,15 +40,13 @@ code {
     margin-bottom: 0.75rem;
 }
 
-.panel__cabecera h2 { margin-bottom: 0; }
-
 /*
  * En el telefono, "Se muestra" no entra al lado del titulo: en vez de bajar
  * abajo, se va a la esquina de arriba a la derecha de la tarjeta, y el
  * titulo le deja lugar.
  */
 @media (max-width: 40rem) {
-    .panel:has(> .panel__cabecera > .interruptor) { position: relative; }
+    .xv-panel:has(> .panel__cabecera > .interruptor) { position: relative; }
 
     .panel__cabecera > .interruptor {
         position: absolute;
@@ -103,9 +77,9 @@ code {
 }
 
 /* Entre campos sueltos del panel, la misma separacion que dentro de la grilla. */
-.panel > .campo + .campo,
-.panel > .campo + .grilla,
-.panel > .grilla + .campo { margin-top: 1.6rem; }
+.xv-panel > .campo + .campo,
+.xv-panel > .campo + .grilla,
+.xv-panel > .grilla + .campo { margin-top: 1.6rem; }
 
 .campo label {
     font-size: var(--xv-texto-sm);
@@ -154,9 +128,9 @@ code {
 }
 
 /* Entre un texto de ayuda y los campos que le siguen, aire: que se lea como explicacion, no como parte del campo. */
-.panel > .tenue + .lista,
-.panel > .tenue + .grilla,
-.panel > .tenue + .marcadores { margin-top: 1.5rem; }
+.xv-panel > .xv-tenue + .lista,
+.xv-panel > .xv-tenue + .grilla,
+.xv-panel > .xv-tenue + .marcadores { margin-top: 1.5rem; }
 
 /* --- Listas editables (programa, informacion) --- */
 
@@ -245,7 +219,7 @@ code {
 
 .icono:hover:not(:disabled) { border-color: var(--xv-borde-fuerte); color: var(--p-primary-color, #5279a2); }
 .icono:disabled { opacity: 0.35; cursor: default; }
-.icono--quitar:hover:not(:disabled) { color: #8f2c2c; border-color: #e4bdbd; }
+.icono--quitar:hover:not(:disabled) { color: var(--xv-error); border-color: var(--xv-error-borde); }
 
 .agregar {
     display: inline-flex;
@@ -291,6 +265,30 @@ code {
 
 .marcadores td:first-child { white-space: nowrap; }
 .marcadores td:last-child  { color: var(--xv-texto-tenue); }
+
+/*
+ * En el telefono las tres columnas no entran: una tabla no se achica por
+ * debajo de su palabra mas larga y empuja la pantalla de costado. Cada fila
+ * pasa a ser una fichita: el marcador, que se pone y donde se cambia.
+ */
+@media (max-width: 40rem) {
+    .marcadores thead { display: none; }
+
+    .marcadores,
+    .marcadores tbody,
+    .marcadores tr,
+    .marcadores td { display: block; }
+
+    .marcadores tr {
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--xv-borde);
+    }
+
+    .marcadores td {
+        padding: 0.15rem 0;
+        border-bottom: 0;
+    }
+}
 
 /* Etiqueta y, a la derecha, "Volver al de fabrica". */
 .campo__cabecera {
@@ -368,14 +366,6 @@ code {
 }
 
 /* --- La vista previa: al costado de todas las pestanas, fija al bajar --- */
-
-.cabecera {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem;
-}
 
 .ver-previa {
     display: inline-flex;
@@ -480,6 +470,6 @@ code {
 .barra__problema,
 .barra__error {
     flex-basis: 100%;
-    color: #8f2c2c;
+    color: var(--xv-error);
     font-size: var(--xv-texto-xs);
 }

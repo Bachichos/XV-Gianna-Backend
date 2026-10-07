@@ -1,0 +1,453 @@
+.cabecera__acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* --- Las citas del dia elegido en el mes --- */
+
+.dia__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* --- Cada mes (o "Ya pasaron", o el dia elegido): un titulo y sus tarjetas --- */
+
+.grupo { margin-bottom: 1.75rem; }
+.grupo__titulo { margin: 0 0 0.75rem; font-size: var(--xv-texto-xl); }
+
+.citas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* --- Lo que usan las dos tarjetas: el estado en el telefono y los botones de calendario --- */
+
+.estado-telefono { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; color: var(--xv-exito); }
+.estado-telefono--cambio { color: var(--xv-espera); }
+.opcion {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde-fuerte);
+    border-radius: 6px;
+    color: var(--xv-texto);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+}
+.opcion:hover { border-color: var(--p-primary-color, #5279a2); color: var(--p-primary-color, #5279a2); }
+
+/* Mes / Lista, con el mismo marco fino que el boton Tipos. */
+.vista {
+    border: 1px solid var(--p-button-outlined-secondary-border-color);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* --- La tarjeta plegable (en prueba). Blanca; el acento es azul claro, como la cabecera de las tablas. --- */
+
+.plegable {
+    overflow: hidden;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: var(--xv-radio-tarjeta);
+    transition: box-shadow 200ms ease;
+}
+
+.plegable--abierta { box-shadow: 0 10px 28px -18px rgba(28, 39, 53, 0.35); }
+.plegable--pasada .plegable__cabeza { opacity: 0.6; }
+
+/* Plegada: fecha | que y donde | acciones. */
+.plegable__cabeza {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+.plegable__fecha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 3.4rem;
+    padding: 0.4rem 0.55rem;
+    background: var(--xv-azul-claro);
+    border: 1px solid var(--xv-azul-claro-borde);
+    border-radius: 8px;
+    line-height: 1.1;
+}
+
+.plegable__mes {
+    font-size: var(--xv-texto-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--p-primary-600, #416186);
+}
+
+.plegable__dia { font-family: var(--xv-display); font-size: 1.5rem; color: var(--xv-texto); }
+
+.plegable__que { min-width: 0; }
+
+.plegable__titulo {
+    margin: 0;
+    font-family: var(--xv-ui);
+    font-size: var(--xv-texto-md);
+    font-weight: var(--xv-peso-fuerte);
+    color: var(--xv-texto);
+}
+
+.plegable__hora { margin-left: 0.3rem; font-weight: var(--xv-peso-normal); font-size: var(--xv-texto-sm); color: var(--xv-texto-tenue); }
+
+.plegable__lugar {
+    margin: 0.15rem 0 0;
+    overflow: hidden;
+    font-size: var(--xv-texto-sm);
+    color: var(--xv-texto-tenue);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.plegable__lugar .pi { font-size: 0.8rem; color: var(--p-primary-600, #416186); }
+
+.plegable__acciones { display: flex; align-items: center; gap: 0.6rem; }
+
+.accion {
+    display: grid;
+    place-items: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--xv-texto-tenue);
+    text-decoration: none;
+}
+
+.accion:hover { border-color: var(--xv-azul-claro-borde); color: var(--p-primary-600, #416186); }
+
+.plegable__flecha {
+    display: grid;
+    place-items: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde);
+    border-radius: 8px;
+    color: var(--xv-texto-tenue);
+    cursor: pointer;
+}
+
+.plegable__flecha .pi { transition: transform 200ms ease; }
+.plegable--abierta .plegable__flecha .pi { transform: rotate(180deg); }
+.plegable__flecha:hover { border-color: var(--xv-azul-claro-borde); color: var(--p-primary-600, #416186); }
+
+/* Desplegada: los cuatro datos y, abajo, calendario y editar. Un fondo azul apenas insinuado. */
+.plegable__cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem 1.2rem;
+    background: var(--xv-azul-claro);
+    border-top: 1px solid var(--xv-azul-claro-borde);
+}
+
+.datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+
+.dato {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    padding: 0.8rem 1rem;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: 8px;
+}
+
+.dato__titulo { font-size: var(--xv-texto-xs); color: var(--xv-texto-tenue); }
+
+.dato__valor {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-weight: var(--xv-peso-medio);
+    color: var(--xv-texto);
+    overflow-wrap: anywhere;
+}
+
+.dato__valor .pi { flex: none; font-size: 0.85rem; color: var(--p-primary-600, #416186); }
+
+/* Las notas, con un hilo azul a la izquierda, como una cita textual. */
+.dato--notas { border-left: 3px solid var(--p-primary-400, #7799bc); }
+
+.dato__nota {
+    font-size: var(--xv-texto-sm);
+    font-style: italic;
+    color: var(--xv-texto);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.dato__vacio { font-size: var(--xv-texto-sm); color: var(--xv-texto-tenue); }
+
+.plegable__pie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+}
+
+.plegable__calendarios { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.plegable__cambio { font-size: var(--xv-texto-xs); color: var(--xv-espera); }
+
+.editar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    background: var(--xv-fondo);
+    border: 1px solid var(--xv-borde);
+    border-radius: 6px;
+    color: var(--xv-texto);
+    font-size: var(--xv-texto-sm);
+    cursor: pointer;
+}
+
+.editar:hover { border-color: var(--xv-borde-fuerte); }
+
+.plegable__botones { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-left: auto; }
+
+/* Marcar lista: el azul de los botones principales. Ya lista, el boton se apaga a "Desmarcar". */
+.marcar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.95rem;
+    background: var(--p-button-primary-background);
+    border: 1px solid var(--p-button-primary-border-color);
+    border-radius: 6px;
+    color: var(--p-button-primary-color);
+    font-size: var(--xv-texto-sm);
+    font-weight: var(--xv-peso-medio);
+    cursor: pointer;
+}
+
+.marcar:hover:not(:disabled) { background: var(--p-button-primary-hover-background); border-color: var(--p-button-primary-hover-border-color); }
+.marcar:disabled { opacity: 0.6; cursor: wait; }
+
+.marcar--hecho { background: var(--xv-superficie); border-color: var(--xv-borde); color: var(--xv-texto-tenue); font-weight: var(--xv-peso-normal); }
+
+/* Una cita lista: su insignia verde, y el titulo apenas apagado. */
+.lista-insignia {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 0.4rem;
+    padding: 0.1rem 0.5rem;
+    background: var(--xv-exito-fondo);
+    border: 1px solid var(--xv-exito-borde);
+    border-radius: 999px;
+    font-size: var(--xv-texto-xs);
+    font-weight: var(--xv-peso-medio);
+    color: var(--xv-exito);
+    vertical-align: middle;
+}
+
+.lista-insignia .pi { font-size: 0.7rem; }
+.plegable--lista .plegable__titulo { color: var(--xv-texto-tenue); }
+
+@media (prefers-reduced-motion: reduce) {
+    .plegable, .plegable__flecha .pi { transition: none; }
+}
+
+/* En el telefono: "Ver detalles" pasa abajo del titulo; los datos, de a uno. */
+@media (max-width: 40rem) {
+    .plegable__cabeza { grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.75rem; padding: 0.85rem 1rem; }
+    .plegable__lugar { white-space: normal; }
+    .datos { grid-template-columns: minmax(0, 1fr); }
+    .plegable__cuerpo { padding: 1rem; }
+}
+
+// ======== Tarjeta anterior (en pausa: ver calendario.html). Para volver, descomentar.
+// /* --- Una cita: su tarjeta --- */
+//
+// .cita {
+//     overflow: hidden;
+//     background: var(--xv-superficie);
+//     border: 1px solid var(--xv-borde);
+//     border-radius: var(--xv-radio-tarjeta);
+// }
+//
+// .cita__cuerpo {
+//     display: grid;
+//     grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+//     gap: 1.25rem;
+//     align-items: start;
+//     padding: 1.25rem 1.25rem 1.1rem;
+// }
+//
+// /* El dia, a la izquierda: azul porcelana, como todo el backoffice. */
+// .cita__fecha {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     padding: 0.7rem 0.4rem;
+//     background: var(--p-primary-50, #f3f6fa);
+//     border: 1px solid var(--p-primary-100, #e4ecf4);
+//     border-radius: 8px;
+//     text-align: center;
+// }
+//
+// .cita__dia {
+//     font-family: var(--xv-display);
+//     font-size: 2rem;
+//     line-height: 1.1;
+//     color: var(--p-primary-700, #374e6b);
+// }
+//
+// .cita__semana,
+// .cita__mes {
+//     font-size: var(--xv-texto-xs);
+//     letter-spacing: 0.08em;
+//     text-transform: uppercase;
+// }
+//
+// .cita__semana { font-weight: var(--xv-peso-medio); color: var(--p-primary-700, #374e6b); }
+// .cita__mes { color: var(--xv-texto-tenue); }
+//
+// .cita__contenido { display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+//
+// .cita__titulo { margin: 0; font-size: var(--xv-texto-lg); font-weight: var(--xv-peso-fuerte); }
+// .cita__titulo a { color: var(--xv-texto); text-decoration: none; }
+// .cita__titulo a:hover { text-decoration: underline; text-underline-offset: 3px; }
+//
+// .cita__etiquetas { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+//
+// .etiqueta {
+//     display: inline-flex;
+//     align-items: center;
+//     gap: 0.35rem;
+//     max-width: 100%;
+//     padding: 0.25rem 0.65rem;
+//     background: var(--xv-fondo);
+//     border: 1px solid var(--xv-borde);
+//     border-radius: 6px;
+//     font-size: var(--xv-texto-xs);
+//     color: var(--xv-texto-tenue);
+//     overflow-wrap: anywhere;
+// }
+//
+// .etiqueta .pi { font-size: 0.8rem; }
+//
+// /* El tipo, el que distingue la cita: en el azul del backoffice. */
+// .etiqueta--tipo {
+//     background: var(--p-primary-100, #e4ecf4);
+//     border-color: var(--p-primary-200, #c8d8e8);
+//     color: var(--p-primary-800, #31435a);
+//     font-weight: var(--xv-peso-medio);
+// }
+//
+// .cita__notas {
+//     display: flex;
+//     align-items: baseline;
+//     gap: 0.45rem;
+//     margin: 0;
+//     padding: 0.55rem 0.8rem;
+//     background: var(--xv-fondo);
+//     border-left: 3px solid var(--p-primary-200, #c8d8e8);
+//     border-radius: 4px;
+//     font-size: var(--xv-texto-sm);
+//     color: var(--xv-texto-tenue);
+// }
+//
+// .cita__notas .pi { flex: none; color: var(--p-primary-color, #5279a2); }
+// .cita__notas strong { color: var(--xv-texto); font-weight: var(--xv-peso-medio); }
+//
+// /* En la lista, las notas largas en dos renglones: completas, en su pantalla. */
+// .cita__notas span {
+//     display: -webkit-box;
+//     -webkit-line-clamp: 2;
+//     -webkit-box-orient: vertical;
+//     overflow: hidden;
+// }
+//
+// /* --- Arriba a la derecha: estado en el telefono, ver, editar --- */
+//
+// .cita__acciones { display: flex; align-items: center; gap: 0.15rem; }
+//
+//
+// .accion {
+//     display: grid;
+//     place-items: center;
+//     width: 2.2rem;
+//     height: 2.2rem;
+//     background: none;
+//     border: 1px solid transparent;
+//     border-radius: 6px;
+//     color: var(--xv-texto-tenue);
+//     text-decoration: none;
+//     cursor: pointer;
+// }
+//
+// .accion:hover { border-color: var(--xv-borde); color: var(--p-primary-color, #5279a2); }
+//
+// /* --- Abajo: pasarla al telefono --- */
+//
+// .cita__pie {
+//     display: flex;
+//     flex-wrap: wrap;
+//     align-items: center;
+//     justify-content: space-between;
+//     gap: 0.6rem 1rem;
+//     padding: 0.75rem 1.25rem;
+//     background: var(--xv-fondo);
+//     border-top: 1px solid var(--xv-borde);
+// }
+//
+// .cita__pie-texto { display: inline-flex; align-items: center; gap: 0.45rem; font-size: var(--xv-texto-sm); color: var(--xv-texto-tenue); }
+// .cita__pie-botones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+//
+//
+//
+// /* Lo que ya paso, apagado. */
+// .cita--pasada .cita__cuerpo { opacity: 0.6; }
+//
+// /* --- En el telefono: la fecha arriba, chica, en una linea --- */
+//
+// @media (max-width: 40rem) {
+//     .cita__cuerpo { grid-template-columns: minmax(0, 1fr) auto; gap: 0.75rem; padding: 1rem; }
+//     .cita__fecha { grid-column: 1; flex-direction: row; gap: 0.4rem; justify-self: start; padding: 0.3rem 0.7rem; }
+//     .cita__dia { font-size: 1.2rem; }
+//     .cita__contenido { grid-column: 1 / -1; grid-row: 2; }
+//     .cita__pie { padding: 0.75rem 1rem; }
+// }
+//
+
+/* --- Sin nada cargado --- */
+
+.vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background: var(--xv-superficie);
+    border: 1px solid var(--xv-borde);
+    border-radius: var(--xv-radio-tarjeta);
+    color: var(--xv-texto-tenue);
+}
+
+.vacio__icono {
+    font-size: 2rem;
+    color: var(--xv-borde-fuerte);
+}

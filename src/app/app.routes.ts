@@ -12,6 +12,11 @@ export const routes: Routes = [
     { path: 'mesas',            canActivate: [loginGuard], loadComponent: () => import('./pages/mesas/mesas').then(m => m.MesasPage) },
     { path: 'invitados',        canActivate: [loginGuard], loadComponent: () => import('./pages/invitados/invitados').then(m => m.InvitadosPage) },
     { path: 'solicitudes',      canActivate: [loginGuard],   loadComponent: () => import('./pages/solicitudes/solicitudes').then(m => m.SolicitudesPage) },
+    { path: 'presupuestos',     canActivate: [loginGuard], loadComponent: () => import('./pages/presupuestos/presupuestos').then(m => m.PresupuestosPage) },
+    { path: 'presupuestos/:id', canActivate: [loginGuard], loadComponent: () => import('./pages/presupuestos/detalle/detalle').then(m => m.PresupuestoPage) },
+    { path: 'album',            canActivate: [loginGuard], loadComponent: () => import('./pages/album/album').then(m => m.AlbumPage) },
+    { path: 'calendario',       canActivate: [loginGuard], loadComponent: () => import('./pages/calendario/calendario').then(m => m.CalendarioPage) },
+    { path: 'calendario/:id',   canActivate: [loginGuard], loadComponent: () => import('./pages/calendario/detalle/detalle').then(m => m.CitaPage) },
 
     { path: '**', redirectTo: '' }
 ];
