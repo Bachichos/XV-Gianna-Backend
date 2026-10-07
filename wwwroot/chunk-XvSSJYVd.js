@@ -1,1 +1,0 @@
-var a=(n,r)=>`${n}${Math.max(0,...r.map(o=>Number(o.id.slice(n.length))||0))+1}`;var d=(n,r,o)=>{let t=n.trim(),e=r.find(s=>s.nombre.toLocaleLowerCase(`es`)===t.toLocaleLowerCase(`es`));if(e)return{id:e.id,lista_nueva:null};let i={id:a(o,r),nombre:t};return{id:i.id,lista_nueva:[...r,i]}};var u=n=>{let r={};for(let o of n)r[o]=(r[o]??0)+1;return r};export{d as n,u as r,a as t};

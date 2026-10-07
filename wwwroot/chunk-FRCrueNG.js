@@ -1,1 +1,0 @@
-var r=e=>(e??``).normalize(`NFD`).replace(/[̀-ͯ]/g,``).toLowerCase().trim();export{r as t};

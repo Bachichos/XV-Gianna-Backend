@@ -67,6 +67,7 @@ const firebase_config = {
   apiKey:            'AIzaSyA4EOllYUMzOvT8V8TFN3MZ4JmRodb3pys',
   authDomain:        'gianna-drs-xv.firebaseapp.com',
   messagingSenderId: '1039836116529'
+  
 }
 
 /** Aura con la paleta del proyecto: azul porcelana, grisado y frio. */
